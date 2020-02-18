@@ -30,6 +30,7 @@ export interface PageItem extends Item {
 export interface SlideshowItem extends Item {
   groups: {
     name: string,
+    options: {},
     items: {
       title: string,
       image: string,
@@ -75,7 +76,9 @@ export class ContextService {
     if (itemUrl.startsWith("/") || itemUrl.startsWith("http://") || itemUrl.startsWith("https://")) {
       return itemUrl;
     } else {
+
       let pieces = this.location.path().split("/").filter(v => v.trim().length > 0);
+
       for (let p of itemUrl.split("/").filter(v => v.trim().length > 0)) {
         switch (p) {
           case "..":

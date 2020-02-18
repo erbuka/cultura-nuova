@@ -1,23 +1,27 @@
 {
     "type": "slideshow",
+    "options" : {
+        "itemWidth" : "20rem",
+        "itemAspectRatio" : 1
+    },
     "groups": [
         {
             "name": "Group #1",
             "items": [
                 {
                     "title": "Item #1",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-1"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-1"
                 },
                 {
                     "title": "Item #2",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-2"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-2"
                 },
                 {
                     "title": "Item #3",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-3"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-3"
                 }
             ]
         },
@@ -26,33 +30,33 @@
             "items": [
                 {
                     "title": "Item #1",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-1"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-1"
                 },
                 {
                     "title": "Item #2",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-2"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-2"
                 },
                 {
                     "title": "Item #3",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-3"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-3"
                 },
                 {
                     "title": "Item #1",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-1"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-1"
                 },
                 {
                     "title": "Item #2",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-2"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-2"
                 },
                 {
                     "title": "Item #3",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-3"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-3"
                 }
             ]
         },
@@ -61,33 +65,33 @@
             "items": [
                 {
                     "title": "Item #1",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-1"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-1"
                 },
                 {
                     "title": "Item #2",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-2"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-2"
                 },
                 {
                     "title": "Item #3",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-3"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-3"
                 },
                 {
                     "title": "Item #1",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-1"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-1"
                 },
                 {
                     "title": "Item #2",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-2"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-2"
                 },
                 {
                     "title": "Item #3",
-                    "image": "",
-                    "href": "../block-list-test2/page-test-3"
+                    "image": "https://via.placeholder.com/300/ff0088",
+                    "href": "../block-list-test-2/page-test-3"
                 }
             ]
         }

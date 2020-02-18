@@ -1,5 +1,32 @@
 <ng-container *ngIf="item">
-    <div *ngFor="let g of item.groups">
-        <h3>{{ g.name }}</h3>
-    </div>
+    <ng-container *ngIf="!currentSlide">
+        <div *ngFor="let grp of item.groups; index as grpIdx" class="my-4">
+            <h3>{{ grp.name }}</h3>
+            <div class="d-flex flex-wrap mx-n1 cn-block-list">
+                <div *ngFor="let it of grp.items; index as itIdx" class="p-1 cn-block-list-item"
+                    [style.width]="item.options.itemWidth">
+                    <div class="cn-relative" [style.padding-bottom]="(1 / item.options.itemAspectRatio) * 100 + '%'"
+                        (click)="gotoSlide(grpIdx, itIdx)">
+                        <div class="cn-overlay cn-bg-cover" [appBgImage]="it.image | cnUrl"></div>
+                        <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
+                        <div class="cn-overlay d-flex align-items-end w-100">
+                            <h5 class="m-0 p-4 bg-light flex-grow-1">{{ it.title }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="currentSlide && currentSlideItem">
+
+        <div class="d-flex flex-column cn-slideshow-carousel">
+            <div class="cn-slideshow-slide flex-grow-1">
+                <app-item [item]="currentSlideItem"></app-item>
+            </div>
+            <div class="cn-slideshow-controls p-4 bg-dark text-light">
+                Controls
+            </div>
+        </div>
+
+    </ng-container>
 </ng-container>
