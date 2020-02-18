@@ -1,0 +1,66 @@
+html,
+body {
+  height: 100%;
+}
+
+$cn-header-height: 10rem;
+
+.cn-bg-cover {
+  background-size: cover;
+  background-position: center center;
+}
+
+.cn-bg-fixed {
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+}
+
+.cn-absolute {
+  position: absolute;
+}
+
+.cn-relative {
+  position: relative;
+}
+
+.cn-overlay {
+  @extend .cn-absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.cn-app-container {
+  position: relative;
+  height: 100%;
+  overflow: auto;
+
+  .cn-app-header {
+    @extend .p-4;
+  }
+
+  .cn-app-content {
+    @extend .p-4;
+    position: relative;
+    overflow: auto;
+  }
+}
+
+.cn-block-list {
+  .cn-block-list-item {
+    position: relative;
+
+    .cn-block-list-hover {
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    &:hover {
+      .cn-block-list-hover {
+        opacity: 1;
+      }
+    }
+  }
+}

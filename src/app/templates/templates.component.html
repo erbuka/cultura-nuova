@@ -1,0 +1,19 @@
+<ng-template let-data appTemplateDef="template0">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <img class="w-100" [src]="data.image">
+            </div>
+            <div class="col-md-8 p-4 bg-light rounded">
+                <h3>{{ data.title }}</h3>
+                <div [innerHtml]="data.text"></div>   
+            </div>
+            <div class="col-6 text-right">
+                <a *ngIf="data.prev" [routerLink]="data.prev | cnUrl">Prev</a>
+            </div>
+            <div class="col-6">
+                <a *ngIf="data.next" [routerLink]="data.next | cnUrl">Next</a>
+            </div>
+        </div>
+    </div>
+</ng-template>

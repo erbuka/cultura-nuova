@@ -1,0 +1,16 @@
+<ng-container *ngIf="item">
+    <div class="container-fluid">
+        <div class="d-flex flex-wrap cn-block-list">
+            <div *ngFor="let l of item.links" class="cn-block-list-item col-md-6 col-lg-4 col-xl-3"
+                [style.padding]="item.options.itemPadding" [routerLink]="l.href | cnUrl">
+                <div class="cn-relative" [style.padding-bottom]="(1 / item.options.itemAspectRatio * 100) + '%'">
+                    <div class="cn-overlay" [appBgImage]="l.image | cnUrl"></div>
+                    <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
+                    <div class="cn-overlay d-flex align-items-end">
+                        <h5 class="w-100 m-0 p-4">{{ l.title }}</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>

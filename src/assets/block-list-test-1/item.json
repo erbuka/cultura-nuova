@@ -1,0 +1,11 @@
+{
+    "type" : "block-list",
+    "options" : {
+        "itemAspectRatio" : "1",
+        "itemPadding" : "1rem"
+    },
+    "links" : [
+        { "href" : "block-list-test-2", "title": "Block List 2", "image": "https://via.placeholder.com/150/000000/FFFFFF" },
+        { "href" : "slideshow-test-1", "title": "SlideShow Test 1", "image": "https://via.placeholder.com/150/000000/FFFFFF" }
+    ]
+}
