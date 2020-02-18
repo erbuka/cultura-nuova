@@ -28,15 +28,18 @@ export class SlideshowComponent implements OnInit {
         let groupIndex = parseInt(paramMap.get("g")),
           itemIndex = parseInt(paramMap.get("s"));
 
-        let url = this.context.resolveUrl(this.item.groups[groupIndex].items[itemIndex].href, this.item);
+        if (itemIndex >= 0 && itemIndex < this.item.groups[groupIndex].items.length) {
 
-        this.context.getItem(url).subscribe(item => {
-          this.currentSlide = {
-            groupIndex: groupIndex,
-            itemIndex: itemIndex
-          };
-          this.currentSlideItem = item;
-        });
+          let url = this.context.resolveUrl(this.item.groups[groupIndex].items[itemIndex].href, this.item);
+
+          this.context.getItem(url).subscribe(item => {
+            this.currentSlide = {
+              groupIndex: groupIndex,
+              itemIndex: itemIndex
+            };
+            this.currentSlideItem = item;
+          });
+        }
 
       } else {
         this.currentSlide = null;

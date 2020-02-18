@@ -1,5 +1,5 @@
 <ng-container *ngIf="item">
-    <div class="d-flex flex-wrap justify-content-center cn-block-list mx-n1">
+    <div class="d-flex flex-wrap justify-content-center cn-block-list">
         <div *ngFor="let l of item.links" class="cn-block-list-item p-1" [style.width]="item.options.itemWidth"
             [routerLink]="l.href | cnUrl : item">
             <div class="cn-relative" [style.padding-bottom]="(1 / item.options.itemAspectRatio * 100) + '%'">

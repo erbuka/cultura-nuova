@@ -1,18 +1,2 @@
 <app-templates></app-templates>
-<ng-container *ngIf="item && config">
-    <div class="cn-app-container cn-bg-fixed" [appBgImage]="config.backgroundImage">
-        <div class="cn-app-header d-flex align-items-center">
-            <div>
-                <h1>Basilica di Santa Croce - Cappella Maggiore, Firenze</h1>
-                <h2>Agnolo Gaddi, Legenda della Vera Croce</h2>
-            </div>
-            <div class="ml-auto">
-                <button (click)="goBack()">Back</button>
-                <button (click)="goUp()">Up</button>
-            </div>
-        </div>
-        <div class="cn-app-content">
-            <app-item [item]="item"></app-item>
-        </div>
-    </div>
-</ng-container>
+<router-outlet></router-outlet>

@@ -12,6 +12,7 @@ import { TemplateDefDirective } from './template-def.directive';
 import { UrlPipe } from './url.pipe';
 import { ItemComponent } from './ui/item/item.component';
 import { SlideshowComponent } from './ui/slideshow/slideshow.component';
+import { MainComponent } from './ui/main/main.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { SlideshowComponent } from './ui/slideshow/slideshow.component';
     UrlPipe,
     ItemComponent,
     SlideshowComponent,
+    MainComponent,
   ],
   imports: [
     BrowserModule,

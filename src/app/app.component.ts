@@ -8,29 +8,4 @@ import { ContextService, Item, Config } from './context.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
-
-  item: Item = null;
-  config: Config;
-
-  constructor(private context: ContextService, private route: ActivatedRoute, private router: Router, private location: Location) { }
-
-  ngOnInit(): void {
-    this.context.getConfig().subscribe(cfg => this.config = cfg);
-
-    this.location.onUrlChange((url) => {
-      this.context.getItem(url).subscribe((item: Item) => {
-        this.item = item;
-      });
-    })
-  }
-
-  goBack(): void {
-    this.location.back();
-  }
-
-  goUp(): void {
-    this.router.navigateByUrl(this.context.resolveUrl("..", this.item));
-  }
-
-}
+export class AppComponent { }

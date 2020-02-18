@@ -72,7 +72,7 @@ export class ContextService {
     this.templates.set(name, ref);
   }
 
-  resolveUrl(itemUrl: string, item:Item) {
+  resolveUrl(itemUrl: string, item: Item) {
     if (itemUrl.startsWith("/") || itemUrl.startsWith("http://") || itemUrl.startsWith("https://")) {
       return itemUrl;
     } else {
@@ -92,11 +92,11 @@ export class ContextService {
         }
       }
 
-      return this.joinUrl(...pieces);
+      return this.joinUrl("/", ...pieces);
     }
   }
 
-  private joinUrl(...pieces: string[]): string {
+  joinUrl(...pieces: string[]): string {
     let result = "";
     for (let p of pieces)
       result = Location.joinWithSlash(result, p);

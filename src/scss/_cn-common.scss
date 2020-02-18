@@ -3,7 +3,7 @@ body {
   height: 100%;
 }
 
-$cn-header-height: 10rem;
+$cn-header-height: 4rem;
 
 .cn-bg-cover {
   background-size: cover;
@@ -39,6 +39,8 @@ $cn-header-height: 10rem;
 
   .cn-app-header {
     @extend .p-4;
+    @extend .bg-dark;
+    @extend .text-light;
     height: $cn-header-height;
   }
 

@@ -1,7 +1,7 @@
 <ng-container *ngIf="item">
     <ng-container *ngIf="!currentSlide">
         <div *ngFor="let grp of item.groups; index as grpIdx" class="my-4">
-            <h3>{{ grp.name }}</h3>
+            <h3 *ngIf="grp.name">{{ grp.name }}</h3>
             <div class="d-flex flex-wrap mx-n1 cn-block-list">
                 <div *ngFor="let it of grp.items; index as itIdx" class="p-1 cn-block-list-item"
                     [style.width]="item.options.itemWidth">
@@ -9,7 +9,7 @@
                         (click)="gotoSlide(grpIdx, itIdx)">
                         <div class="cn-overlay cn-bg-cover" [appBgImage]="it.image | cnUrl : item"></div>
                         <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
-                        <div class="cn-overlay d-flex align-items-end w-100">
+                        <div class="cn-overlay d-flex align-items-end w-100" *ngIf="it.title">
                             <h5 class="m-0 p-4 bg-light flex-grow-1">{{ it.title }}</h5>
                         </div>
                     </div>
@@ -23,8 +23,11 @@
             <div class="cn-slideshow-slide flex-grow-1">
                 <app-item [item]="currentSlideItem"></app-item>
             </div>
-            <div class="cn-slideshow-controls p-4 bg-dark text-light">
-                Controls
+            <div class="cn-slideshow-controls p-4 bg-dark text-light d-flex align-items-center justify-content-center">
+                <button (click)="gotoSlide(currentSlide.groupIndex, currentSlide.itemIndex - 1)">Prev</button>
+                <span class="mx-4">{{ currentSlide.itemIndex + 1 }} /
+                    {{  item.groups[currentSlide.groupIndex].items.length }}</span>
+                <button (click)="gotoSlide(currentSlide.groupIndex, currentSlide.itemIndex + 1)">Next</button>
             </div>
         </div>
 
