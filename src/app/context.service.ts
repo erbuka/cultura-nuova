@@ -72,12 +72,12 @@ export class ContextService {
     this.templates.set(name, ref);
   }
 
-  resolveUrl(itemUrl: string) {
+  resolveUrl(itemUrl: string, item:Item) {
     if (itemUrl.startsWith("/") || itemUrl.startsWith("http://") || itemUrl.startsWith("https://")) {
       return itemUrl;
     } else {
 
-      let pieces = this.location.path().split("/").filter(v => v.trim().length > 0);
+      let pieces = item.url.split("/").filter(v => v.trim().length > 0);
 
       for (let p of itemUrl.split("/").filter(v => v.trim().length > 0)) {
         switch (p) {

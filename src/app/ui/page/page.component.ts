@@ -17,7 +17,7 @@ export class PageComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.template = this.context.getTemplate(this.item.template);
-    this.templateContext = { $implicit: this.item.data };
+    this.templateContext = { $implicit: this.item.data, item: this.item };
   }
 
 

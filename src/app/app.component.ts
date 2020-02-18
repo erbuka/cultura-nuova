@@ -18,9 +18,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.context.getConfig().subscribe(cfg => this.config = cfg);
 
-
     this.location.onUrlChange((url) => {
-      console.log(this.location.path());
       this.context.getItem(url).subscribe((item: Item) => {
         this.item = item;
       });
@@ -32,7 +30,7 @@ export class AppComponent implements OnInit {
   }
 
   goUp(): void {
-    this.router.navigate(this.context.resolveUrl("..").split("/"));
+    this.router.navigateByUrl(this.context.resolveUrl("..", this.item));
   }
 
 }

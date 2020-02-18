@@ -9,7 +9,7 @@ export class UrlPipe implements PipeTransform {
   constructor(private context:ContextService) {}
 
   transform(value: any, ...args: any[]): any {
-    return this.context.resolveUrl(value);
+    return this.context.resolveUrl(value, args[0]);
   }
 
 }
