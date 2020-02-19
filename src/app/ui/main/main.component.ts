@@ -18,14 +18,29 @@ export class MainComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.context.getConfig().subscribe(cfg => this.config = cfg);
+    this.context.getConfig().subscribe(cfg => {
 
-    this.route.url.subscribe(v => {
-      let url = this.context.joinUrl("/", ...v.map(x => x.path));
-      this.context.getItem(url).subscribe((item: Item) => {
-        this.item = item;
+      this.config = cfg;
+
+      this.route.url.subscribe(v => {
+
+        if (v.length === 0) {
+          this.context.getItem(this.config.entry).subscribe(item => this.item = item);
+        } else {
+          let url = this.context.joinUrl("/", ...v.map(x => x.path));
+          this.context.getItem(url).subscribe(item => this.item = item);
+        }
       });
-    });
+
+
+    })
+
+
+
+  }
+
+  goHome():void {
+    this.router.navigateByUrl("/");
   }
 
   goBack(): void {

@@ -1,12 +1,15 @@
 <ng-container *ngIf="item">
-    <div class="d-flex flex-wrap justify-content-center cn-block-list">
-        <div *ngFor="let l of item.links" class="cn-block-list-item p-1" [style.width]="item.options.itemWidth"
-            [routerLink]="l.href | cnUrl : item">
-            <div class="cn-relative" [style.padding-bottom]="(1 / item.options.itemAspectRatio * 100) + '%'">
-                <div class="cn-overlay" [appBgImage]="l.image | cnUrl : item"></div>
-                <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
-                <div class="cn-overlay d-flex align-items-end w-100">
-                    <h5 class="m-0 p-4 bg-light flex-grow-1">{{ l.title }}</h5>
+    <div class="d-flex h-100">
+        <div class="d-flex flex-wrap justify-content-center cn-block-list m-auto">
+            <div *ngFor="let l of item.links" class="cn-block-list-item p-1" [style.width]="item.options.itemWidth">
+                <div class="cn-relative mat-elevation-z4"
+                    [style.padding-bottom]="(1 / item.options.itemAspectRatio * 100) + '%'"
+                    [routerLink]="l.href | cnUrl : item">
+                    <div class="cn-overlay cn-bg-cover" [appBgImage]="l.image | cnUrl : item"></div>
+                    <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
+                    <div class="cn-overlay d-flex align-items-end w-100">
+                        <h5 class="m-0 p-4 bg-light flex-grow-1">{{ l.title }}</h5>
+                    </div>
                 </div>
             </div>
         </div>

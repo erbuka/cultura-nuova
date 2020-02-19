@@ -1,9 +1,25 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box; // 1
+}
+
 html,
 body {
   height: 100%;
 }
+body {
+  margin: 0;
+  font-family: $cn-font-family;
+}
 
 $cn-header-height: 4rem;
+
+.cn-bg-contain {
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+}
 
 .cn-bg-cover {
   background-size: cover;
@@ -39,7 +55,7 @@ $cn-header-height: 4rem;
 
   .cn-app-header {
     @extend .p-4;
-    @extend .bg-dark;
+    @extend .bg-primary;
     @extend .text-light;
     height: $cn-header-height;
   }

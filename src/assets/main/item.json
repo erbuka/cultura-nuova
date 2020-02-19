@@ -1,0 +1,39 @@
+{
+    "type": "block-list",
+    "options": {
+        "itemWidth": "20rem",
+        "itemAspectRatio": "1"
+    },
+    "links": [
+        {
+            "href": "modello-3d",
+            "title": "Modello 3D",
+            "image": "modello3d.png"
+        },
+        {
+            "href": "sviluppo",
+            "title": "Sviluppo",
+            "image": "sviluppo.png"
+        },
+        {
+            "href": "volta",
+            "title": "Volta",
+            "image": "volta.png"
+        },
+        {
+            "href": "intervento",
+            "title": "Intervento",
+            "image": "intervento.png"
+        },
+        {
+            "href": "video",
+            "title": "Video",
+            "image": "video.png"
+        },
+        {
+            "href": "metodologia",
+            "title": "Metodologia",
+            "image": "metodologia.png"
+        }
+    ]
+}

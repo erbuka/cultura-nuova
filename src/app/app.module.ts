@@ -13,6 +13,10 @@ import { UrlPipe } from './url.pipe';
 import { ItemComponent } from './ui/item/item.component';
 import { SlideshowComponent } from './ui/slideshow/slideshow.component';
 import { MainComponent } from './ui/main/main.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -26,11 +30,16 @@ import { MainComponent } from './ui/main/main.component';
     ItemComponent,
     SlideshowComponent,
     MainComponent,
+
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    AppRoutingModule
+    AppRoutingModule,
+    BrowserAnimationsModule,
+
+    MatButtonModule,
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -30,15 +30,18 @@ export class SlideshowComponent implements OnInit {
 
         if (itemIndex >= 0 && itemIndex < this.item.groups[groupIndex].items.length) {
 
-          let url = this.context.resolveUrl(this.item.groups[groupIndex].items[itemIndex].href, this.item);
+          this.currentSlide = {
+            groupIndex: groupIndex,
+            itemIndex: itemIndex
+          };
 
-          this.context.getItem(url).subscribe(item => {
-            this.currentSlide = {
-              groupIndex: groupIndex,
-              itemIndex: itemIndex
-            };
-            this.currentSlideItem = item;
-          });
+          if (this.item.groups[groupIndex].items[itemIndex].href) {
+            let url = this.context.resolveUrl(this.item.groups[groupIndex].items[itemIndex].href, this.item);
+            this.context.getItem(url).subscribe(
+              item => this.currentSlideItem = item,
+              _ => this.currentSlideItem = null
+            );
+          }
         }
 
       } else {
@@ -46,6 +49,14 @@ export class SlideshowComponent implements OnInit {
         this.currentSlideItem = null;
       }
     });
+  }
+
+  nextSlide():void {
+    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex + 1);
+  }
+
+  previousSlide():void {
+    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex - 1);
   }
 
   gotoSlide(groupIndex: number, itemIndex: number): void {

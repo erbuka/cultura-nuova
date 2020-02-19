@@ -1,12 +1,19 @@
 <ng-container *ngIf="item && config">
     <div class="cn-app-container cn-bg-fixed" [appBgImage]="config.backgroundImage">
-        <div class="cn-app-header d-flex align-items-center">
+        <div class="cn-app-header d-flex align-items-center mat-elevation-z4">
             <div>
                 <h3>Basilica di Santa Croce - Cappella Maggiore, Firenze</h3>
             </div>
             <div class="ml-auto">
-                <button (click)="goBack()">Back</button>
-                <button (click)="goUp()">Up</button>
+                <button mat-icon-button (click)="goBack()">
+                    <mat-icon>chevron_left</mat-icon>
+                </button>
+                <button mat-icon-button (click)="goUp()">
+                    <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button mat-icon-button (click)="goHome()">
+                    <mat-icon>home</mat-icon>
+                </button>
             </div>
         </div>
         <div class="cn-app-content">

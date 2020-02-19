@@ -28,9 +28,9 @@ export interface PageItem extends Item {
 }
 
 export interface SlideshowItem extends Item {
+  options: {},
   groups: {
     name: string,
-    options: {},
     items: {
       title: string,
       image: string,
@@ -55,7 +55,7 @@ export class ContextService {
   }
 
   getItem(url: string): Observable<Item> {
-    return this.httpClient.get<any>(this.joinUrl("assets", url, "item.json"), { responseType: "json" }).pipe(
+    return this.httpClient.get<any>(this.joinUrl(url, "item.json"), { responseType: "json" }).pipe(
       tap(x => x, e => console.error(e.message)),
       map(x => {
         x.url = url;

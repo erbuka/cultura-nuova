@@ -1,4 +1,46 @@
+$cn-font-family: "Roboto", "Helvetica", sans-serif;
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@import '~@angular/material/theming';
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+
+// Be sure that you only ever include this mixin once!
+
+$cn-mat-config: mat-typography-config($cn-font-family);
+
+@include mat-core($cn-mat-config);
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$cn-mat-primary: mat-palette($mat-indigo);
+$cn-mat-accent: mat-palette($mat-pink, A200, A100, A400);
+
+// The warn palette is optional (defaults to red).
+$cn-mat-warn: mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$cn-mat-theme: mat-light-theme($cn-mat-primary, $cn-mat-accent, $cn-mat-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($cn-mat-theme);
+
 // Customize bootstrap
+
+$font-family-base: $cn-font-family;
+
+$theme-colors: (
+  "primary": map-get($cn-mat-primary, "default"),
+  "accent": map-get($cn-mat-accent, "default"),
+  "danger": map-get($cn-mat-warn, "default")
+);
 
 // Required
 @import "../node_modules/bootstrap/scss/functions";
@@ -7,9 +49,8 @@
 
 // Optional
 @import "../node_modules/bootstrap/scss/root";
-@import "../node_modules/bootstrap/scss/reboot";
 @import "../node_modules/bootstrap/scss/grid";
 @import "../node_modules/bootstrap/scss/utilities";
-@import "../node_modules/bootstrap/scss/type";
 
 @import "scss/cn-common";
+
