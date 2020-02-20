@@ -24,8 +24,17 @@
     <ng-container *ngIf="currentSlide">
 
         <div class="d-flex flex-column cn-slideshow-carousel animated fadeIn">
-            <div class="cn-slideshow-slide flex-grow-1">
-                <app-item *ngIf="currentSlideItem" [item]="currentSlideItem"></app-item>
+            <div class="cn-slideshow-slide flex-grow-1 cn-relative">
+                
+
+
+                <div class="cn-absolute w-100 h-100" style="overflow: auto;">
+                    <app-item *ngIf="currentSlideItem" [item]="currentSlideItem"></app-item>
+
+                    <div *ngIf="!currentSlideItem" class="cn-bg-contain w-100 h-100"
+                        [appBgImage]="item.groups[currentSlide.groupIndex].items[currentSlide.itemIndex].image | cnUrl : item">
+                    </div>
+                </div>
 
                 <div class="cn-absolute" style="right: 1rem; top:1rem">
                     <button mat-mini-fab (click)="clearSlide()" class="cn-absolute">
@@ -39,16 +48,14 @@
                     </button>
                 </div>
 
-                
+
                 <div class="cn-absolute" style="right: 1rem; top:50%; transform: translateY(-50%);">
                     <button mat-mini-fab (click)="nextSlide()" class="cn-absolute">
                         <mat-icon>chevron_right</mat-icon>
                     </button>
                 </div>
 
-                <div *ngIf="!currentSlideItem" class="cn-bg-contain w-100 h-100"
-                    [appBgImage]="item.groups[currentSlide.groupIndex].items[currentSlide.itemIndex].image | cnUrl : item">
-                </div>
+
             </div>
             <div class="cn-slideshow-controls p-4 d-flex align-items-center justify-content-center">
                 <span class="mx-4">{{ currentSlide.itemIndex + 1 }} /
