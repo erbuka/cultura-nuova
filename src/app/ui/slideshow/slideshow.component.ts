@@ -51,11 +51,15 @@ export class SlideshowComponent implements OnInit {
     });
   }
 
-  nextSlide():void {
+  clearSlide(): void {
+    this.router.navigate([], { relativeTo: this.route });
+  }
+
+  nextSlide(): void {
     this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex + 1);
   }
 
-  previousSlide():void {
+  previousSlide(): void {
     this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex - 1);
   }
 

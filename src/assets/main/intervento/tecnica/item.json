@@ -48,6 +48,13 @@
                 { "image" : "incisioni/3.png"},
                 { "image" : "incisioni/4.png"}
             ]
+        },
+        {
+            "title": "Esempio altri controlli",
+            "items" : [
+                { "image" : "../../opere/filippo-maria-visconti.png", "href" : "../../opere/filippo-maria-visconti" },
+                { "image" : "../../opere/niccolo-piccinino.png", "href" : "../../opere/niccolo-piccinino" }
+            ]
         }
     ]
 }

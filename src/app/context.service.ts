@@ -1,6 +1,6 @@
-import { Injectable, TemplateRef } from '@angular/core';
+import { Injectable, TemplateRef, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, catchError, tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 
@@ -39,6 +39,10 @@ export interface SlideshowItem extends Item {
   }[]
 }
 
+export type Error = {
+  description: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -46,22 +50,32 @@ export class ContextService {
 
   templates: Map<string, TemplateRef<any>> = new Map();
 
-  constructor(private httpClient: HttpClient, private location: Location) {
+  onError: EventEmitter<Error> = new EventEmitter();
 
-  }
+  constructor(private httpClient: HttpClient, private location: Location) {}
 
   getConfig(): Observable<Config> {
     return this.httpClient.get<any>("/assets/config.json");
   }
 
-  getItem(url: string): Observable<Item> {
-    return this.httpClient.get<any>(this.joinUrl(url, "item.json"), { responseType: "json" }).pipe(
-      tap(x => x, e => console.error(e.message)),
+  getItem(url: string, handleError: boolean = true): Observable<Item> {
+
+    let obs = this.httpClient.get<any>(this.joinUrl(url, "item.json"), { responseType: "json" });
+
+    if (handleError) {
+      obs = obs.pipe(tap(x => x, e => {
+        this.raiseError({ description: e.message })
+      }));
+    }
+
+    obs = obs.pipe(
       map(x => {
         x.url = url;
         return <Item>x;
       })
-    )
+    );
+
+    return obs;
   }
 
   getTemplate(name: string): TemplateRef<any> {
@@ -101,6 +115,11 @@ export class ContextService {
     for (let p of pieces)
       result = Location.joinWithSlash(result, p);
     return result;
+  }
+
+  raiseError(err: Error): void {
+    console.error(err);
+    this.onError.emit(err);
   }
 
 }

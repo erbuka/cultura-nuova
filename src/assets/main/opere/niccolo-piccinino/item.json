@@ -1,0 +1,15 @@
+{
+    "type" : "page",
+    "template" : "opera-template",
+    "data" : {
+        "image" : "../niccolo-piccinino.png",
+        "title_it" : "Ritratto di Niccolo Piccinino",
+        "title_en" : "Portrait of Niccolo Piccinino",
+        "type_it" : "Olio su tavola",
+        "type_en" : "Oil on board",
+        "size" : "cm 60x44",
+        "location" : "Gallerie degli Uffizi, Firenze",
+        "text_it" : "L'evidente vicinanza della gioviana con una medaglia di Pisanello reali77ata tra il 1/111 e 1442 è la prova del modello utili77ato da Cristofano di Papi dell'Altissimo. Allievo di Pontorrno ma soprattutto di Bronzino, lo si ricorda per l'intensa attività legata alla cosiddetta Serie Gioviana. Nel 1552 fu inviato a Como da Cosimo I de' Medici per eseguire in olio su tavola i ritratti della collezione pittorica e numismatica di Paolo Giovio. Sono in totale duecentottantadue quelli eseguiti da Cristofano, esposti nei monumentali corridoi della Galleria degli Uffizi.",
+        "text_en" : "The evident similarity of the 'Giovio Series' portrait to a medal made by Pisanello between 1441 and 1442 is the proof that a was the mode) used by Cristofano di Papi dell'Altissimo. A student of Pontormo but mainly of Bronzino, he is remembered for his intense activity around the so called \"Giovio Series\". In 1552 he was sent to Como by Cosimo I de' Medici to carry out portraits in oil on board from the pictorial and numismatic collections of Paolo Giovi() In total there are two hundred and eighty two works carried out by Cristofano, exhibited in the monumental corridors of the Uffizi Gallery."
+    }
+}

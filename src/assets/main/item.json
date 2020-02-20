@@ -34,6 +34,16 @@
             "href": "metodologia",
             "title": "Metodologia",
             "image": "metodologia.png"
+        },
+        {
+            "href": "mostra",
+            "title": "La Mostra",
+            "image": "mostra.png"
+        },
+        {
+            "href": "opere",
+            "title": "La opere in mostra",
+            "image": "opere.png"
         }
     ]
 }

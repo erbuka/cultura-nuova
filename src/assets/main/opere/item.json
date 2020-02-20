@@ -1,0 +1,59 @@
+{
+    "type": "block-list",
+    "options": {
+        "itemWidth": "20rem",
+        "itemAspectRatio": "1"
+    },
+    "links": [
+        {
+            "title": "Filippo Maria Visconti",
+            "href": "filippo-maria-visconti",
+            "image": "filippo-maria-visconti.png"
+        },
+        {
+            "title": "Niccolò Piccinino",
+            "href": "niccolo-piccinino",
+            "image": "niccolo-piccinino.png"
+        },
+        {
+            "title": "Eugenio IV",
+            "href": "eugenio-4",
+            "image": "eugenio-4.png"
+        },
+        {
+            "title": "Neri Capponi",
+            "href": "neri-capponi",
+            "image": "neri-capponi.png"
+        },
+        {
+            "title": "Cosimo il Vecchio De' Medici",
+            "href": "cosimo-medici",
+            "image": "cosimo-medici.png"
+        },
+        {
+            "title": "Sforziade (frammenti)",
+            "href": "sforziade",
+            "image": "sforziade.png"
+        },
+        {
+            "title": "Lenardo Da Vinci",
+            "href": "leonardo",
+            "image": "leonardo.png"
+        },
+        {
+            "title": "La battaglia - Episodio dello stendardo",
+            "href": "battaglia",
+            "image": "battaglia.png"
+        },
+        {
+            "title": "La battaglia - Tavola Doria",
+            "href": "tavola-doria",
+            "image": "tavola-doria.png"
+        },
+        {
+            "title": "La battaglia - Gérard Edelinck",
+            "href": "gerard-edelinck",
+            "image": "gerard-edelinck.png"
+        }
+    ]
+}
