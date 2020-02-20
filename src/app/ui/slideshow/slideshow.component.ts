@@ -14,6 +14,8 @@ type Slide = {
 })
 export class SlideshowComponent implements OnInit {
 
+  direction: "forward" | "backward" | "none" = "forward";
+
   currentSlide: Slide = null;
   currentSlideItem: Item = null;
   @Input() item: SlideshowItem = null;
@@ -35,6 +37,7 @@ export class SlideshowComponent implements OnInit {
             itemIndex: itemIndex
           };
 
+
           if (this.item.groups[groupIndex].items[itemIndex].href) {
             let url = this.context.resolveUrl(this.item.groups[groupIndex].items[itemIndex].href, this.item);
             this.context.getItem(url).subscribe(
@@ -51,16 +54,41 @@ export class SlideshowComponent implements OnInit {
     });
   }
 
+
+
   clearSlide(): void {
     this.router.navigate([], { relativeTo: this.route });
   }
 
   nextSlide(): void {
-    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex + 1);
+    let cs = this.currentSlide;
+
+    this.direction = "forward";
+
+    if (cs.itemIndex === this.getCurrentGroup().items.length - 1 && cs.groupIndex < this.getGroupCount() - 1) {
+      cs.groupIndex++;
+      cs.itemIndex = 0;
+    } else if (cs.itemIndex < this.getCurrentGroup().items.length - 1) {
+      cs.itemIndex++;
+    }
+
+    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex);
   }
 
+
   previousSlide(): void {
-    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex - 1);
+    let cs = this.currentSlide;
+
+    this.direction = "backward";
+
+    if (cs.itemIndex === 0 && cs.groupIndex > 0) {
+      cs.groupIndex--;
+      cs.itemIndex = this.getCurrentGroup().items.length - 1;
+    } else if (cs.itemIndex > 0) {
+      cs.itemIndex--;
+    }
+
+    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex);
   }
 
   gotoSlide(groupIndex: number, itemIndex: number): void {
@@ -72,5 +100,10 @@ export class SlideshowComponent implements OnInit {
       }
     });
   }
+
+  getGroupCount(): number { return this.item.groups.length; }
+  getGroup(idx: number) { return this.item.groups[idx] }
+  getCurrentGroup() { return this.getGroup(this.currentSlide.groupIndex); }
+
 
 }

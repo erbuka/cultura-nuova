@@ -16,7 +16,7 @@ body {
 }
 
 .animated {
-  animation-duration: 0.25s;
+  animation-duration: 1s;
 }
 
 $cn-header-height: 4rem;
@@ -78,9 +78,17 @@ $cn-header-height: 4rem;
   @extend .mat-elevation-z1;
   position: relative;
 
-  .cn-slideshow-slide {
-    overflow: auto;
+  .cn-slideshow-slides {
+    position: relative;
+    overflow: hidden;
     background-color: rgba(0, 0, 0, 0.5);
+
+    .cn-slideshow-slide {
+      position: absolute;
+      @extend .h-100;
+      @extend .w-100;
+    }
+
   }
 
   .cn-slideshow-controls {

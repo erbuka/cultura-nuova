@@ -24,13 +24,14 @@
     <ng-container *ngIf="currentSlide">
 
         <div class="d-flex flex-column cn-slideshow-carousel animated fadeIn">
-            <div class="cn-slideshow-slide flex-grow-1 cn-relative">
-                
+            <div class="cn-slideshow-slides flex-grow-1">
 
-
-                <div class="cn-absolute w-100 h-100" style="overflow: auto;">
+                <div *ngFor="let it of getCurrentGroup().items; index as i" class="cn-slideshow-slide animated"
+                    [class.fadeInRight]="i === this.currentSlide.itemIndex && direction === 'forward'"
+                    [class.fadeOut]="i !== this.currentSlide.itemIndex && direction === 'forward'"
+                    [class.fadeInLeft]="i === this.currentSlide.itemIndex && direction === 'backward'"
+                    [class.fadeOut]="i !== this.currentSlide.itemIndex && direction === 'backward'">
                     <app-item *ngIf="currentSlideItem" [item]="currentSlideItem"></app-item>
-
                     <div *ngIf="!currentSlideItem" class="cn-bg-contain w-100 h-100"
                         [appBgImage]="item.groups[currentSlide.groupIndex].items[currentSlide.itemIndex].image | cnUrl : item">
                     </div>
