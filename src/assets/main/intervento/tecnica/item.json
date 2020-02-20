@@ -3,7 +3,7 @@
     "options": {
         "itemWidth": "10rem",
         "itemAspectRatio": 1.6,
-        "orientation" : "vertical"
+        "orientation" : "horizontal"
     },
     "groups": [
         {

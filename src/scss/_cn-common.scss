@@ -11,6 +11,8 @@ body {
 body {
   margin: 0;
   font-family: $cn-font-family;
+  @extend .bg-background;
+  @extend .text-foreground;
 }
 
 $cn-header-height: 4rem;
@@ -55,8 +57,6 @@ $cn-header-height: 4rem;
 
   .cn-app-header {
     @extend .p-4;
-    @extend .bg-primary;
-    @extend .text-light;
     height: $cn-header-height;
   }
 

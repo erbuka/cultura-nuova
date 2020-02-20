@@ -1,8 +1,7 @@
 <ng-container *ngIf="item">
     <ng-container *ngIf="!currentSlide">
-
         <ng-container *ngIf="!item.options.orientation || item.options.orientation === 'horizontal'">
-            <div *ngFor="let grp of item.groups; index as grpIdx" class="my-4">
+            <div *ngFor="let grp of item.groups; index as grpIdx">
                 <h3 *ngIf="grp.title">{{ grp.title }}</h3>
                 <div class="d-flex flex-wrap mx-n1 cn-block-list">
                     <div *ngFor="let it of grp.items; index as itIdx" class="p-1 cn-block-list-item"
@@ -13,7 +12,7 @@
                             <div class="cn-overlay cn-bg-cover" [appBgImage]="it.image | cnUrl : item"></div>
                             <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
                             <div class="cn-overlay d-flex align-items-end w-100" *ngIf="it.title">
-                                <h5 class="m-0 p-4 bg-light flex-grow-1">{{ it.title }}</h5>
+                                <h5 class="m-0 p-4 bg-background flex-grow-1">{{ it.title }}</h5>
                             </div>
                         </div>
                     </div>
@@ -22,7 +21,7 @@
         </ng-container>
 
         <ng-container *ngIf="item.options.orientation === 'vertical'">
-            <div *ngFor="let grp of item.groups; index as grpIdx" class="my-4">
+            <div *ngFor="let grp of item.groups; index as grpIdx">
                 <h3 *ngIf="grp.title">{{ grp.title }}</h3>
                 <div class="d-flex flex-wrap mx-n1 cn-block-list">
                     <div *ngFor="let it of grp.items; index as itIdx" class="p-1 cn-block-list-item"
@@ -33,7 +32,7 @@
                             <div class="cn-overlay cn-bg-cover" [appBgImage]="it.image | cnUrl : item"></div>
                             <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
                             <div class="cn-overlay d-flex align-items-end w-100" *ngIf="it.title">
-                                <h5 class="m-0 p-4 bg-light flex-grow-1">{{ it.title }}</h5>
+                                <h5 class="m-0 p-4 bg-background flex-grow-1">{{ it.title }}</h5>
                             </div>
                         </div>
                     </div>

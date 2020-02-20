@@ -38,8 +38,11 @@ $font-family-base: $cn-font-family;
 
 $theme-colors: (
   "primary": map-get($cn-mat-primary, "default"),
+  "primary-contrast": map-get($cn-mat-primary, "default-contrast"),
   "accent": map-get($cn-mat-accent, "default"),
-  "danger": map-get($cn-mat-warn, "default")
+  "danger": map-get($cn-mat-warn, "default"),
+  "background" : mat-color(map-get($cn-mat-theme, "background"), "background"),
+  "foreground" : mat-color(map-get($cn-mat-theme, "foreground"), "base"),
 );
 
 // Required
