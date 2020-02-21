@@ -1,55 +1,84 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { SlideshowItem, ContextService, Item } from 'src/app/context.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+  query,
+  group
+} from '@angular/animations';
 
-type Slide = {
-  groupIndex: number;
-  itemIndex: number;
-}
+
 
 @Component({
   selector: 'app-slideshow',
   templateUrl: './slideshow.component.html',
-  styleUrls: ['./slideshow.component.scss']
+  styleUrls: ['./slideshow.component.scss'],
+  animations: [
+    trigger('slideAnimation', [
+      transition(':increment',
+        group([
+          query(":enter", [
+            style({ transform: "translateX(100%)" }),
+            animate("0.25s", style({ transform: "translateX(0)" }))
+          ]),
+          query(":leave", [
+            animate("0.25s", style({ transform: "translateX(-100%)" }))
+          ], { optional: true }),
+        ])
+      ),
+      transition(':decrement',
+        group([
+          query(":enter", [
+            style({ transform: "translateX(-100%)" }),
+            animate("0.25s", style({ transform: "translateX(0)" }))
+          ]),
+          query(":leave", [
+            animate("0.25s", style({ transform: "translateX(100%)" }))
+          ], { optional: true }),
+        ])
+      )
+    ])
+  ]
 })
 export class SlideshowComponent implements OnInit {
 
-  direction: "forward" | "backward" | "none" = "forward";
-
-  currentSlide: Slide = null;
-  currentSlideItem: Item = null;
   @Input() item: SlideshowItem = null;
 
+  direction: "forward" | "backward" | "none" = "forward";
+  currentSlideIndex: number = null;
+
+
+  slideItemsCache: Item[] = null;
 
   constructor(private route: ActivatedRoute, private context: ContextService, private router: Router) { }
 
   ngOnInit() {
+
+    this.slideItemsCache = new Array<Item>(this.item.slides.length);
+    this.slideItemsCache.fill(null, 0, this.slideItemsCache.length);
+
     this.route.queryParamMap.subscribe(paramMap => {
-      if (paramMap.has("g") && paramMap.has("s")) {
+      if (paramMap.has("s")) {
 
-        let groupIndex = parseInt(paramMap.get("g")),
-          itemIndex = parseInt(paramMap.get("s"));
+        let slideIndex = parseInt(paramMap.get("s"));
 
-        if (itemIndex >= 0 && itemIndex < this.item.groups[groupIndex].items.length) {
+        if (slideIndex >= 0) {
 
-          this.currentSlide = {
-            groupIndex: groupIndex,
-            itemIndex: itemIndex
-          };
+          this.currentSlideIndex = slideIndex;
 
-
-          if (this.item.groups[groupIndex].items[itemIndex].href) {
-            let url = this.context.resolveUrl(this.item.groups[groupIndex].items[itemIndex].href, this.item);
-            this.context.getItem(url).subscribe(
-              item => this.currentSlideItem = item,
-              _ => this.currentSlideItem = null
-            );
+          if (this.item.slides[slideIndex].href && this.slideItemsCache[slideIndex] === null) {
+            let url = this.context.resolveUrl(this.item.slides[slideIndex].href, this.item);
+            this.context.getItem(url).subscribe(item => this.slideItemsCache[slideIndex] = item);
           }
+
         }
 
       } else {
-        this.currentSlide = null;
-        this.currentSlideItem = null;
+        this.currentSlideIndex = null;
       }
     });
   }
@@ -61,49 +90,27 @@ export class SlideshowComponent implements OnInit {
   }
 
   nextSlide(): void {
-    let cs = this.currentSlide;
-
-    this.direction = "forward";
-
-    if (cs.itemIndex === this.getCurrentGroup().items.length - 1 && cs.groupIndex < this.getGroupCount() - 1) {
-      cs.groupIndex++;
-      cs.itemIndex = 0;
-    } else if (cs.itemIndex < this.getCurrentGroup().items.length - 1) {
-      cs.itemIndex++;
-    }
-
-    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex);
+    let idx = Math.min(this.currentSlideIndex + 1, this.item.slides.length - 1);
+    this.gotoSlide(idx);
   }
 
 
   previousSlide(): void {
-    let cs = this.currentSlide;
-
-    this.direction = "backward";
-
-    if (cs.itemIndex === 0 && cs.groupIndex > 0) {
-      cs.groupIndex--;
-      cs.itemIndex = this.getCurrentGroup().items.length - 1;
-    } else if (cs.itemIndex > 0) {
-      cs.itemIndex--;
-    }
-
-    this.gotoSlide(this.currentSlide.groupIndex, this.currentSlide.itemIndex);
+    let idx = Math.max(0, this.currentSlideIndex - 1);
+    this.gotoSlide(idx);
   }
 
-  gotoSlide(groupIndex: number, itemIndex: number): void {
+  gotoSlide(s: number | object): void {
+    let idx = typeof s === "number" ? s : this.item.slides.findIndex(x => x === s);
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: {
-        g: groupIndex,
-        s: itemIndex
-      }
+      queryParams: { s: idx }
     });
   }
 
-  getGroupCount(): number { return this.item.groups.length; }
-  getGroup(idx: number) { return this.item.groups[idx] }
-  getCurrentGroup() { return this.getGroup(this.currentSlide.groupIndex); }
+  getSlidesForGroup(group: string) {
+    return this.item.slides.filter(s => s.group === group);
+  }
 
 
 }

@@ -29,13 +29,12 @@ export interface PageItem extends Item {
 
 export interface SlideshowItem extends Item {
   options: {},
-  groups: {
-    name: string,
-    items: {
-      title: string,
-      image: string,
-      href: string
-    }[]
+  groups: string[],
+  slides: {
+    group:string,
+    title:string,
+    image:string,
+    href:string
   }[]
 }
 

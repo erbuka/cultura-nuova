@@ -1,40 +1,38 @@
 <ng-container *ngIf="item">
-    <ng-container *ngIf="!currentSlide">
-        <ng-container *ngIf="!item.options.orientation || item.options.orientation === 'horizontal'">
-            <div *ngFor="let grp of item.groups; index as grpIdx" class="animated fadeIn">
-                <h3 *ngIf="grp.title">{{ grp.title }}</h3>
-                <div class="d-flex flex-wrap mx-n1 cn-block-list">
-                    <div *ngFor="let it of grp.items; index as itIdx" class="p-1 cn-block-list-item"
-                        [style.width]="item.options.itemWidth">
-                        <div class="cn-relative mat-elevation-z4"
-                            [style.padding-bottom]="(1 / item.options.itemAspectRatio) * 100 + '%'"
-                            (click)="gotoSlide(grpIdx, itIdx)">
-                            <div class="cn-overlay cn-bg-cover" [appBgImage]="it.image | cnUrl : item"></div>
-                            <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
-                            <div class="cn-overlay d-flex align-items-end w-100" *ngIf="it.title">
-                                <h5 class="m-0 p-4 bg-background flex-grow-1">{{ it.title }}</h5>
-                            </div>
+    <ng-container *ngIf="currentSlideIndex === null">
+        <div *ngFor="let grp of item.groups">
+            <h3>{{ grp }}</h3>
+            <div class="d-flex flex-wrap mx-n1 cn-block-list">
+                <div *ngFor="let slide of getSlidesForGroup(grp); index as i" class="p-1 cn-block-list-item"
+                    [style.width]="item.options.itemWidth">
+                    <div class="cn-relative mat-elevation-z4"
+                        [style.padding-bottom]="(1 / item.options.itemAspectRatio) * 100 + '%'"
+                        (click)="gotoSlide(slide)">
+                        <div class="cn-overlay cn-bg-cover" [appBgImage]="slide.image | cnUrl : item"></div>
+                        <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
+                        <div class="cn-overlay d-flex align-items-end w-100" *ngIf="slide.title">
+                            <h5 class="m-0 p-4 bg-background flex-grow-1">{{ it.title }}</h5>
                         </div>
                     </div>
                 </div>
             </div>
-        </ng-container>
-
+        </div>
     </ng-container>
-    <ng-container *ngIf="currentSlide">
+
+    <ng-container *ngIf="currentSlideIndex !== null">
 
         <div class="d-flex flex-column cn-slideshow-carousel animated fadeIn">
-            <div class="cn-slideshow-slides flex-grow-1">
+            <div class="cn-slideshow-slides flex-grow-1" (swipeleft)="nextSlide()" (swiperight)="previousSlide()">
 
-                <div *ngFor="let it of getCurrentGroup().items; index as i" class="cn-slideshow-slide animated"
-                    [class.fadeInRight]="i === this.currentSlide.itemIndex && direction === 'forward'"
-                    [class.fadeOut]="i !== this.currentSlide.itemIndex && direction === 'forward'"
-                    [class.fadeInLeft]="i === this.currentSlide.itemIndex && direction === 'backward'"
-                    [class.fadeOut]="i !== this.currentSlide.itemIndex && direction === 'backward'">
-                    <app-item *ngIf="currentSlideItem" [item]="currentSlideItem"></app-item>
-                    <div *ngIf="!currentSlideItem" class="cn-bg-contain w-100 h-100"
-                        [appBgImage]="item.groups[currentSlide.groupIndex].items[currentSlide.itemIndex].image | cnUrl : item">
-                    </div>
+                <div [@slideAnimation]="currentSlideIndex">
+                    <ng-container *ngFor="let it of item.slides; index as i">
+                        <div *ngIf="i === currentSlideIndex" class="cn-slideshow-slide">
+                            <app-item *ngIf="it.href" [item]="slideItemsCache[i]"></app-item>
+                            <div *ngIf="!it.href" class="cn-bg-contain w-100 h-100"
+                                [appBgImage]="it.image | cnUrl : item">
+                            </div>
+                        </div>
+                    </ng-container>
                 </div>
 
                 <div class="cn-absolute" style="right: 1rem; top:1rem">
@@ -59,8 +57,7 @@
 
             </div>
             <div class="cn-slideshow-controls p-4 d-flex align-items-center justify-content-center">
-                <span class="mx-4">{{ currentSlide.itemIndex + 1 }} /
-                    {{  item.groups[currentSlide.groupIndex].items.length }}</span>
+                <span class="mx-4">{{ currentSlideIndex + 1 }} / {{  item.slides.length }}</span>
             </div>
         </div>
 

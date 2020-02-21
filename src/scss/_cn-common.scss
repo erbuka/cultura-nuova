@@ -16,7 +16,7 @@ body {
 }
 
 .animated {
-  animation-duration: 1s;
+  animation-duration: .5s;
 }
 
 $cn-header-height: 4rem;
@@ -85,6 +85,7 @@ $cn-header-height: 4rem;
 
     .cn-slideshow-slide {
       position: absolute;
+      overflow: auto;
       @extend .h-100;
       @extend .w-100;
     }

@@ -3,58 +3,77 @@
     "options": {
         "itemWidth": "10rem",
         "itemAspectRatio": 1.6,
-        "orientation" : "horizontal"
+        "orientation": "horizontal"
     },
     "groups": [
+        "Giornate",
+        "Sinopia",
+        "Spolvero",
+        "Incisioni",
+        "Esempio altri controlli"
+    ],
+    "slides": [
         {
-            "title": "Giornate",
-            "items": [
-                {
-                    "image": "giornate/1.png"
-                },
-                {
-                    "image": "giornate/2.png"
-                },
-                {
-                    "image": "giornate/3.png"
-                },
-                {
-                    "image": "giornate/4.png"
-                },
-                {
-                    "image": "giornate/5.png"
-                }
-            ]
-        }, 
-        {
-            "title" : "Sinopia",
-            "items" : [
-                { "image" : "sinopia/1.png"},
-                { "image" : "sinopia/2.png"}
-            ]
+            "group": "Giornate",
+            "image": "giornate/1.png"
         },
         {
-            "title" : "Spolvero",
-            "items" : [
-                { "image" : "spolvero/1.png"},
-                { "image" : "spolvero/2.png"}
-            ]
+            "group": "Giornate",
+            "image": "giornate/2.png"
         },
         {
-            "title" : "Incisioni",
-            "items" : [
-                { "image" : "incisioni/1.png"},
-                { "image" : "incisioni/2.png"},
-                { "image" : "incisioni/3.png"},
-                { "image" : "incisioni/4.png"}
-            ]
+            "group": "Giornate",
+            "image": "giornate/3.png"
         },
         {
-            "title": "Esempio altri controlli",
-            "items" : [
-                { "image" : "../../opere/filippo-maria-visconti.png", "href" : "../../opere/filippo-maria-visconti" },
-                { "image" : "../../opere/niccolo-piccinino.png", "href" : "../../opere/niccolo-piccinino" }
-            ]
+            "group": "Giornate",
+            "image": "giornate/4.png"
+        },
+        {
+            "group": "Giornate",
+            "image": "giornate/5.png"
+        },
+        {
+            "group": "Sinopia",
+            "image": "sinopia/1.png"
+        },
+        {
+            "group": "Sinopia",
+            "image": "sinopia/2.png"
+        },
+        {
+            "group" : "Spolvero",
+            "image": "spolvero/1.png"
+        },
+        {
+            "group" : "Spolvero",
+            "image": "spolvero/2.png"
+        },
+        {
+            "group" : "Incisioni",
+            "image": "incisioni/1.png"
+        },
+        {
+            "group" : "Incisioni",
+            "image": "incisioni/2.png"
+        },
+        {
+            "group" : "Incisioni",
+            "image": "incisioni/3.png"
+        },
+        {
+            "group" : "Incisioni",
+            "image": "incisioni/4.png"
+        },
+        {
+            "group" : "Esempio altri controlli",
+            "image": "../../opere/filippo-maria-visconti.png",
+            "href": "../../opere/filippo-maria-visconti"
+        },
+        {
+            "group" : "Esempio altri controlli",
+            "image": "../../opere/niccolo-piccinino.png",
+            "href": "../../opere/niccolo-piccinino"
         }
     ]
 }
