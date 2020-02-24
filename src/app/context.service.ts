@@ -1,10 +1,12 @@
-import { Injectable, TemplateRef, EventEmitter } from '@angular/core';
+import { Injectable, TemplateRef, EventEmitter, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 
-import * as PAGE_SCHEMA from '../schema/page.schema.json';
+import * as ajv from "ajv";
+
+const PAGE_SCHEMA = require('../schema/page.schema.json');
 
 
 export interface Config {
@@ -53,8 +55,11 @@ export class ContextService {
 
   onError: EventEmitter<Error> = new EventEmitter();
 
+  private jsonValidator: ajv.Ajv = null;
 
-  constructor(private httpClient: HttpClient, private location: Location) { }
+  constructor(private httpClient: HttpClient) {
+    this.jsonValidator = new ajv({ allErrors: true });
+  }
 
   getConfig(): Observable<Config> {
     return this.httpClient.get<any>("/assets/config.json");
@@ -63,6 +68,24 @@ export class ContextService {
   getItem(url: string, handleError: boolean = true): Observable<Item> {
 
     let obs = this.httpClient.get<any>(this.joinUrl(url, "item.json"), { responseType: "json" });
+
+    obs = obs.pipe(tap((v: Item) => {
+      let valid: boolean = true;
+
+      switch (v.type) {
+        case "page": valid = <boolean>this.jsonValidator.validate(PAGE_SCHEMA, v); break;
+        default: break;
+      }
+
+      if (!valid) {
+        this.raiseError({
+          description: `Some errors occured during schema validation:<br> ${
+            this.jsonValidator.errors.reduce((prev, e) => prev + `- ${e.message}<br>`, "")
+            }`
+        })
+      }
+
+    }));
 
     if (handleError) {
       obs = obs.pipe(tap(x => x, e => {
@@ -89,14 +112,16 @@ export class ContextService {
     this.templates.set(name, ref);
   }
 
-  resolveUrl(itemUrl: string, item: Item) {
-    if (itemUrl.startsWith("/") || itemUrl.startsWith("http://") || itemUrl.startsWith("https://")) {
-      return itemUrl;
+  resolveUrl(url: string, item: Item) {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    } else if (url.startsWith("/")) {
+      return url;
     } else {
 
       let pieces = item.url.split("/").filter(v => v.trim().length > 0);
 
-      for (let p of itemUrl.split("/").filter(v => v.trim().length > 0)) {
+      for (let p of url.split("/").filter(v => v.trim().length > 0)) {
         switch (p) {
           case "..":
             pieces.pop();

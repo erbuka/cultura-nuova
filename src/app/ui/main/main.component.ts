@@ -38,7 +38,7 @@ export class MainComponent implements OnInit {
 
   }
 
-  goHome():void {
+  goHome(): void {
     this.router.navigateByUrl("/");
   }
 

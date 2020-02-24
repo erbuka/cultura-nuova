@@ -6,7 +6,9 @@
         <mat-icon>error_outline</mat-icon>
         <span>Error</span>
     </h4>
-    <mat-dialog-content class="pb-3">{{ data.description }}</mat-dialog-content>
+    <mat-dialog-content class="pb-3">
+        <div [innerHtml]="data.description"></div>
+    </mat-dialog-content>
     <mat-dialog-actions align="end">
         <button mat-button [mat-dialog-close]="true">Close</button>
     </mat-dialog-actions>
