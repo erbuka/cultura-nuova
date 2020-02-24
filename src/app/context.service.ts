@@ -21,7 +21,10 @@ export interface Item {
 }
 
 export interface BlockListItem extends Item {
-  options: {},
+  options: {
+    itemWidth: string,
+    itemAspectRatio: number
+  },
   links: { link: string, image: string }[]
 }
 
@@ -32,7 +35,10 @@ export interface PageItem extends Item {
 }
 
 export interface SlideshowItem extends Item {
-  options: {},
+  options: {
+    itemWidth: string,
+    itemAspectRatio: number
+  },
   groups: string[],
   slides: {
     group: string,
@@ -62,7 +68,7 @@ export class ContextService {
   }
 
   getConfig(): Observable<Config> {
-    return this.httpClient.get<any>("/assets/config.json");
+    return this.httpClient.get<any>("assets/config.json");
   }
 
   getItem(url: string, handleError: boolean = true): Observable<Item> {
