@@ -4,6 +4,8 @@ import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 
+import * as PAGE_SCHEMA from '../schema/page.schema.json';
+
 
 export interface Config {
   backgroundImage: string;
@@ -31,10 +33,10 @@ export interface SlideshowItem extends Item {
   options: {},
   groups: string[],
   slides: {
-    group:string,
-    title:string,
-    image:string,
-    href:string
+    group: string,
+    title: string,
+    image: string,
+    href: string
   }[]
 }
 
@@ -51,7 +53,8 @@ export class ContextService {
 
   onError: EventEmitter<Error> = new EventEmitter();
 
-  constructor(private httpClient: HttpClient, private location: Location) {}
+
+  constructor(private httpClient: HttpClient, private location: Location) { }
 
   getConfig(): Observable<Config> {
     return this.httpClient.get<any>("/assets/config.json");
@@ -66,6 +69,7 @@ export class ContextService {
         this.raiseError({ description: e.message })
       }));
     }
+
 
     obs = obs.pipe(
       map(x => {

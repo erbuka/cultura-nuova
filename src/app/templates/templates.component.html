@@ -154,6 +154,9 @@
                         <p *ngIf="data.size">{{ data.size }}</p>
 
                         <p *ngIf="data.location">{{ data.location }}</p>
+                        <p>
+                            <a [routerLink]="'..' | cnUrl : item">Back</a>
+                        </p>
                     </div>
                 </div>
             </div>
