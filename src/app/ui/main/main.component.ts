@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Item, ContextService } from 'src/app/context.service';
 import { Config } from 'protractor';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Location } from '@angular/common';
+import { Location, APP_BASE_HREF } from '@angular/common';
 
 @Component({
   selector: 'app-main',

@@ -1,5 +1,5 @@
 {
     "name" : "Test App",
-    "backgroundImage" : "/assets/bg.png",
-    "entry" : "/assets/main"
+    "backgroundImage" : "assets/bg.png",
+    "entry" : "assets/main"
 }
