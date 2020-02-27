@@ -34,6 +34,8 @@ export interface PageItem extends Item {
   data: any;
 }
 
+
+
 export interface SlideshowItem extends Item {
   options: {
     itemWidth: string,

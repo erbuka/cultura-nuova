@@ -18,6 +18,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DeepZoomComponent } from './ui/deep-zoom/deep-zoom.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     ItemComponent,
     SlideshowComponent,
     MainComponent,
+    DeepZoomComponent,
 
   ],
   imports: [

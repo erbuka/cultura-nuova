@@ -51,6 +51,9 @@ $theme-colors: (
   "foreground" : mat-color(map-get($cn-mat-theme, "foreground"), "base"),
 );
 
+// Leaflet
+@import "~leaflet/dist/leaflet.css";
+
 // Required
 @import "../node_modules/bootstrap/scss/functions";
 @import "../node_modules/bootstrap/scss/variables";

@@ -1,0 +1,19 @@
+{
+    "type" : "deep-zoom",
+    "options" : {
+        "viewport" : {
+            "width" : 4256,
+            "height" : 2832
+        }
+    },
+    "layers" : [
+        {
+            "type" : "deep-image",
+            "imageSrc" : "layer0",
+            "width" : 4256,
+            "height" : 2832,
+            "tileSize" : 256,
+            "tileOverlap" : 1
+        }
+    ]
+}
