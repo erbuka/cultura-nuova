@@ -1,0 +1,15 @@
+.cn-dz-layer-controls {
+  overflow: hidden;
+
+  .cn-dz-layer {
+    &:not(:last-child) {
+      @extend .border-bottom;
+    }
+
+    .cn-dz-layer-preview {
+      width: 3rem;
+      height: 3rem;
+      background-color: red;
+    }
+  }
+}

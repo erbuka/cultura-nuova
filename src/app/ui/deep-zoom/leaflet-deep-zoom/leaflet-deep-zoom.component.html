@@ -1,0 +1,18 @@
+<div class="h-100 cn-relative">
+    <div class="cn-deep-zoom-container h-100" #mapContainer>
+    </div>
+
+    <div class="cn-absolute cn-dz-layer-controls bg-background rounded mat-elevation-z1" style="top: 16px; left:16px; z-index: 1000;">
+        <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
+            <div class="cn-dz-layer-preview cn-bg-cover" [appBgImage]="l.previewImage | cnUrl : item"></div>
+            <div class="mx-2">{{ l.title }}</div>
+            <mat-slider class="ml-auto mr-2" min="0" step="0.01" max="1" [disabled]="!l.visible" (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
+            </mat-slider>
+            <button mat-icon-button (click)="l.visible=!l.visible; updateLayers()">
+                <mat-icon *ngIf="l.visible">visibility</mat-icon>
+                <mat-icon *ngIf="!l.visible" style="opacity: 0.25;">visibility_off</mat-icon>
+            </button>
+        </div>
+    </div>
+
+</div>

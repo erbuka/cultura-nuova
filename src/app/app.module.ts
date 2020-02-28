@@ -1,6 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,12 +15,12 @@ import { UrlPipe } from './url.pipe';
 import { ItemComponent } from './ui/item/item.component';
 import { SlideshowComponent } from './ui/slideshow/slideshow.component';
 import { MainComponent } from './ui/main/main.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
-import { DeepZoomComponent } from './ui/deep-zoom/deep-zoom.component';
+import { LeafletDeepZoomComponent } from './ui/deep-zoom/leaflet-deep-zoom/leaflet-deep-zoom.component';
+import { MatSliderModule } from '@angular/material/slider';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,7 @@ import { DeepZoomComponent } from './ui/deep-zoom/deep-zoom.component';
     ItemComponent,
     SlideshowComponent,
     MainComponent,
-    DeepZoomComponent,
+    LeafletDeepZoomComponent,
 
   ],
   imports: [
@@ -40,10 +42,12 @@ import { DeepZoomComponent } from './ui/deep-zoom/deep-zoom.component';
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    FormsModule,
 
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    MatSliderModule
   ],
   providers: [],
   bootstrap: [AppComponent]
