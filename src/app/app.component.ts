@@ -1,7 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Location } from '@angular/common';
-import { ContextService, Item, Config } from './context.service';
+import { ContextService } from './context.service';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({
