@@ -6,44 +6,44 @@
     },
     "links": [
         {
-            "href": "modello-3d",
+            "href": "./modello-3d",
             "title": "Modello 3D",
-            "image": "modello3d.png"
+            "image": "./modello3d.png"
         },
         {
-            "href": "sviluppo",
+            "href": "./sviluppo",
             "title": "Sviluppo",
-            "image": "sviluppo.png"
+            "image": "./sviluppo.png"
         },
         {
-            "href": "deep-zoom-0",
+            "href": "./deep-zoom-0",
             "title": "Deep Zoom 0",
-            "image": "volta.png"
+            "image": "./volta.png"
         },
         {
-            "href": "intervento",
+            "href": "./intervento",
             "title": "Intervento",
-            "image": "intervento.png"
+            "image": "./intervento.png"
         },
         {
-            "href": "video",
+            "href": "./video",
             "title": "Video",
-            "image": "video.png"
+            "image": "./video.png"
         },
         {
-            "href": "metodologia",
+            "href": "./metodologia",
             "title": "Metodologia",
-            "image": "metodologia.png"
+            "image": "./metodologia.png"
         },
         {
-            "href": "mostra",
+            "href": "./mostra",
             "title": "La Mostra",
-            "image": "mostra.png"
+            "image": "./mostra.png"
         },
         {
-            "href": "opere",
+            "href": "./opere",
             "title": "La opere in mostra",
-            "image": "opere.png"
+            "image": "./opere.png"
         }
     ]
 }
