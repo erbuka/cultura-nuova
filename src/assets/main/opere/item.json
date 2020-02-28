@@ -7,53 +7,53 @@
     "links": [
         {
             "title": "Filippo Maria Visconti",
-            "href": "filippo-maria-visconti",
-            "image": "filippo-maria-visconti.png"
+            "href": "./filippo-maria-visconti",
+            "image": "./filippo-maria-visconti.png"
         },
         {
             "title": "Niccolò Piccinino",
-            "href": "niccolo-piccinino",
-            "image": "niccolo-piccinino.png"
+            "href": "./niccolo-piccinino",
+            "image": "./niccolo-piccinino.png"
         },
         {
             "title": "Eugenio IV",
-            "href": "eugenio-4",
-            "image": "eugenio-4.png"
+            "href": "./eugenio-4",
+            "image": "./eugenio-4.png"
         },
         {
             "title": "Neri Capponi",
-            "href": "neri-capponi",
-            "image": "neri-capponi.png"
+            "href": "./neri-capponi",
+            "image": "./neri-capponi.png"
         },
         {
             "title": "Cosimo il Vecchio De' Medici",
-            "href": "cosimo-medici",
-            "image": "cosimo-medici.png"
+            "href": "./cosimo-medici",
+            "image": "./cosimo-medici.png"
         },
         {
             "title": "Sforziade (frammenti)",
-            "href": "sforziade",
-            "image": "sforziade.png"
+            "href": "./sforziade",
+            "image": "./sforziade.png"
         },
         {
             "title": "Lenardo Da Vinci",
-            "href": "leonardo",
-            "image": "leonardo.png"
+            "href": "./leonardo",
+            "image": "./leonardo.png"
         },
         {
             "title": "La battaglia - Episodio dello stendardo",
-            "href": "battaglia",
-            "image": "battaglia.png"
+            "href": "./battaglia",
+            "image": "./battaglia.png"
         },
         {
             "title": "La battaglia - Tavola Doria",
-            "href": "tavola-doria",
-            "image": "tavola-doria.png"
+            "href": "./tavola-doria",
+            "image": "./tavola-doria.png"
         },
         {
             "title": "La battaglia - Gérard Edelinck",
-            "href": "gerard-edelinck",
-            "image": "gerard-edelinck.png"
+            "href": "./gerard-edelinck",
+            "image": "./gerard-edelinck.png"
         }
     ]
 }

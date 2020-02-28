@@ -27,7 +27,8 @@ export class MainComponent implements OnInit {
         if (v.length === 0) {
           this.context.getItem(this.config.entry).subscribe(item => this.item = item);
         } else {
-          let url = this.context.joinUrl("/", ...v.map(x => x.path));
+          let url = this.context.joinUrl(...v.map(x => x.path));
+          console.log(url);
           this.context.getItem(url).subscribe(item => this.item = item);
         }
       });

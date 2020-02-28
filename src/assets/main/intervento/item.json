@@ -6,19 +6,19 @@
     },
     "links": [
         {
-            "href": "tecnica",
+            "href": "./tecnica",
             "title": "Tecnica Artistica",
-            "image": "tecnica.png"
+            "image": "./tecnica.png"
         },
         {
-            "href": "stato",
+            "href": "./stato",
             "title": "Stato di conservazione",
-            "image": "stato.png"
+            "image": "./stato.png"
         },
         {
-            "href": "intervento",
+            "href": "./intervento",
             "title": "Intervento",
-            "image": "intervento.png"
+            "image": "./intervento.png"
         }
     ]
 }

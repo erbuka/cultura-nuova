@@ -9,7 +9,9 @@ export class UrlPipe implements PipeTransform {
   constructor(private context:ContextService) {}
 
   transform(value: any, ...args: any[]): any {
-    return this.context.resolveUrl(value, args[0]);
+    let routerUrl = args.length >= 2 && args[1] === true;
+    let url = this.context.resolveUrl(value, args[0]);
+    return routerUrl ? this.context.joinUrl("/", url) : url;
   }
 
 }

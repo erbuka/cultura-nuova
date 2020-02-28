@@ -123,9 +123,7 @@ export class ContextService {
   resolveUrl(url: string, item: Item) {
     if (url.startsWith("http://") || url.startsWith("https://")) {
       return url;
-    } else if (url.startsWith("/")) {
-      return url;
-    } else {
+    } else if (url.startsWith(".") || url.startsWith("..")) {
 
       let pieces = item.url.split("/").filter(v => v.trim().length > 0);
 
@@ -142,7 +140,9 @@ export class ContextService {
         }
       }
 
-      return this.joinUrl("/", ...pieces);
+      return this.joinUrl(...pieces);
+    } else {
+      return url;
     }
   }
 

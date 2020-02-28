@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod",
+    "build": "ng build --watch --base-href=/dist/",
     "build:ghpages" : "ng build --prod --output-path docs --base-href /cultura-nuova/",
     "test": "ng test",
     "lint": "ng lint",
