@@ -3,6 +3,7 @@ import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
 import { Location } from '@angular/common';
 import { DeepZoomLayerControls, DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
+import { Router } from '@angular/router';
 
 
 
@@ -114,7 +115,7 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   layerControls: LeafletLayerControls[] = null;
 
-  constructor(private context: ContextService) { }
+  constructor(private context: ContextService, private router:Router) { }
 
   ngOnInit() {
     this.map = L.map(this.mapContainer.nativeElement, {
@@ -207,6 +208,13 @@ export class LeafletDeepZoomComponent implements OnInit {
 
         if (s.title) {
           shape.bindTooltip(s.title);
+        }
+
+        if(s.href) {
+          shape.on("click", () => {
+            let url = this.context.joinUrl("/", this.context.resolveUrl(s.href, this.item));
+            this.router.navigateByUrl(url);
+          });
         }
 
         shape.setStyle({

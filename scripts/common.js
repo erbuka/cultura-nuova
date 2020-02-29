@@ -13,10 +13,11 @@ const generateJsonSchema = function (files, types, watchCallback) {
 
     files = files.map(f => path.resolve(f));
 
-    const program = tjs.getProgramFromFiles(files);
-    const generator = tjs.buildGenerator(program, settings);
 
     const getSchemas = function () {
+        const program = tjs.getProgramFromFiles(files);
+        const generator = tjs.buildGenerator(program, settings);
+        
         let result = {};
         for (let t of types) {
             result[t] = generator.getSchemaForSymbol(t);

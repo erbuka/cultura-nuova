@@ -1,8 +1,10 @@
 import { ItemBase } from './item';
 
+
 export interface DeepZoomItemShape {
     type: string;
     title?: string;
+    href?: string;
     drawAttributes: {
         stroke: boolean;
         fill: boolean;
@@ -10,6 +12,7 @@ export interface DeepZoomItemShape {
         fillColor: string;
     }
 }
+
 
 export interface DeepZoomItemPolygon extends DeepZoomItemShape {
     type: "polygon";

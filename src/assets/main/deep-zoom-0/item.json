@@ -57,6 +57,7 @@
                 {
                     "type": "polygon",
                     "title": "My Polygon",
+                    "href" : "../intervento/tecnica",
                     "drawAttributes": {
                         "stroke": true,
                         "strokeColor": "rgb(255, 100, 255)",
