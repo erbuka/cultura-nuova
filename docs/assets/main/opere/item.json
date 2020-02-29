@@ -2,7 +2,7 @@
     "type": "block-list",
     "options": {
         "itemWidth": "20rem",
-        "itemAspectRatio": "1"
+        "itemAspectRatio": 1
     },
     "links": [
         {

@@ -2,8 +2,7 @@
     "type": "slideshow",
     "options": {
         "itemWidth": "10rem",
-        "itemAspectRatio": 1.6,
-        "orientation": "horizontal"
+        "itemAspectRatio": 1.6
     },
     "groups": [
         "Giornate",
@@ -15,65 +14,70 @@
     "slides": [
         {
             "group": "Giornate",
-            "image": "./giornate/1.png"
+            "previewImage": "./giornate/1.png"
         },
         {
             "group": "Giornate",
-            "image": "./giornate/2.png"
+            "previewImage": "./giornate/2.png"
         },
         {
             "group": "Giornate",
-            "image": "./giornate/3.png"
+            "previewImage": "./giornate/3.png"
         },
         {
             "group": "Giornate",
-            "image": "./giornate/4.png"
+            "previewImage": "./giornate/4.png"
         },
         {
             "group": "Giornate",
-            "image": "./giornate/5.png"
+            "previewImage": "./giornate/5.png"
         },
         {
             "group": "Sinopia",
-            "image": "./sinopia/1.png"
+            "previewImage": "./sinopia/1.png"
         },
         {
             "group": "Sinopia",
-            "image": "./sinopia/2.png"
+            "previewImage": "./sinopia/2.png"
         },
         {
             "group" : "Spolvero",
-            "image": "./spolvero/1.png"
+            "previewImage": "./spolvero/1.png"
         },
         {
             "group" : "Spolvero",
-            "image": "./spolvero/2.png"
+            "previewImage": "./spolvero/2.png"
         },
         {
             "group" : "Incisioni",
-            "image": "./incisioni/1.png"
+            "previewImage": "./incisioni/1.png"
         },
         {
             "group" : "Incisioni",
-            "image": "./incisioni/2.png"
+            "previewImage": "./incisioni/2.png"
         },
         {
             "group" : "Incisioni",
-            "image": "./incisioni/3.png"
+            "previewImage": "./incisioni/3.png"
         },
         {
             "group" : "Incisioni",
-            "image": "./incisioni/4.png"
+            "previewImage": "./incisioni/4.png"
         },
         {
             "group" : "Esempio altri controlli",
-            "image": "../../opere/filippo-maria-visconti.png",
+            "previewImage": "../../opere/filippo-maria-visconti.png",
             "href": "../../opere/filippo-maria-visconti"
         },
         {
             "group" : "Esempio altri controlli",
-            "image": "../../opere/niccolo-piccinino.png",
+            "previewImage": "../../opere/niccolo-piccinino.png",
             "href": "../../opere/niccolo-piccinino"
+        },
+        {
+            "group" : "Esempio altri controlli",
+            "previewImage" : "assets/main/deep-zoom-0/layer0/8/0_0.jpg",
+            "href" : "assets/main/deep-zoom-0"
         }
     ]
 }
