@@ -24,7 +24,7 @@
         <div class="d-flex flex-column cn-slideshow-carousel animated fadeIn">
             <div class="cn-slideshow-slides-wrapper flex-grow-1">
 
-                <div [@slideAnimation]="currentSlideIndex" class="w-100 h-100 cn-relative cn-slideshow-slides">
+                <div [@slideAnimation]="currentSlideIndex" class="cn-slideshow-slides">
                     <div class="cn-relative w-100 h-100">
                         <ng-container *ngFor="let it of item.slides; index as i">
                             <div *ngIf="i === currentSlideIndex" class="cn-slideshow-slide">

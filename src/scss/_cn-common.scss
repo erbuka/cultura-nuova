@@ -84,10 +84,11 @@ $cn-header-height: 4rem;
     background-color: rgba(0, 0, 0, 0.5);
 
     .cn-slideshow-slides {
-      
+      @extend .cn-relative;
+      @extend .h-100;
+      @extend .w-100;
       z-index: 0;
       overflow: hidden;
-      padding: 3rem;
 
       .cn-slideshow-slide {
         position: absolute;

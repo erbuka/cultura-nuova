@@ -124,8 +124,6 @@ export class LeafletDeepZoomComponent implements OnInit {
       zoomControl: false
     });
 
-    this.map.on("click", (evt) => console.log(evt.latlng));
-
     this.createLayers();
   }
 
