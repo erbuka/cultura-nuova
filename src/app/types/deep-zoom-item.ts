@@ -1,4 +1,4 @@
-import { Item } from 'src/app/context.service';
+import { ItemBase } from './item';
 
 export interface DeepZoomItemShape {
     type: string;
@@ -45,7 +45,8 @@ export interface DeepZoomItemVectorLayer extends DeepZoomItemLayer {
     shapes: (DeepZoomItemPolygon | DeepZoomItemCircle)[];
 }
 
-export interface DeepZoomItem extends Item {
+export interface DeepZoomItem extends ItemBase {
+    type: "deep-zoom";
     options: {
         viewport: {
             width: number,

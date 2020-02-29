@@ -8,7 +8,7 @@
                     <div class="cn-relative mat-elevation-z4"
                         [style.padding-bottom]="(1 / item.options.itemAspectRatio) * 100 + '%'"
                         (click)="gotoSlide(slide)">
-                        <div class="cn-overlay cn-bg-cover" [appBgImage]="slide.image | cnUrl : item"></div>
+                        <div class="cn-overlay cn-bg-cover" [appBgImage]="slide.previewImage | cnUrl : item"></div>
                         <div class="cn-overlay cn-block-list-hover" style="background-color: rgba(0,0,0,.5);"></div>
                         <div class="cn-overlay d-flex align-items-end w-100" *ngIf="slide.title">
                             <h5 class="m-0 p-4 bg-background flex-grow-1">{{ slide.title }}</h5>
@@ -22,33 +22,35 @@
     <ng-container *ngIf="currentSlideIndex !== null">
 
         <div class="d-flex flex-column cn-slideshow-carousel animated fadeIn">
-            <div class="cn-slideshow-slides flex-grow-1" (swipeleft)="nextSlide()" (swiperight)="previousSlide()">
+            <div class="cn-slideshow-slides-wrapper flex-grow-1">
 
-                <div [@slideAnimation]="currentSlideIndex">
-                    <ng-container *ngFor="let it of item.slides; index as i">
-                        <div *ngIf="i === currentSlideIndex" class="cn-slideshow-slide">
-                            <app-item *ngIf="it.href" [item]="slideItemsCache[i]"></app-item>
-                            <div *ngIf="!it.href" class="cn-bg-contain w-100 h-100"
-                                [appBgImage]="it.image | cnUrl : item">
+                <div [@slideAnimation]="currentSlideIndex" class="w-100 h-100 cn-relative cn-slideshow-slides">
+                    <div class="cn-relative w-100 h-100">
+                        <ng-container *ngFor="let it of item.slides; index as i">
+                            <div *ngIf="i === currentSlideIndex" class="cn-slideshow-slide">
+                                <app-item *ngIf="it.href" [item]="slideItemsCache[i]"></app-item>
+                                <div *ngIf="!it.href" class="cn-bg-contain w-100 h-100"
+                                    [appBgImage]="it.previewImage | cnUrl : item">
+                                </div>
                             </div>
-                        </div>
-                    </ng-container>
+                        </ng-container>
+                    </div>
                 </div>
 
-                <div class="cn-absolute" style="right: 1rem; top:1rem">
+                <div class="cn-absolute" style="right: -1rem; top:-1rem;z-index: 1;">
                     <button mat-mini-fab (click)="clearSlide()" class="cn-absolute">
                         <mat-icon>close</mat-icon>
                     </button>
                 </div>
 
-                <div class="cn-absolute" style="left: 1rem; top:50%; transform: translateY(-50%);">
+                <div class="cn-absolute" style="left: -1rem; top:50%; transform: translateY(-50%); z-index: 1;">
                     <button mat-mini-fab (click)="previousSlide()" class="cn-absolute">
                         <mat-icon>chevron_left</mat-icon>
                     </button>
                 </div>
 
 
-                <div class="cn-absolute" style="right: 1rem; top:50%; transform: translateY(-50%);">
+                <div class="cn-absolute" style="right: -1rem; top:50%; transform: translateY(-50%);">
                     <button mat-mini-fab (click)="nextSlide()" class="cn-absolute">
                         <mat-icon>chevron_right</mat-icon>
                     </button>

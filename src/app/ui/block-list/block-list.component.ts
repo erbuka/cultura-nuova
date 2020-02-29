@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Injectable } from '@angular/core';
-import { BlockListItem, ContextService } from 'src/app/context.service';
+import { ContextService } from 'src/app/context.service';
+import { BlockListItem } from 'src/app/types/block-list-item';
 
 
 

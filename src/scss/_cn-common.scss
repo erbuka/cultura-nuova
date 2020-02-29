@@ -16,7 +16,7 @@ body {
 }
 
 .animated {
-  animation-duration: .5s;
+  animation-duration: 0.5s;
 }
 
 $cn-header-height: 4rem;
@@ -78,18 +78,24 @@ $cn-header-height: 4rem;
   @extend .mat-elevation-z1;
   position: relative;
 
-  .cn-slideshow-slides {
+  .cn-slideshow-slides-wrapper {
     position: relative;
-    overflow: hidden;
+    overflow: show;
     background-color: rgba(0, 0, 0, 0.5);
 
-    .cn-slideshow-slide {
-      position: absolute;
-      overflow: auto;
-      @extend .h-100;
-      @extend .w-100;
-    }
+    .cn-slideshow-slides {
+      
+      z-index: 0;
+      overflow: hidden;
+      padding: 3rem;
 
+      .cn-slideshow-slide {
+        position: absolute;
+        overflow: auto;
+        @extend .h-100;
+        @extend .w-100;
+      }
+    }
   }
 
   .cn-slideshow-controls {

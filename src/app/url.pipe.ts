@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ContextService, Item } from './context.service';
+import { ContextService } from './context.service';
 
 @Pipe({
   name: 'cnUrl'

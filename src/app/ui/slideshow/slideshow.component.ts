@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { SlideshowItem, ContextService, Item } from 'src/app/context.service';
+import { ContextService } from 'src/app/context.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   trigger,
@@ -10,6 +10,8 @@ import {
   query,
   group
 } from '@angular/animations';
+import { Item } from 'src/app/types/item';
+import { SlideshowItem } from 'src/app/types/slideshow-item';
 
 
 
@@ -50,8 +52,6 @@ export class SlideshowComponent implements OnInit {
 
   direction: "forward" | "backward" | "none" = "forward";
   currentSlideIndex: number = null;
-
-
   slideItemsCache: Item[] = null;
 
   constructor(private route: ActivatedRoute, private context: ContextService, private router: Router) { }
@@ -83,28 +83,27 @@ export class SlideshowComponent implements OnInit {
     });
   }
 
-
-
   clearSlide(): void {
     this.router.navigate([], { relativeTo: this.route });
   }
 
   nextSlide(): void {
     let idx = Math.min(this.currentSlideIndex + 1, this.item.slides.length - 1);
-    this.gotoSlide(idx);
+    this.gotoSlide(idx, true);
   }
 
 
   previousSlide(): void {
     let idx = Math.max(0, this.currentSlideIndex - 1);
-    this.gotoSlide(idx);
+    this.gotoSlide(idx, true);
   }
 
-  gotoSlide(s: number | object): void {
+  gotoSlide(s: number | object, replaceUrl: boolean = false): void {
     let idx = typeof s === "number" ? s : this.item.slides.findIndex(x => x === s);
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { s: idx }
+      queryParams: { s: idx },
+      replaceUrl: replaceUrl
     });
   }
 

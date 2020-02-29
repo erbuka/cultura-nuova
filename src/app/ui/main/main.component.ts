@@ -1,8 +1,9 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { Item, ContextService } from 'src/app/context.service';
+import { ContextService } from 'src/app/context.service';
 import { Config } from 'protractor';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location, APP_BASE_HREF } from '@angular/common';
+import { Item } from 'src/app/types/item';
 
 @Component({
   selector: 'app-main',
@@ -28,7 +29,6 @@ export class MainComponent implements OnInit {
           this.context.getItem(this.config.entry).subscribe(item => this.item = item);
         } else {
           let url = this.context.joinUrl(...v.map(x => x.path));
-          console.log(url);
           this.context.getItem(url).subscribe(item => this.item = item);
         }
       });

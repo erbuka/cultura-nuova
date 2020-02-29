@@ -5,50 +5,15 @@ import { Observable } from 'rxjs';
 import { Location } from '@angular/common';
 
 import * as ajv from "ajv";
+import { Item } from './types/item';
 
-const PAGE_SCHEMA = require('../schema/page.schema.json');
-
+const ITEM_SCHEMA = require('./types/schema.json');
 
 export interface Config {
   backgroundImage: string;
   entry: string;
 }
 
-export interface Item {
-  url: string;
-  type: string;
-  [k: string]: any;
-}
-
-export interface BlockListItem extends Item {
-  options: {
-    itemWidth: string,
-    itemAspectRatio: number
-  },
-  links: { link: string, image: string }[]
-}
-
-
-export interface PageItem extends Item {
-  template: string;
-  data: any;
-}
-
-
-
-export interface SlideshowItem extends Item {
-  options: {
-    itemWidth: string,
-    itemAspectRatio: number
-  },
-  groups: string[],
-  slides: {
-    group: string,
-    title: string,
-    image: string,
-    href: string
-  }[]
-}
 
 export type Error = {
   description: string;
@@ -78,17 +43,12 @@ export class ContextService {
     let obs = this.httpClient.get<any>(this.joinUrl(url, "item.json"), { responseType: "json" });
 
     obs = obs.pipe(tap((v: Item) => {
-      let valid: boolean = true;
-
-      switch (v.type) {
-        case "page": valid = <boolean>this.jsonValidator.validate(PAGE_SCHEMA, v); break;
-        default: break;
-      }
+      let valid = this.jsonValidator.validate(ITEM_SCHEMA, v);
 
       if (!valid) {
         this.raiseError({
-          description: `Some errors occured during schema validation:<br> ${
-            this.jsonValidator.errors.reduce((prev, e) => prev + `- ${e.message}<br>`, "")
+          description: `Some errors occured during schema validation (${url}):<br> ${
+            this.jsonValidator.errors.reduce((prev, e) => prev + `- JSON${e.dataPath} ${e.message}<br>`, "")
             }`
         })
       }

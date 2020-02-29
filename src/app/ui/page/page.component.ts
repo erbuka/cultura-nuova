@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, TemplateRef, OnChanges, SimpleChanges } from '@angular/core';
-import { PageItem, ContextService } from 'src/app/context.service';
+import { ContextService } from 'src/app/context.service';
+import { PageItem } from 'src/app/types/page-item';
 
 @Component({
   selector: 'app-page',

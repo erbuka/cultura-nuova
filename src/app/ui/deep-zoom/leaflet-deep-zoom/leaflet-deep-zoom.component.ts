@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
-import { DeepZoomItem, DeepZoomLayerControls, DeepZoomItemVectorLayer, DeepZoomItemDeepImageLayer } from '../deep-zoom';
 import { Location } from '@angular/common';
+import { DeepZoomLayerControls, DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
 
 
 
