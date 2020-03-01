@@ -8,8 +8,8 @@ export interface DeepZoomItemShape {
     drawAttributes: {
         stroke: boolean;
         fill: boolean;
-        strokeColor: string;
-        fillColor: string;
+        strokeColor?: string;
+        fillColor?: string;
     }
 }
 
@@ -59,10 +59,3 @@ export interface DeepZoomItem extends ItemBase {
     layers: (DeepZoomItemDeepImageLayer | DeepZoomItemVectorLayer)[]
 }
 
-export interface DeepZoomLayerControls {
-    title: string;
-    opacity: number;
-    visible: boolean;
-    exclusive: boolean;
-    previewImage: string;
-}

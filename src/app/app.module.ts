@@ -15,12 +15,14 @@ import { UrlPipe } from './url.pipe';
 import { ItemComponent } from './ui/item/item.component';
 import { SlideshowComponent } from './ui/slideshow/slideshow.component';
 import { MainComponent } from './ui/main/main.component';
+import { LeafletDeepZoomComponent } from './ui/deep-zoom/leaflet-deep-zoom/leaflet-deep-zoom.component';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
-import { LeafletDeepZoomComponent } from './ui/deep-zoom/leaflet-deep-zoom/leaflet-deep-zoom.component';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatSelectModule } from '@angular/material/select';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -48,6 +50,9 @@ import { MatSliderModule } from '@angular/material/slider';
     MatIconModule,
     MatDialogModule,
     MatSliderModule,
+    MatSelectModule,
+    MatMenuModule,
+
     HammerModule
   ],
   providers: [],

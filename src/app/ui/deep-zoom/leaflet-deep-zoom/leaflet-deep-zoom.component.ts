@@ -2,9 +2,9 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
 import { Location } from '@angular/common';
-import { DeepZoomLayerControls, DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
+import { DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
+import { DeepZoomLayerControls, DeepZoomTools, DeepZoomMeasureUnit } from '../deep-zoom';
 import { Router } from '@angular/router';
-
 
 
 
@@ -112,12 +112,58 @@ export class LeafletDeepZoomComponent implements OnInit {
   @Input() item: DeepZoomItem = null;
 
   map = null;
-
   layerControls: LeafletLayerControls[] = null;
+  _tool: DeepZoomTools = "pan";
+  _measureUnit: DeepZoomMeasureUnit = "pixels";
 
-  constructor(private context: ContextService, private router:Router) { }
+  constructor(private context: ContextService, private router: Router) { }
+
+
+  set measureUnit(m: DeepZoomMeasureUnit) {
+    this._measureUnit = m;
+    this.tool = "measure";
+  }
+
+  get measureUnit(): DeepZoomMeasureUnit {
+    return this._measureUnit;
+  }
+
+  set tool(t: DeepZoomTools) {
+    this._tool = t;
+
+    switch (t) {
+      case "measure":
+        this.map.dragging.disable();
+        break;
+      case "pan":
+        this.map.dragging.enable();
+        break;
+    }
+
+  }
+
+  get tool(): DeepZoomTools {
+    return this._tool;
+  }
 
   ngOnInit() {
+    this.createMap();
+  }
+
+
+  updateLayers(): void {
+    this.layerControls.forEach(l => l.nativeLayer.getPane().style.display = l.visible ? "block" : "none");
+    this.layerControls.filter(l => l.visible).forEach(l => l.update());
+  }
+
+  resetCamera(options: object = {}): void {
+    let viewport = this.item.options.viewport;
+    this.map.setView(this.pointToLatLng(viewport.width / 2, viewport.height / 2, 0), this.map.getMinZoom());
+  }
+
+  private createMap(): void {
+
+
     this.map = L.map(this.mapContainer.nativeElement, {
       center: [0, 0],
       zoom: 0,
@@ -125,13 +171,24 @@ export class LeafletDeepZoomComponent implements OnInit {
       zoomControl: false
     });
 
+    // Create the layers
     this.createLayers();
-  }
+    this.updateLayers();
 
+    // Set the minimum zoom
+    let bounds = [
+      this.pointToLatLng(0, 0, 0),
+      this.pointToLatLng(this.item.options.viewport.width, this.item.options.viewport.height, 0)
+    ];
 
-  updateLayers(): void {
-    this.layerControls.forEach(l => l.nativeLayer.getPane().style.display = l.visible ? "block" : "none");
-    this.layerControls.filter(l => l.visible).forEach(l => l.update());
+    this.map.setMinZoom(this.map.getBoundsZoom(bounds));
+
+    // Reset the camera
+    this.resetCamera();
+
+    // Se tool 
+    this.tool = this._tool;
+
   }
 
   private createLayers(): void {
@@ -158,16 +215,20 @@ export class LeafletDeepZoomComponent implements OnInit {
 
 
     }
-    this.updateLayers();
 
 
   }
 
 
   private createDeepImageLayer(layerSpec: DeepZoomItemDeepImageLayer, pane: string): LeafletLayerControls {
+
     let nativeLayer = new DeepImageLayer({
       keepBuffer: 10,
       pane: pane,
+      bounds: [
+        this.pointToLatLng(0, 0, 0),
+        this.pointToLatLng(this.item.options.viewport.width, this.item.options.viewport.height, 0)
+      ],
       cnTileSize: layerSpec.tileSize,
       cnViewportWidth: this.item.options.viewport.width,
       cnViewportHeight: this.item.options.viewport.height,
@@ -189,18 +250,21 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   }
 
+  private pointToLatLng(x: number, y: number, z: number): any {
+    return this.map.options.crs.pointToLatLng(L.point(x, y), z);
+  }
+
   private createVectorLayer(layerSpec: DeepZoomItemVectorLayer, pane: string): LeafletLayerControls {
     let nativeLayer = L.layerGroup([], { pane: pane });
-    let crs = this.map.options.crs;
 
     for (let s of layerSpec.shapes) {
       let shape = null;
 
       if (s.type === "polygon") {
-        shape = L.polygon(s.points.map(p => crs.pointToLatLng(L.point(p[0], p[1]), 0)), { pane: pane });
+        shape = L.polygon(s.points.map(p => this.pointToLatLng(p[0], p[1], 0)), { pane: pane });
 
       } else if (s.type === "circle") {
-        shape = L.circle(crs.pointToLatLng(L.point(s.center[0], s.center[1]), 0), { radius: s.radius, pane: pane });
+        shape = L.circle(this.pointToLatLng(s.center[0], s.center[1], 0), { radius: s.radius, pane: pane });
       }
 
 
@@ -210,7 +274,7 @@ export class LeafletDeepZoomComponent implements OnInit {
           shape.bindTooltip(s.title);
         }
 
-        if(s.href) {
+        if (s.href) {
           shape.on("click", () => {
             let url = this.context.joinUrl("/", this.context.resolveUrl(s.href, this.item));
             this.router.navigateByUrl(url);
@@ -219,9 +283,9 @@ export class LeafletDeepZoomComponent implements OnInit {
 
         shape.setStyle({
           fill: s.drawAttributes.fill,
-          fillColor: s.drawAttributes.fillColor,
+          fillColor: s.drawAttributes.fillColor || "#fff",
           stroke: s.drawAttributes.stroke,
-          color: s.drawAttributes.strokeColor
+          color: s.drawAttributes.strokeColor || "#000"
         });
         nativeLayer.addLayer(shape);
       }

@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build --watch --base-href=/dist/",
     "build:ghpages": "ng build --prod --output-path docs --base-href /cultura-nuova/",
-    "build:type-schemas": "node ./scripts/build-type-schemas.js",
+    "build:type-schema": "node ./scripts/build-type-schemas.js",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
