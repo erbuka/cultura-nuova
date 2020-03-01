@@ -37,7 +37,6 @@ import { MatMenuModule } from '@angular/material/menu';
     SlideshowComponent,
     MainComponent,
     LeafletDeepZoomComponent,
-
   ],
   imports: [
     BrowserModule,

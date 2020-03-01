@@ -1,9 +1,9 @@
 <div class="h-100 cn-relative">
-    <div class="cn-deep-zoom-container h-100" #mapContainer>
+    <div class="cn-deep-zoom-container h-100" style="z-index: 0;" #mapContainer>
     </div>
 
     <div class="cn-absolute cn-dz-layer-controls bg-background rounded mat-elevation-z1"
-        style="top: 16px; left:16px; z-index: 1000;">
+        style="top: 16px; left:16px; z-index: 1;">
         <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
             <div class="cn-dz-layer-preview cn-bg-cover" [appBgImage]="l.previewImage | cnUrl : item"></div>
             <div class="mx-2">{{ l.title }}</div>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="cn-absolute mat-elevation-z1 bg-background rounded"
-        style="z-index: 1000; bottom:16px; left:50%; transform: translateX(-50%)">
+        style="z-index: 1; bottom:16px; left:50%; transform: translateX(-50%)">
 
         <mat-menu #unitsMenu>
             <button mat-menu-item>
