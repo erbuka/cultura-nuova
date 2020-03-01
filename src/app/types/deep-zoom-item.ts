@@ -27,11 +27,12 @@ export interface DeepZoomItemCircle extends DeepZoomItemShape {
 
 export interface DeepZoomItemLayer {
     type: string;
-    title: string;
-    opacity: number;
-    visible: boolean;
-    exclusive: boolean;
-    previewImage: string;
+    title?: string;
+    opacity?: number;
+    visible?: boolean;
+    exclusive?: boolean;
+    previewImage?: string;
+    color?:string;
 }
 
 export interface DeepZoomItemDeepImageLayer extends DeepZoomItemLayer {

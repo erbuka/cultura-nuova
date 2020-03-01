@@ -11,6 +11,7 @@
         {
             "type": "deep-image",
             "title": "Layer 0",
+            "color": "#ff3333",
             "opacity": 1,
             "visible": true,
             "exclusive": false,
@@ -24,6 +25,7 @@
         {
             "type": "deep-image",
             "title": "Layer 1",
+            "color": "#3333ff",
             "opacity": 1,
             "visible": false,
             "exclusive": false,
@@ -50,10 +52,10 @@
         {
             "type": "vector",
             "title": "Vector Layer Test",
+            "color": "#ff33ff",
             "opacity": 1,
             "exclusive": false,
             "visible": true,
-            "previewImage": "./layer0/8/0_0.jpg",
             "shapes": [
                 {
                     "type": "polygon",

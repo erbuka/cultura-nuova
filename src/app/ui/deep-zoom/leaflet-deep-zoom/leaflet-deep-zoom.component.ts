@@ -2,7 +2,7 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
 import { DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
-import { DeepZoomLayerControls, DeepZoomTools, DeepZoomMeasureUnit } from '../deep-zoom';
+import { DeepZoomLayerControls, DeepZoomTools, DeepZoomMeasureUnit, DeepZoomLayerControlsDefaults } from '../deep-zoom';
 import { Router } from '@angular/router';
 import { LeafletDeepImageLayer } from './leaflet-deep-image-layer';
 
@@ -198,10 +198,11 @@ export class LeafletDeepZoomComponent implements OnInit {
 
     return {
       title: layerSpec.title,
-      opacity: layerSpec.opacity,
-      visible: layerSpec.visible,
-      exclusive: layerSpec.exclusive,
-      previewImage: layerSpec.previewImage,
+      opacity: typeof layerSpec.opacity === "number" ? layerSpec.opacity : DeepZoomLayerControlsDefaults.opacity,
+      visible: typeof layerSpec.visible === "boolean" ? layerSpec.visible : DeepZoomLayerControlsDefaults.visible,
+      exclusive: typeof layerSpec.exclusive === "boolean" ? layerSpec.exclusive : DeepZoomLayerControlsDefaults.exclusive,
+      previewImage: layerSpec.previewImage || DeepZoomLayerControlsDefaults.previewImage,
+      color: layerSpec.color || DeepZoomLayerControlsDefaults.color,
       nativeLayer: nativeLayer,
       update: function () { this.nativeLayer.setOpacity(this.opacity); }
     };
@@ -255,10 +256,11 @@ export class LeafletDeepZoomComponent implements OnInit {
 
     return {
       title: layerSpec.title,
-      exclusive: layerSpec.exclusive,
-      opacity: layerSpec.opacity,
-      visible: layerSpec.visible,
-      previewImage: layerSpec.previewImage,
+      opacity: typeof layerSpec.opacity === "number" ? layerSpec.opacity : DeepZoomLayerControlsDefaults.opacity,
+      visible: typeof layerSpec.visible === "boolean" ? layerSpec.visible : DeepZoomLayerControlsDefaults.visible,
+      exclusive: typeof layerSpec.exclusive === "boolean" ? layerSpec.exclusive : DeepZoomLayerControlsDefaults.exclusive,
+      previewImage: layerSpec.previewImage || DeepZoomLayerControlsDefaults.previewImage,
+      color: layerSpec.color || DeepZoomLayerControlsDefaults.color,
       nativeLayer: nativeLayer,
       update: function () {
         this.nativeLayer.eachLayer(l => {
@@ -268,7 +270,7 @@ export class LeafletDeepZoomComponent implements OnInit {
           });
         })
       }
-    }
+    };
 
   }
 

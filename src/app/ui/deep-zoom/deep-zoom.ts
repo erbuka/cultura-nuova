@@ -11,6 +11,15 @@ export interface DeepZoomLayerControls {
     visible: boolean;
     exclusive: boolean;
     previewImage: string;
+    color: string;
+}
+
+export const DeepZoomLayerControlsDefaults: Partial<DeepZoomLayerControls> = {
+    opacity: 1,
+    visible: true,
+    exclusive: false,
+    previewImage: "",
+    color: "rgba(0,0,0,.25)"
 }
 
 const INCHES_CONVERSION_TABLE: { [unit in MeasurableUnit]: number } = {
