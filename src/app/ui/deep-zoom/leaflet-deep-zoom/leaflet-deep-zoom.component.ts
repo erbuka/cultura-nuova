@@ -31,7 +31,7 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   @Input() item: DeepZoomItem = null;
 
-  map = null;
+  map:L.Map = null;
   layerControls: LeafletLayerControls[] = null;
   _tool: DeepZoomTools = "pan";
   _measureUnit: DeepZoomMeasureUnit = "pixels";
@@ -96,10 +96,10 @@ export class LeafletDeepZoomComponent implements OnInit {
     this.updateLayers();
 
     // Set the minimum zoom
-    let bounds = [
+    let bounds = L.latLngBounds(
       this.pointToLatLng(0, 0, 0),
       this.pointToLatLng(this.item.options.viewport.width, this.item.options.viewport.height, 0)
-    ];
+    );
 
     this.map.setMinZoom(this.map.getBoundsZoom(bounds));
 
@@ -141,6 +141,7 @@ export class LeafletDeepZoomComponent implements OnInit {
     }
 
 
+
   }
 
 
@@ -149,10 +150,10 @@ export class LeafletDeepZoomComponent implements OnInit {
     let nativeLayer = new LeafletDeepImageLayer({
       keepBuffer: 10,
       pane: pane,
-      bounds: [
+      bounds: L.latLngBounds(
         this.pointToLatLng(0, 0, 0),
         this.pointToLatLng(this.item.options.viewport.width, this.item.options.viewport.height, 0)
-      ],
+      ),
       cnTileSize: layerSpec.tileSize,
       cnViewportWidth: this.item.options.viewport.width,
       cnViewportHeight: this.item.options.viewport.height,
@@ -174,7 +175,7 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   }
 
-  private pointToLatLng(x: number, y: number, z: number): any {
+  private pointToLatLng(x: number, y: number, z: number): L.LatLng {
     return this.map.options.crs.pointToLatLng(L.point(x, y), z);
   }
 
