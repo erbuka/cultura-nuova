@@ -54,7 +54,8 @@ export interface DeepZoomItem extends ItemBase {
         viewport: {
             width: number,
             height: number
-        }
+        },
+        minimapImage: string
     },
     layers: (DeepZoomItemDeepImageLayer | DeepZoomItemVectorLayer)[]
 }

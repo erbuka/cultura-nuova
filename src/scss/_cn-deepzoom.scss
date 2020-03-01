@@ -1,5 +1,9 @@
 .cn-dz-layer-controls {
+  @extend .cn-absolute;
   overflow: hidden;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
 
   .cn-dz-layer {
     &:not(:last-child) {
@@ -11,4 +15,33 @@
       height: 3rem;
     }
   }
+}
+
+.cn-dz-minimap {
+  @extend .cn-absolute;
+  width: 10rem;
+  top: 16px;
+  right: 16px;
+  z-index: 1;
+
+  .cn-dz-minimap-image {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    background-size: 100% 100%;
+
+    .cn-dz-minimap-track {
+      position: absolute;
+      border: 1px solid #f00
+    }
+
+  }
+}
+
+.cn-dz-tools {
+  @extend .cn-absolute;
+  z-index: 1;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
 }

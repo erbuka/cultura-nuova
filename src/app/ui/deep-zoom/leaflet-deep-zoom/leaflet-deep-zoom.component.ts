@@ -31,13 +31,18 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   @Input() item: DeepZoomItem = null;
 
-  map:L.Map = null;
+  map: L.Map = null;
   layerControls: LeafletLayerControls[] = null;
+  minimapTrackStyle: object = {};
   _tool: DeepZoomTools = "pan";
   _measureUnit: DeepZoomMeasureUnit = "pixels";
 
   constructor(private context: ContextService, private router: Router) { }
 
+
+  get viewportAspectRatio(): number {
+    return this.item.options.viewport.width / this.item.options.viewport.height;
+  }
 
   set measureUnit(m: DeepZoomMeasureUnit) {
     this._measureUnit = m;
@@ -81,6 +86,33 @@ export class LeafletDeepZoomComponent implements OnInit {
     this.map.setView(this.pointToLatLng(viewport.width / 2, viewport.height / 2, 0), this.map.getMinZoom());
   }
 
+  updateMinimapTrackStyle() {
+    let bounds = this.map.getBounds();
+    let a = L.bounds(this.latLngToPoint(bounds.getNorthEast(), 0), this.latLngToPoint(bounds.getSouthWest(), 0));
+    let b = L.bounds([0, 0], [this.item.options.viewport.width, this.item.options.viewport.height]);
+
+    let minX = Math.max(a.min.x, b.min.x);
+    let maxX = Math.min(a.max.x, b.max.x);
+    let minY = Math.max(a.min.y, b.min.y);
+    let maxY = Math.min(a.max.y, b.max.y);
+
+    if (maxX > minX && maxY > minY) { // Intersezione non nulla
+      let left = minX / b.max.x * 100 + "%"
+      let top = minY / b.max.y * 100 + "%"
+      let width = (maxX - minX) / b.max.x * 100 + "%";
+      let height = (maxY - minY) / b.max.y * 100 + "%";
+
+      this.minimapTrackStyle = {
+        left: left,
+        top: top,
+        width: width,
+        height: height
+      }
+
+    }
+
+  }
+
   private createMap(): void {
 
 
@@ -90,6 +122,10 @@ export class LeafletDeepZoomComponent implements OnInit {
       crs: L.CRS.Simple,
       zoomControl: false
     });
+
+    // Setup map listeners 
+    this.map.on("move", this.updateMinimapTrackStyle.bind(this));
+    this.map.on("zoomend", this.updateMinimapTrackStyle.bind(this));
 
     // Create the layers
     this.createLayers();
@@ -108,9 +144,6 @@ export class LeafletDeepZoomComponent implements OnInit {
 
     // Set tool 
     this.tool = this._tool;
-
-    // Setup the measure tool
-
 
   }
 
@@ -177,6 +210,10 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   private pointToLatLng(x: number, y: number, z: number): L.LatLng {
     return this.map.options.crs.pointToLatLng(L.point(x, y), z);
+  }
+
+  private latLngToPoint(latlng: L.LatLng, zoom: number): L.Point {
+    return this.map.options.crs.latLngToPoint(latlng, zoom);
   }
 
   private createVectorLayer(layerSpec: DeepZoomItemVectorLayer, pane: string): LeafletLayerControls {

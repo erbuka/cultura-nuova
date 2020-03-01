@@ -4,7 +4,8 @@
         "viewport": {
             "width": 5000,
             "height": 5000
-        }
+        },
+        "minimapImage" : "./layer1/8/0_0.jpg"
     },
     "layers": [
         {
