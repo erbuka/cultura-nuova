@@ -1,3 +1,6 @@
+.cn-deep-zoom-container {
+  @extend .cn-relative;
+}
 .cn-dz-layer-controls {
   @extend .cn-absolute;
   overflow: hidden;

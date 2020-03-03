@@ -5,7 +5,6 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
 
   zoomLevels: null,
   zoomLevelCount: null,
-
   initialize: function (options) {
 
     let scaleX = options.cnViewportWidth / options.cnWidth;

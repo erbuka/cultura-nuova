@@ -23,6 +23,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
+import { ThreeDeepZoomComponent } from './ui/deep-zoom/threejs-deep-zoom/three-deep-zoom.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +38,7 @@ import { MatMenuModule } from '@angular/material/menu';
     SlideshowComponent,
     MainComponent,
     LeafletDeepZoomComponent,
+    ThreeDeepZoomComponent,
   ],
   imports: [
     BrowserModule,

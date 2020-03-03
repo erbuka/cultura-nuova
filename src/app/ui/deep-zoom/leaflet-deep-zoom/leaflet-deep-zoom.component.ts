@@ -120,7 +120,10 @@ export class LeafletDeepZoomComponent implements OnInit {
       center: [0, 0],
       zoom: 0,
       crs: L.CRS.Simple,
-      zoomControl: false
+      renderer: L.svg({ padding: 1 }),
+      zoomControl: false,
+      zoomAnimation: true,
+      zoomSnap: 0,
     });
 
     // Setup map listeners 
@@ -181,6 +184,9 @@ export class LeafletDeepZoomComponent implements OnInit {
   private createDeepImageLayer(layerSpec: DeepZoomItemDeepImageLayer, pane: string): LeafletLayerControls {
 
     let nativeLayer = new LeafletDeepImageLayer({
+      updateInterval: 1,
+      updateWhenIdle: false,
+      updateWhenZooming: true,
       keepBuffer: 10,
       pane: pane,
       bounds: L.latLngBounds(

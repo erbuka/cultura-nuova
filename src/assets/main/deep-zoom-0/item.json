@@ -5,7 +5,7 @@
             "width": 5000,
             "height": 5000
         },
-        "minimapImage" : "./layer1/8/0_0.jpg"
+        "minimapImage": "./layer1/8/0_0.jpg"
     },
     "layers": [
         {
@@ -13,7 +13,7 @@
             "title": "Layer 0",
             "color": "#ff3333",
             "opacity": 1,
-            "visible": true,
+            "visible": false,
             "exclusive": false,
             "previewImage": "./layer0/8/0_0.jpg",
             "imageSrc": "./layer0",
@@ -39,6 +39,7 @@
         {
             "type": "deep-image",
             "title": "Layer 1 Copia",
+            "color": "#33ff66",
             "opacity": 1,
             "visible": true,
             "exclusive": true,
@@ -60,7 +61,7 @@
                 {
                     "type": "polygon",
                     "title": "My Polygon",
-                    "href" : "../intervento/tecnica",
+                    "href": "../intervento/tecnica",
                     "drawAttributes": {
                         "stroke": true,
                         "strokeColor": "rgb(255, 100, 255)",
