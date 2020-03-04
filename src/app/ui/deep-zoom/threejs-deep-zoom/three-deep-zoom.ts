@@ -42,7 +42,7 @@ class Cache<K extends (string | number), T extends Partial<Disposable>> implemen
 
 }
 
-class Batch<T extends Partial<Disposable>> implements Disposable {
+class Buffer<T extends Partial<Disposable>> implements Disposable {
 
     private elements: T[] = [];
     private currentIndex: number = 0;
@@ -331,8 +331,8 @@ class DeepImageLayerTile implements Disposable {
         pos.setXYZ(2, x + width, y + height, 0);
 
         pos.setXYZ(3, x, y, 0);
-        pos.setXYZ(3, x + width, y + height, 0);
-        pos.setXYZ(3, x, y + height, 0);
+        pos.setXYZ(4, x + width, y + height, 0);
+        pos.setXYZ(5, x, y + height, 0);
 
         pos.needsUpdate = true;
 
@@ -345,14 +345,14 @@ class DeepImageLayerTile implements Disposable {
         uv.setXY(1, u1, v0);
         uv.setXY(2, u1, v1);
 
-        uv.setXY(0, u0, v0);
-        uv.setXY(1, u1, v1);
-        uv.setXY(2, u0, v1);
+        uv.setXY(3, u0, v0);
+        uv.setXY(4, u1, v1);
+        uv.setXY(5, u0, v1);
 
         uv.needsUpdate = true;
     }
 
-    getMaterial():MeshBasicMaterial {
+    getMaterial(): MeshBasicMaterial {
         return this._material;
     }
 
@@ -406,6 +406,7 @@ export class DeepImageLayer extends Layer {
         }
     } = null;
     private _textureCache: Cache<string, three.Texture> = new Cache();
+    private _tilesBuffer: Buffer<DeepImageLayerTile>;
 
 
     options: DeepImageLayerOptions;
@@ -426,6 +427,8 @@ export class DeepImageLayer extends Layer {
 
 
         this._container = this._renderer.domElement;
+
+        this._tilesBuffer = new Buffer(() => { return new DeepImageLayerTile() }, 100);
 
         // Compute zoomLevels
         {
@@ -498,14 +501,17 @@ export class DeepImageLayer extends Layer {
 
         renderer.setViewport(0, 0, this._container.width, this._container.height);
 
+        this._tilesBuffer.begin();
+
         let mz0 = this.getMeshForZoom(dt, z0, 1, false);
         let mz1 = this.getMeshForZoom(dt, z1, 1 - zDelta, true);
 
         if (mz0)
             scene.add(...mz0);
-        if (mz1)
-            scene.add(...mz1);
-
+        /*
+                if (mz1)
+                    scene.add(...mz1);
+        */
 
         renderer.render(scene, camera);
 
@@ -543,21 +549,17 @@ export class DeepImageLayer extends Layer {
         let maxX = Math.min(tx - 1, Math.ceil(camera.right / worldTileWidth));
         let maxY = Math.min(ty - 1, camera.top / worldTileHeight);
 
-        let plane = new three.PlaneGeometry(worldTileWidth, worldTileHeight, 1, 1);
-
-        let wireframeMat = new three.MeshBasicMaterial({
-            transparent: true,
-            wireframe: true,
-        });
 
         for (let x = minX; x <= maxX; x++) {
             for (let y = minY; y <= maxY; y++) {
 
+                let tile = this._tilesBuffer.next();
+
                 let coordsHash = this.hashTileCoord(x, y, zoom);
                 let tileUrl = this.options.getTileURL(zoom, x, y);
 
-                let mesh: three.Mesh;
-
+                let mesh: three.Mesh = tile.getMesh();
+                let material: three.MeshBasicMaterial = tile.getMaterial();
 
                 let texture: three.Texture = this._textureCache.get(coordsHash);
 
@@ -568,32 +570,23 @@ export class DeepImageLayer extends Layer {
                 }
 
 
-                let material = new three.MeshBasicMaterial({
-                    transparent: true,
-                    opacity: opacity,
-                    map: texture
-                });
-
+                material.transparent = true;
+                material.opacity = opacity;
+                material.map = texture;
+                //material.wireframe = true;
                 if (x === maxX || y === maxY) {
 
                     let tw = x === maxX ? zoomLevel.viewportExcessX : worldTileWidth;
                     let th = y === maxY ? zoomLevel.viewportExcessY : worldTileHeight;
 
-
-                    let geom = new three.PlaneGeometry(tw, th, 1, 1);
-                    mesh = new three.Mesh(geom, material);
-                    mesh.position.add(new three.Vector3(x * worldTileWidth + tw * .5, y * worldTileHeight + th * .5));
+                    tile.setPosition(x * worldTileWidth + tw * .5, y * worldTileHeight + th * .5, tw, th);
                 } else {
-                    mesh = new three.Mesh(plane, material);
-                    mesh.position.add(new three.Vector3((x + .5) * worldTileWidth, (y + .5) * worldTileHeight));
+                    tile.setPosition((x + .5) * worldTileWidth, (y + .5) * worldTileHeight, worldTileWidth, worldTileHeight)
                 }
-                result.push(mesh);
 
-                {
-                    let wfMesh = mesh.clone();
-                    wfMesh.material = wireframeMat;
-                    result.push(wfMesh);
-                }
+                tile.setUV(0, 1, 0, 1);
+
+                result.push(mesh);
 
             }
         }
