@@ -9,7 +9,6 @@ export interface DeepZoomLayerControls {
     title: string;
     opacity: number;
     visible: boolean;
-    exclusive: boolean;
     previewImage: string;
     color: string;
 }
@@ -17,7 +16,6 @@ export interface DeepZoomLayerControls {
 export const DeepZoomLayerControlsDefaults: Partial<DeepZoomLayerControls> = {
     opacity: 1,
     visible: true,
-    exclusive: false,
     previewImage: "",
     color: "rgba(0,0,0,.25)"
 }

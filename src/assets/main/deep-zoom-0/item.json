@@ -10,52 +10,58 @@
     "layers": [
         {
             "type": "deep-image",
+            "name" : "layer0",
             "title": "Layer 0",
             "color": "#ff3333",
             "opacity": 1,
             "visible": false,
-            "exclusive": false,
             "previewImage": "./layer0/8/0_0.jpg",
             "imageSrc": "./layer0",
             "width": 4256,
             "height": 2832,
             "tileSize": 256,
-            "tileOverlap": 1
+            "tileOverlap": 1,
+            "minZoom": -13,
+            "maxZoom": 0
         },
         {
             "type": "deep-image",
+            "name" : "layer1",
             "title": "Layer 1",
             "color": "#3333ff",
             "opacity": 1,
             "visible": false,
-            "exclusive": false,
             "previewImage": "./layer1/8/0_0.jpg",
             "imageSrc": "./layer1",
             "width": 4256,
             "height": 6396,
             "tileSize": 256,
-            "tileOverlap": 1
+            "tileOverlap": 1,
+            "minZoom": -13,
+            "maxZoom": -1
         },
         {
             "type": "deep-image",
+            "name" : "layer1_copy",
             "title": "Layer 1 Copia",
             "color": "#33ff66",
             "opacity": 1,
             "visible": true,
-            "exclusive": true,
             "previewImage": "./layer1/8/0_0.jpg",
             "imageSrc": "./layer1",
             "width": 4256,
             "height": 6396,
             "tileSize": 256,
-            "tileOverlap": 1
+            "tileOverlap": 1,
+            "minZoom": -13,
+            "maxZoom": -2
         },
         {
             "type": "vector",
+            "name" : "vector_layer_test",
             "title": "Vector Layer Test",
             "color": "#ff33ff",
             "opacity": 1,
-            "exclusive": false,
             "visible": true,
             "shapes": [
                 {

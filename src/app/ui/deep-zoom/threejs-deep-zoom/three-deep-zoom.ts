@@ -1,5 +1,5 @@
 import * as three from 'three';
-import { Vector2, Box2, Mesh, Vector3, Color } from 'three';
+import { Vector2, Box2, Mesh, Vector3, Color, BufferGeometry } from 'three';
 
 const moveTowards = function (n: number, target: number, maxDelta: number) {
     return Math.abs(target - n) <= maxDelta ? target : n + Math.sign(target - n) * maxDelta;
@@ -213,16 +213,6 @@ export interface LayerOptions {
     color?: string;
 }
 
-export interface DeepImageLayerOptions extends LayerOptions {
-    tileSize: number,
-    tileOverlap: number,
-    viewportWidth: number,
-    viewportHeight: number,
-    width: number,
-    height: number,
-    maxZoom: number;
-    getTileURL(): string;
-}
 
 export abstract class Layer {
 
@@ -245,9 +235,41 @@ export abstract class Layer {
     abstract resize(w: number, h: number);
 }
 
+
+export interface DeepImageLayerOptions extends LayerOptions {
+    tileSize: number;
+    tileOverlap: number;
+    viewportWidth: number;
+    viewportHeight: number;
+    width: number;
+    height: number;
+    minZoom: number;
+    maxZoom: number;
+    getTileURL(zoom: number, x: number, y: number): string;
+}
+
+
 export class DeepImageLayer extends Layer {
-    _container: HTMLCanvasElement;
-    _renderer: three.WebGLRenderer;
+
+    private _container: HTMLCanvasElement;
+    private _renderer: three.WebGLRenderer;
+    private _zoomLevels: {
+        [key: number]: {
+            zoom: number,
+            width: number,
+            height: number,
+            tilesX: number,
+            tilesY: number,
+            excessX: number,
+            excessY: number,
+            viewportExcessX: number,
+            viewportExcessY: number,
+            worldTileWidth: number,
+            worldTileHeight: number
+        }
+    } = null;
+
+
     options: DeepImageLayerOptions;
 
     constructor(options: DeepImageLayerOptions) {
@@ -266,6 +288,45 @@ export class DeepImageLayer extends Layer {
 
 
         this._container = this._renderer.domElement;
+
+        // Compute zoomLevels
+        {
+            let w = options.width, h = options.height;
+            this._zoomLevels = {};
+
+            for (let z = options.maxZoom; z >= options.minZoom; z--) {
+
+                let tilesX = Math.ceil(w / options.tileSize);
+                let tilesY = Math.ceil(h / options.tileSize);
+
+                let excessX = options.tileSize - (tilesX * options.tileSize - w);
+                let excessY = options.tileSize - (tilesY * options.tileSize - h);
+
+                let worldTileWidth = options.viewportWidth / (tilesX - 1 + excessX / options.tileSize);
+                let worldTileHeight = options.viewportHeight / (tilesY - 1 + excessY / options.tileSize);
+
+                let viewportExcessX = excessX / options.tileSize * worldTileWidth;
+                let viewportExcessY = excessY / options.tileSize * worldTileHeight;
+
+                this._zoomLevels[z] = {
+                    zoom: z,
+                    width: w,
+                    height: h,
+                    tilesX: tilesX,
+                    tilesY: tilesY,
+                    excessX: excessX,
+                    excessY: excessY,
+                    viewportExcessX: viewportExcessX,
+                    viewportExcessY: viewportExcessY,
+                    worldTileWidth: worldTileWidth,
+                    worldTileHeight: worldTileHeight
+                };
+
+                w = Math.ceil(w / 2);
+                h = Math.ceil(h / 2);
+            }
+        }
+
     }
 
     resize(w: number, h: number): void {
@@ -292,41 +353,78 @@ export class DeepImageLayer extends Layer {
         let zDelta = z - z1;
 
 
-
         renderer.setViewport(0, 0, this._container.width, this._container.height);
 
         let mz0 = this.getMeshForZoom(dt, z0, 1, false);
         let mz1 = this.getMeshForZoom(dt, z1, 1 - zDelta, true);
 
-
         if (mz0)
-            scene.add(mz0);
+            scene.add(...mz0);
 
-        
         if (mz1)
-            scene.add(mz1);
-        
+            scene.add(...mz1);
+
         renderer.render(scene, camera);
+
+        scene.dispose();
+
 
     }
 
-    private getMeshForZoom(dt: number, zoom: number, opacity: number, replace: boolean): Mesh {
+    private getMeshForZoom(dt: number, zoom: number, opacity: number, replace: boolean): Mesh[] {
 
         if (zoom - 2 * this.options.maxZoom > 0)
             return null;
 
-        console.log(this._parent.zoom);
+        let zoomLevel = this._zoomLevels[zoom];
 
-        let geom = new three.PlaneBufferGeometry(this.options.viewportWidth, this.options.viewportHeight, 1, 1);
-        geom.translate(this.options.viewportWidth / 2, this.options.viewportHeight / 2, 0);
 
-        let mat = new three.MeshBasicMaterial({
+        let result: Mesh[] = [];
+
+        let material = new three.MeshBasicMaterial({
             color: new Color(this.options.color),
             transparent: true,
-            opacity: opacity,
+            opacity: opacity
         });
 
-        return new Mesh(geom, mat);
+        let tx = zoomLevel.tilesX;
+        let ty = zoomLevel.tilesY;
+
+        let camera = this._parent.getCamera();
+
+        let worldTileWidth = zoomLevel.worldTileWidth;
+        let worldTileHeight = zoomLevel.worldTileHeight;
+
+        let minX = Math.max(0, Math.floor(camera.left / worldTileWidth))
+        let minY = Math.max(0, Math.floor(camera.bottom / worldTileHeight));
+        let maxX = Math.min(tx - 1, Math.ceil(camera.right / worldTileWidth));
+        let maxY = Math.min(ty - 1, camera.top / worldTileHeight);
+
+        let plane = new three.PlaneGeometry(worldTileWidth, worldTileHeight, 1, 1);
+
+        for (let x = minX; x <= maxX; x++) {
+            for (let y = minY; y <= maxY; y++) {
+                let mesh: three.Mesh;
+
+                if (x === maxX || y === maxY) {
+
+                    let tw = x === maxX ? zoomLevel.viewportExcessX : worldTileWidth;
+                    let th = y === maxY ? zoomLevel.viewportExcessY : worldTileHeight;
+
+
+                    let geom = new three.PlaneGeometry(tw, th, 1, 1);
+                    mesh = new three.Mesh(geom, material);
+                    mesh.position.add(new three.Vector3(x * worldTileWidth + tw * .5, y * worldTileHeight + th * .5));
+                } else {
+                    mesh = new three.Mesh(plane, material);
+                    mesh.position.add(new three.Vector3((x + .5) * worldTileWidth, (y + .5) * worldTileHeight));
+                }
+                result.push(mesh);
+
+            }
+        }
+
+        return result;
     }
 
 

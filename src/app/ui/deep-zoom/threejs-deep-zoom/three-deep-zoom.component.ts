@@ -2,6 +2,7 @@ import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy } from '@ang
 import { DeepZoomItem, DeepZoomItemDeepImageLayer } from 'src/app/types/deep-zoom-item';
 import * as tdz from './three-deep-zoom';
 import { DeepZoomLayerControls, DeepZoomLayerControlsDefaults } from '../deep-zoom';
+import { ContextService } from 'src/app/context.service';
 
 
 
@@ -23,7 +24,7 @@ export class ThreeDeepZoomComponent implements OnInit, OnDestroy {
   layerControls: ThreeLayerControls[] = null;
   deepZoom: tdz.DeepZoom = null;
 
-  constructor() { }
+  constructor(private context:ContextService) { }
 
   ngOnInit(): void {
     this.deepZoom = new tdz.DeepZoom(this.mapContainer.nativeElement);
@@ -60,11 +61,13 @@ export class ThreeDeepZoomComponent implements OnInit, OnDestroy {
   }
 
   createDeepImageLayer(layerSpec: DeepZoomItemDeepImageLayer): ThreeLayerControls {
+
+    let baseUrl = this.context.resolveUrl(layerSpec.imageSrc, this.item);
+
     return {
       title: layerSpec.title,
       opacity: typeof layerSpec.opacity === "number" ? layerSpec.opacity : DeepZoomLayerControlsDefaults.opacity,
       visible: typeof layerSpec.visible === "boolean" ? layerSpec.visible : DeepZoomLayerControlsDefaults.visible,
-      exclusive: typeof layerSpec.exclusive === "boolean" ? layerSpec.exclusive : DeepZoomLayerControlsDefaults.exclusive,
       previewImage: layerSpec.previewImage || DeepZoomLayerControlsDefaults.previewImage,
       color: layerSpec.color || DeepZoomLayerControlsDefaults.color,
       nativeLayer: new tdz.DeepImageLayer({
@@ -75,8 +78,11 @@ export class ThreeDeepZoomComponent implements OnInit, OnDestroy {
         height: layerSpec.height,
         viewportWidth: this.item.options.viewport.width,
         viewportHeight: this.item.options.viewport.height,
-        maxZoom: 0,
-        getTileURL: () => ""
+        minZoom: layerSpec.minZoom,
+        maxZoom: layerSpec.maxZoom,
+        getTileURL: (zoom, x, y) => {
+          return "";
+        }
       })
     }
   }

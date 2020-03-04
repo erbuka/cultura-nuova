@@ -12,12 +12,9 @@ interface LeafletLayerControls extends DeepZoomLayerControls {
   title: string;
   opacity: number;
   visible: boolean;
-  exclusive: boolean;
   previewImage: string;
   nativeLayer: any;
-
   update(): void;
-
 }
 
 @Component({
@@ -206,7 +203,6 @@ export class LeafletDeepZoomComponent implements OnInit {
       title: layerSpec.title,
       opacity: typeof layerSpec.opacity === "number" ? layerSpec.opacity : DeepZoomLayerControlsDefaults.opacity,
       visible: typeof layerSpec.visible === "boolean" ? layerSpec.visible : DeepZoomLayerControlsDefaults.visible,
-      exclusive: typeof layerSpec.exclusive === "boolean" ? layerSpec.exclusive : DeepZoomLayerControlsDefaults.exclusive,
       previewImage: layerSpec.previewImage || DeepZoomLayerControlsDefaults.previewImage,
       color: layerSpec.color || DeepZoomLayerControlsDefaults.color,
       nativeLayer: nativeLayer,
@@ -264,7 +260,6 @@ export class LeafletDeepZoomComponent implements OnInit {
       title: layerSpec.title,
       opacity: typeof layerSpec.opacity === "number" ? layerSpec.opacity : DeepZoomLayerControlsDefaults.opacity,
       visible: typeof layerSpec.visible === "boolean" ? layerSpec.visible : DeepZoomLayerControlsDefaults.visible,
-      exclusive: typeof layerSpec.exclusive === "boolean" ? layerSpec.exclusive : DeepZoomLayerControlsDefaults.exclusive,
       previewImage: layerSpec.previewImage || DeepZoomLayerControlsDefaults.previewImage,
       color: layerSpec.color || DeepZoomLayerControlsDefaults.color,
       nativeLayer: nativeLayer,
