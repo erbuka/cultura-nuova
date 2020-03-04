@@ -512,10 +512,10 @@ export class DeepImageLayer extends Layer {
 
         if (mz0)
             scene.add(...mz0);
-        /*
-                if (mz1)
-                    scene.add(...mz1);
-        */
+
+        if (mz1)
+            scene.add(...mz1);
+
 
         renderer.render(scene, camera);
 
@@ -569,6 +569,9 @@ export class DeepImageLayer extends Layer {
 
                 if (!texture) {
                     texture = textureLoader.load(tileUrl);
+                    texture.generateMipmaps = false;
+                    texture.minFilter = three.LinearFilter;
+                    texture.magFilter = three.LinearFilter;
                     texture.flipY = false;
                     this._textureCache.put(coordsHash, texture);
                 }
@@ -577,7 +580,8 @@ export class DeepImageLayer extends Layer {
                 material.transparent = true;
                 material.opacity = opacity;
                 material.map = texture;
-                //material.wireframe = true;
+                material.opacity = opacity;
+
                 if (x === maxX || y === maxY) {
 
                     let tw = x === maxX ? zoomLevel.viewportExcessX : worldTileWidth;

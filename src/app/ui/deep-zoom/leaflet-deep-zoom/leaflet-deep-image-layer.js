@@ -10,10 +10,7 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
     let scaleX = options.cnViewportWidth / options.cnWidth * Math.pow(2, options.maxZoom);
     let scaleY = options.cnViewportHeight / options.cnHeight * Math.pow(2, options.maxZoom);
 
-
     options.tileSize = L.point(options.cnTileSize * scaleX, options.cnTileSize * scaleY);
-    //options.minZoom = -Math.ceil(Math.log2(Math.max(options.cnWidth, options.cnHeight)));
-    //options.maxZoom = 0;
 
     console.log(options.tileSize);
 
