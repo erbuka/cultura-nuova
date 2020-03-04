@@ -1,11 +1,16 @@
 import * as three from 'three';
-import { Vector2, Box2, Mesh, Vector3, Color, BufferGeometry } from 'three';
+import { Vector2, Box2, Mesh, Vector3, Color, BufferGeometry, MeshBasicMaterial } from 'three';
 
 const moveTowards = function (n: number, target: number, maxDelta: number) {
     return Math.abs(target - n) <= maxDelta ? target : n + Math.sign(target - n) * maxDelta;
 }
 
-class Cache<K extends (string | number), T extends { dispose?: () => void }> {
+interface Disposable {
+    dispose(): void;
+}
+
+class Cache<K extends (string | number), T extends Partial<Disposable>> implements Disposable {
+
 
     private cacheMap: Map<K, T> = new Map();
 
@@ -31,9 +36,43 @@ class Cache<K extends (string | number), T extends { dispose?: () => void }> {
         this.cacheMap.clear();
     }
 
+    dispose(): void {
+        this.clear();
+    }
+
 }
 
-class EventHandlers {
+class Batch<T extends Partial<Disposable>> implements Disposable {
+
+    private elements: T[] = [];
+    private currentIndex: number = 0;
+
+    constructor(private constructFn: () => T, initialSize: number) {
+        for (let i = 0; i < initialSize; i++)
+            this.elements.push(constructFn());
+    }
+
+    begin(): void {
+        this.currentIndex = 0;
+    }
+
+    next(): T {
+        if (this.currentIndex >= this.elements.length)
+            this.elements.push(this.constructFn());
+        return this.elements[this.currentIndex++];
+    }
+
+    dispose(): void {
+        this.elements.forEach(e => {
+            if (e.dispose)
+                e.dispose();
+        });
+    }
+
+}
+
+class EventHandlers implements Disposable {
+
     private _handlers: { el: EventTarget, evtName: string, handler: EventListener }[] = [];
 
     register(el: EventTarget, evtName: string, handler: EventListener): void {
@@ -49,6 +88,10 @@ class EventHandlers {
         for (let h of this._handlers) {
             h.el.removeEventListener(h.evtName, h.handler);
         }
+    }
+
+    dispose(): void {
+        this.cleanup();
     }
 
 }
@@ -242,7 +285,7 @@ export interface LayerOptions {
 }
 
 
-export abstract class Layer {
+export abstract class Layer implements Disposable {
 
     protected _parent: DeepZoom = null;
 
@@ -264,6 +307,71 @@ export abstract class Layer {
     abstract dispose(): void;
 }
 
+
+class DeepImageLayerTile implements Disposable {
+
+    private _mesh: three.Mesh;
+    private _geom: three.BufferGeometry;
+    private _material: three.MeshBasicMaterial;
+
+    constructor() {
+        this._geom = new three.BufferGeometry();
+        this._material = new three.MeshBasicMaterial();
+        this._mesh = new three.Mesh(this._geom, this._material);
+
+        this.initGeometry();
+
+    }
+
+    setPosition(x: number, y: number, width: number, height: number): void {
+        let pos = this._geom.getAttribute("position") as three.BufferAttribute;
+
+        pos.setXYZ(0, x, y, 0);
+        pos.setXYZ(1, x + width, y, 0);
+        pos.setXYZ(2, x + width, y + height, 0);
+
+        pos.setXYZ(3, x, y, 0);
+        pos.setXYZ(3, x + width, y + height, 0);
+        pos.setXYZ(3, x, y + height, 0);
+
+        pos.needsUpdate = true;
+
+    }
+
+    setUV(u0: number, u1: number, v0: number, v1: number): void {
+        let uv = this._geom.getAttribute("uv") as three.BufferAttribute;
+
+        uv.setXY(0, u0, v0);
+        uv.setXY(1, u1, v0);
+        uv.setXY(2, u1, v1);
+
+        uv.setXY(0, u0, v0);
+        uv.setXY(1, u1, v1);
+        uv.setXY(2, u0, v1);
+
+        uv.needsUpdate = true;
+    }
+
+    getMaterial():MeshBasicMaterial {
+        return this._material;
+    }
+
+    getMesh(): three.Mesh {
+        return this._mesh;
+    }
+
+    dispose(): void {
+        this._geom.dispose();
+        this._material.dispose();
+    }
+
+    private initGeometry() {
+        let g = this._geom;
+        g.setAttribute("position", new three.BufferAttribute(new Float32Array(3 * 6), 3));
+        g.setAttribute("uv", new three.BufferAttribute(new Float32Array(2 * 6), 2));
+        g.setDrawRange(0, 6);
+    }
+}
 
 export interface DeepImageLayerOptions extends LayerOptions {
     tileSize: number;
@@ -397,7 +505,7 @@ export class DeepImageLayer extends Layer {
             scene.add(...mz0);
         if (mz1)
             scene.add(...mz1);
-        
+
 
         renderer.render(scene, camera);
 
@@ -406,7 +514,7 @@ export class DeepImageLayer extends Layer {
 
     }
 
-    private hashTileCoord(x: number, y: number, z:number): string {
+    private hashTileCoord(x: number, y: number, z: number): string {
         return `${x}-${y}-${z}`;
     }
 
@@ -492,6 +600,5 @@ export class DeepImageLayer extends Layer {
 
         return result;
     }
-
 
 }
