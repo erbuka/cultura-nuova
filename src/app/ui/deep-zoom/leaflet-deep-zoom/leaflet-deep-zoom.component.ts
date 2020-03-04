@@ -181,15 +181,13 @@ export class LeafletDeepZoomComponent implements OnInit {
   private createDeepImageLayer(layerSpec: DeepZoomItemDeepImageLayer, pane: string): LeafletLayerControls {
 
     let nativeLayer = new LeafletDeepImageLayer({
-      updateInterval: 1,
-      updateWhenIdle: false,
-      updateWhenZooming: true,
-      keepBuffer: 10,
       pane: pane,
       bounds: L.latLngBounds(
         this.pointToLatLng(0, 0, 0),
         this.pointToLatLng(this.item.options.viewport.width, this.item.options.viewport.height, 0)
       ),
+      minZoom: layerSpec.minZoom,
+      maxZoom: layerSpec.maxZoom,
       cnTileSize: layerSpec.tileSize,
       cnViewportWidth: this.item.options.viewport.width,
       cnViewportHeight: this.item.options.viewport.height,

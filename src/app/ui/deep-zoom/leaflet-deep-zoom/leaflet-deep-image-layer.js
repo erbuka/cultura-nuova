@@ -7,19 +7,22 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
   zoomLevelCount: null,
   initialize: function (options) {
 
-    let scaleX = options.cnViewportWidth / options.cnWidth;
-    let scaleY = options.cnViewportHeight / options.cnHeight;
+    let scaleX = options.cnViewportWidth / options.cnWidth * Math.pow(2, options.maxZoom);
+    let scaleY = options.cnViewportHeight / options.cnHeight * Math.pow(2, options.maxZoom);
+
 
     options.tileSize = L.point(options.cnTileSize * scaleX, options.cnTileSize * scaleY);
-    options.minZoom = -Math.ceil(Math.log2(Math.max(options.cnWidth, options.cnHeight)));
-    options.maxZoom = 0;
+    //options.minZoom = -Math.ceil(Math.log2(Math.max(options.cnWidth, options.cnHeight)));
+    //options.maxZoom = 0;
+
+    console.log(options.tileSize);
 
     L.GridLayer.prototype.initialize.call(this, options);
 
 
     this.zoomLevelCount = options.maxZoom - options.minZoom + 1;
 
-    this.zoomLevels = [];
+    this.zoomLevels = {};
 
     let w = options.cnWidth, h = options.cnHeight;
 
@@ -35,6 +38,8 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
       w = Math.ceil(w / 2);
       h = Math.ceil(h / 2);
     }
+
+    console.log(this.zoomLevels);
 
 
   },
@@ -73,7 +78,7 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
       done(null, tile);
     })
 
-    img.src = Location.joinWithSlash(this.options.cnImageSrc, `${this.zoomLevelCount - 1 + z}/${coords.x}_${coords.y}.jpg`);
+    img.src = Location.joinWithSlash(this.options.cnImageSrc, `${this.zoomLevelCount - 1 + (z - this.options.maxZoom)}/${coords.x}_${coords.y}.jpg`);
 
     return tile;
   }
