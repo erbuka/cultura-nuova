@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, OnChanges } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
 import { DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
@@ -35,7 +35,6 @@ export class LeafletDeepZoomComponent implements OnInit {
   _measureUnit: DeepZoomMeasureUnit = "pixels";
 
   constructor(private context: ContextService, private router: Router) { }
-
 
   get viewportAspectRatio(): number {
     return this.item.options.viewport.width / this.item.options.viewport.height;

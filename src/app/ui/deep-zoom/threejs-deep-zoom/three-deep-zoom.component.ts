@@ -24,7 +24,7 @@ export class ThreeDeepZoomComponent implements OnInit, OnDestroy {
   layerControls: ThreeLayerControls[] = null;
   deepZoom: tdz.DeepZoom = null;
 
-  constructor(private context:ContextService) { }
+  constructor(private context: ContextService) { }
 
   ngOnInit(): void {
     this.deepZoom = new tdz.DeepZoom(this.mapContainer.nativeElement);
@@ -63,6 +63,7 @@ export class ThreeDeepZoomComponent implements OnInit, OnDestroy {
   createDeepImageLayer(layerSpec: DeepZoomItemDeepImageLayer): ThreeLayerControls {
 
     let baseUrl = this.context.resolveUrl(layerSpec.imageSrc, this.item);
+    let zoomLevelsCount = layerSpec.maxZoom - layerSpec.minZoom + 1;
 
     return {
       title: layerSpec.title,
@@ -81,7 +82,7 @@ export class ThreeDeepZoomComponent implements OnInit, OnDestroy {
         minZoom: layerSpec.minZoom,
         maxZoom: layerSpec.maxZoom,
         getTileURL: (zoom, x, y) => {
-          return "";
+          return this.context.joinUrl(baseUrl, `${zoomLevelsCount - 1 + (zoom - layerSpec.maxZoom) }/${x}_${y}.jpg`);
         }
       })
     }

@@ -5,6 +5,34 @@ const moveTowards = function (n: number, target: number, maxDelta: number) {
     return Math.abs(target - n) <= maxDelta ? target : n + Math.sign(target - n) * maxDelta;
 }
 
+class Cache<K extends (string | number), T extends { dispose?: () => void }> {
+
+    private cacheMap: Map<K, T> = new Map();
+
+    constructor() {
+
+    }
+
+    get(key: K): T | null {
+        if (this.cacheMap.has(key))
+            return this.cacheMap.get(key);
+        return null;
+    }
+
+    put(key: K, value: T): void {
+        this.cacheMap.set(key, value);
+    }
+
+    clear(): void {
+        for (let v of this.cacheMap.values()) {
+            if (v.dispose)
+                v.dispose();
+        }
+        this.cacheMap.clear();
+    }
+
+}
+
 class EventHandlers {
     private _handlers: { el: EventTarget, evtName: string, handler: EventListener }[] = [];
 
@@ -233,6 +261,7 @@ export abstract class Layer {
     abstract render(dt: number): void;
     abstract getContainer(): HTMLElement;
     abstract resize(w: number, h: number);
+    abstract dispose(): void;
 }
 
 
@@ -268,6 +297,7 @@ export class DeepImageLayer extends Layer {
             worldTileHeight: number
         }
     } = null;
+    private _textureCache: Cache<string, three.Texture> = new Cache();
 
 
     options: DeepImageLayerOptions;
@@ -325,8 +355,13 @@ export class DeepImageLayer extends Layer {
                 w = Math.ceil(w / 2);
                 h = Math.ceil(h / 2);
             }
+
         }
 
+    }
+
+    dispose(): void {
+        this._textureCache.clear();
     }
 
     resize(w: number, h: number): void {
@@ -360,15 +395,19 @@ export class DeepImageLayer extends Layer {
 
         if (mz0)
             scene.add(...mz0);
-
         if (mz1)
             scene.add(...mz1);
+        
 
         renderer.render(scene, camera);
 
         scene.dispose();
 
 
+    }
+
+    private hashTileCoord(x: number, y: number, z:number): string {
+        return `${x}-${y}-${z}`;
     }
 
     private getMeshForZoom(dt: number, zoom: number, opacity: number, replace: boolean): Mesh[] {
@@ -381,11 +420,7 @@ export class DeepImageLayer extends Layer {
 
         let result: Mesh[] = [];
 
-        let material = new three.MeshBasicMaterial({
-            color: new Color(this.options.color),
-            transparent: true,
-            opacity: opacity
-        });
+        let textureLoader = new three.TextureLoader();
 
         let tx = zoomLevel.tilesX;
         let ty = zoomLevel.tilesY;
@@ -402,9 +437,34 @@ export class DeepImageLayer extends Layer {
 
         let plane = new three.PlaneGeometry(worldTileWidth, worldTileHeight, 1, 1);
 
+        let wireframeMat = new three.MeshBasicMaterial({
+            transparent: true,
+            wireframe: true,
+        });
+
         for (let x = minX; x <= maxX; x++) {
             for (let y = minY; y <= maxY; y++) {
+
+                let coordsHash = this.hashTileCoord(x, y, zoom);
+                let tileUrl = this.options.getTileURL(zoom, x, y);
+
                 let mesh: three.Mesh;
+
+
+                let texture: three.Texture = this._textureCache.get(coordsHash);
+
+                if (!texture) {
+                    texture = textureLoader.load(tileUrl);
+                    texture.flipY = false;
+                    this._textureCache.put(coordsHash, texture);
+                }
+
+
+                let material = new three.MeshBasicMaterial({
+                    transparent: true,
+                    opacity: opacity,
+                    map: texture
+                });
 
                 if (x === maxX || y === maxY) {
 
@@ -420,6 +480,12 @@ export class DeepImageLayer extends Layer {
                     mesh.position.add(new three.Vector3((x + .5) * worldTileWidth, (y + .5) * worldTileHeight));
                 }
                 result.push(mesh);
+
+                {
+                    let wfMesh = mesh.clone();
+                    wfMesh.material = wireframeMat;
+                    result.push(wfMesh);
+                }
 
             }
         }
