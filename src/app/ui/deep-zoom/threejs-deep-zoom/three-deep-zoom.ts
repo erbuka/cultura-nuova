@@ -336,6 +336,10 @@ class DeepImageLayerTile implements Disposable {
 
         pos.needsUpdate = true;
 
+        this._geom.computeBoundingBox();
+        this._geom.computeBoundingSphere();
+
+
     }
 
     setUV(u0: number, u1: number, v0: number, v1: number): void {
@@ -579,9 +583,9 @@ export class DeepImageLayer extends Layer {
                     let tw = x === maxX ? zoomLevel.viewportExcessX : worldTileWidth;
                     let th = y === maxY ? zoomLevel.viewportExcessY : worldTileHeight;
 
-                    tile.setPosition(x * worldTileWidth + tw * .5, y * worldTileHeight + th * .5, tw, th);
+                    tile.setPosition(x * worldTileWidth, y * worldTileHeight, tw, th);
                 } else {
-                    tile.setPosition((x + .5) * worldTileWidth, (y + .5) * worldTileHeight, worldTileWidth, worldTileHeight)
+                    tile.setPosition(x * worldTileWidth, y * worldTileHeight, worldTileWidth, worldTileHeight)
                 }
 
                 tile.setUV(0, 1, 0, 1);
