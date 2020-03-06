@@ -93,8 +93,8 @@
             "height": 2832,
             "tileSize": 256,
             "tileOverlap": 1,
-            "minZoom": -13,
-            "maxZoom": 0
+            "minZoom": -14,
+            "maxZoom": -1
         },
         {
             "type": "deep-image",
@@ -109,8 +109,8 @@
             "height": 6396,
             "tileSize": 256,
             "tileOverlap": 1,
-            "minZoom": -13,
-            "maxZoom": 0
+            "minZoom": -15,
+            "maxZoom": -2
         }
     ],
     "layerGroups": [
