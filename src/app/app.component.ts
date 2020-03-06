@@ -9,9 +9,10 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class AppComponent implements OnInit {
 
+
   @ViewChild("errorDialog", { static: true }) errorDialogTemplate: TemplateRef<any> = null;
 
-  constructor(private context: ContextService, private dialog: MatDialog) {
+  constructor(public context: ContextService, private dialog: MatDialog) {
 
   }
 

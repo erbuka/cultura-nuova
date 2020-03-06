@@ -2,6 +2,7 @@
     "type": "deep-zoom",
     "options": {
         "viewport": {
+            "dpi": 360,
             "width": 5000,
             "height": 5000
         },
@@ -9,56 +10,8 @@
     },
     "layers": [
         {
-            "type": "deep-image",
-            "name" : "layer0",
-            "title": "Layer 0",
-            "color": "#ff3333",
-            "opacity": 1,
-            "visible": false,
-            "previewImage": "./layer0/8/0_0.jpg",
-            "imageSrc": "./layer0",
-            "width": 4256,
-            "height": 2832,
-            "tileSize": 256,
-            "tileOverlap": 1,
-            "minZoom": -13,
-            "maxZoom": 0
-        },
-        {
-            "type": "deep-image",
-            "name" : "layer1",
-            "title": "Layer 1",
-            "color": "#3333ff",
-            "opacity": 1,
-            "visible": false,
-            "previewImage": "./layer1/8/0_0.jpg",
-            "imageSrc": "./layer1",
-            "width": 4256,
-            "height": 6396,
-            "tileSize": 256,
-            "tileOverlap": 1,
-            "minZoom": -13,
-            "maxZoom": 0
-        },
-        {
-            "type": "deep-image",
-            "name" : "layer1_copy",
-            "title": "Layer 1 Copia",
-            "color": "#33ff66",
-            "opacity": 1,
-            "visible": true,
-            "previewImage": "./layer1/8/0_0.jpg",
-            "imageSrc": "./layer1",
-            "width": 4256,
-            "height": 6396,
-            "tileSize": 256,
-            "tileOverlap": 1,
-            "minZoom": -13,
-            "maxZoom": 0
-        },
-        {
             "type": "vector",
-            "name" : "vector_layer_test",
+            "name": "vector_layer_test",
             "title": "Vector Layer Test",
             "color": "#ff33ff",
             "opacity": 1,
@@ -108,6 +61,73 @@
                     ],
                     "radius": 500
                 }
+            ]
+        },
+        {
+            "type": "deep-image",
+            "name": "layer1_copy",
+            "title": "Layer 1 Copia",
+            "color": "#33ff66",
+            "opacity": 1,
+            "opacityControl": false,
+            "visible": true,
+            "previewImage": "./layer1/8/0_0.jpg",
+            "imageSrc": "./layer1",
+            "width": 4256,
+            "height": 6396,
+            "tileSize": 256,
+            "tileOverlap": 1,
+            "minZoom": -13,
+            "maxZoom": 0
+        },
+        {
+            "type": "deep-image",
+            "name": "layer0",
+            "title": "Layer 0",
+            "color": "#ff3333",
+            "opacity": 1,
+            "visible": false,
+            "previewImage": "./layer0/8/0_0.jpg",
+            "imageSrc": "./layer0",
+            "width": 4256,
+            "height": 2832,
+            "tileSize": 256,
+            "tileOverlap": 1,
+            "minZoom": -13,
+            "maxZoom": 0
+        },
+        {
+            "type": "deep-image",
+            "name": "layer1",
+            "title": "Layer 1",
+            "color": "#3333ff",
+            "opacity": 1,
+            "visible": false,
+            "previewImage": "./layer1/8/0_0.jpg",
+            "imageSrc": "./layer1",
+            "width": 4256,
+            "height": 6396,
+            "tileSize": 256,
+            "tileOverlap": 1,
+            "minZoom": -13,
+            "maxZoom": 0
+        }
+    ],
+    "layerGroups": [
+        {
+            "name": "group0",
+            "exclusive": true,
+            "layers": [
+                "layer0",
+                "layer1"
+            ]
+        },
+        {
+            "name": "group1",
+            "exclusive": false,
+            "layers": [
+                "layer1_copy",
+                "vector_layer_test"
             ]
         }
     ]

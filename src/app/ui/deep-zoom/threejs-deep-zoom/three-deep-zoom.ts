@@ -535,7 +535,6 @@ export class DeepImageLayer extends Layer {
 
         let zoomLevel = this._zoomLevels[zoom];
 
-
         let result: Mesh[] = [];
 
         let textureLoader = new three.TextureLoader();

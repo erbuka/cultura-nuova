@@ -1,5 +1,7 @@
-<app-templates></app-templates>
-<router-outlet></router-outlet>
+<ng-container *ngIf="context.initialize() | async">
+    <app-templates></app-templates>
+    <router-outlet></router-outlet>
+</ng-container>
 
 <ng-template #errorDialog let-data>
     <h4 mat-dialog-title class="text-danger d-flex align-items-center">

@@ -28,8 +28,11 @@ export interface DeepZoomItemCircle extends DeepZoomItemShape {
 export interface DeepZoomItemLayer {
     type: string;
     name: string;
+    minZoom?: number;
+    maxZoom?: number;
     title?: string;
     opacity?: number;
+    opacityControl?: boolean;
     visible?: boolean;
     previewImage?: string;
     color?: string;
@@ -37,8 +40,7 @@ export interface DeepZoomItemLayer {
 
 export interface DeepZoomItemDeepImageLayer extends DeepZoomItemLayer {
     type: "deep-image";
-    minZoom: number;
-    maxZoom: number;
+
     imageSrc: string;
     width: number;
     height: number;
@@ -55,11 +57,18 @@ export interface DeepZoomItem extends ItemBase {
     type: "deep-zoom";
     options: {
         viewport: {
+            dpi: number,
             width: number,
             height: number
         },
         minimapImage: string
     },
-    layers: (DeepZoomItemDeepImageLayer | DeepZoomItemVectorLayer)[]
+    layers: (DeepZoomItemDeepImageLayer | DeepZoomItemVectorLayer)[],
+    layerGroups: {
+        name: string;
+        exclusive: boolean;
+        title?: string;
+        layers: string[]
+    }[]
 }
 

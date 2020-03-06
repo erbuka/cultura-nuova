@@ -2,18 +2,22 @@ import { Component, OnInit, Input, ViewChild, ElementRef, OnChanges } from '@ang
 import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
 import { DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
-import { DeepZoomLayerControls, DeepZoomTools, DeepZoomMeasureUnit, DeepZoomLayerControlsDefaults } from '../deep-zoom';
+import { DeepZoomLayerControls, DeepZoomTools, DeepZoomMeasureUnit, DeepZoomLayerControlsDefaults, measure } from '../deep-zoom';
 import { Router } from '@angular/router';
 import { LeafletDeepImageLayer } from './leaflet-deep-image-layer';
+import { LeafletMeasureLayer } from './leaflet-measure-layer';
 
+
+const MEASURE_LAYER_PANE = "dz-measure-pane";
 
 
 interface LeafletLayerControls extends DeepZoomLayerControls {
+  name: string;
   title: string;
   opacity: number;
   visible: boolean;
   previewImage: string;
-  nativeLayer: any;
+  nativeLayer: L.Layer;
   update(): void;
 }
 
@@ -31,6 +35,7 @@ export class LeafletDeepZoomComponent implements OnInit {
   map: L.Map = null;
   layerControls: LeafletLayerControls[] = null;
   minimapTrackStyle: object = {};
+  measureLayer: LeafletMeasureLayer = null;
   _tool: DeepZoomTools = "pan";
   _measureUnit: DeepZoomMeasureUnit = "pixels";
 
@@ -55,9 +60,12 @@ export class LeafletDeepZoomComponent implements OnInit {
     switch (t) {
       case "measure":
         this.map.dragging.disable();
+        if (!this.map.hasLayer(this.measureLayer))
+          this.map.addLayer(this.measureLayer);
         break;
       case "pan":
         this.map.dragging.enable();
+        this.map.removeLayer(this.measureLayer);
         break;
     }
 
@@ -67,14 +75,45 @@ export class LeafletDeepZoomComponent implements OnInit {
     return this._tool;
   }
 
+  get formattedZoom(): string {
+    return ((100 * Math.pow(2, this.map.getZoom())).toFixed(0) + "%");
+  }
+
   ngOnInit() {
     this.createMap();
   }
 
+  toggleLayerVisibility(l: LeafletLayerControls): void {
+    let visible = !l.visible;
+
+    if (visible) {
+      this.item.layerGroups.filter(g => g.exclusive && g.layers.includes(l.name)).forEach(g => {
+        this.layerControls.filter(l2 => g.layers.includes(l2.name)).forEach(l2 => l2.visible = false);
+      })
+    }
+
+    l.visible = visible;
+    this.updateLayers();
+  }
+
 
   updateLayers(): void {
-    this.layerControls.forEach(l => l.nativeLayer.getPane().style.display = l.visible ? "block" : "none");
-    this.layerControls.filter(l => l.visible).forEach(l => l.update());
+    //this.layerControls.forEach(l => l.nativeLayer.getPane().style.display = l.visible ? "block" : "none");
+    let zoom = this.map.getZoom();
+    this.layerControls.forEach(l => {
+
+      if (l.maxZoom >= zoom && l.minZoom <= zoom) {
+        l.nativeLayer.getPane().style.display = l.visible ? "block" : "none"
+      } else {
+        l.nativeLayer.getPane().style.display = "none";
+      }
+
+    });
+
+    this.layerControls.filter(l => l.visible).reverse().forEach((l, i) => {
+      l.nativeLayer.getPane().style.zIndex = i + "";
+      l.update();
+    })
   }
 
   resetCamera(options: object = {}): void {
@@ -123,8 +162,11 @@ export class LeafletDeepZoomComponent implements OnInit {
     });
 
     // Setup map listeners 
-    this.map.on("move", this.updateMinimapTrackStyle.bind(this));
-    this.map.on("zoomend", this.updateMinimapTrackStyle.bind(this));
+    this.map.on("move", () => this.updateMinimapTrackStyle());
+    this.map.on("zoom", () => {
+      this.updateMinimapTrackStyle();
+      this.updateLayers();
+    });
 
     // Create the layers
     this.createLayers();
@@ -152,7 +194,8 @@ export class LeafletDeepZoomComponent implements OnInit {
     this.layerControls = [];
     let i = 0;
 
-    for (let layerSpec of this.item.layers) {
+    this.item.layers.forEach(layerSpec => {
+
       let layerControls: LeafletLayerControls = null;
       let pane = `dz-pane-${i++}`;
 
@@ -168,25 +211,56 @@ export class LeafletDeepZoomComponent implements OnInit {
         this.map.addLayer(layerControls.nativeLayer);
         this.layerControls.push(layerControls);
       }
+    });
 
-
+    // Measure layer
+    {
+      this.measureLayer = new LeafletMeasureLayer({
+        pane: MEASURE_LAYER_PANE,
+        measure: (p0, p1) => {
+          let distance = this.map.options.crs.distance(p0, p1);
+          return measure(distance, this.measureUnit, this.item.options.viewport.dpi).toFixed(2);
+        }
+      });
+      this.map.createPane(MEASURE_LAYER_PANE).style.zIndex = this.layerControls.length + "";
     }
-
-
 
   }
 
 
+
+  private pointToLatLng(x: number, y: number, z: number): L.LatLng {
+    return this.map.options.crs.pointToLatLng(L.point(x, y), z);
+  }
+
+  private latLngToPoint(latlng: L.LatLng, zoom: number): L.Point {
+    return this.map.options.crs.latLngToPoint(latlng, zoom);
+  }
+
   private createDeepImageLayer(layerSpec: DeepZoomItemDeepImageLayer, pane: string): LeafletLayerControls {
 
-    let nativeLayer = new LeafletDeepImageLayer({
+    let result = this.context.assign({}, DeepZoomLayerControlsDefaults, {
+      name: layerSpec.name,
+      title: layerSpec.title,
+      opacity: layerSpec.opacity,
+      opacityControl: layerSpec.opacityControl,
+      visible: layerSpec.visible,
+      minZoom: layerSpec.minZoom,
+      maxZoom: layerSpec.maxZoom,
+      previewImage: layerSpec.previewImage,
+      color: layerSpec.color,
+      nativeLayer: null,
+      update: function () { this.nativeLayer.setOpacity(this.opacity); }
+    })
+
+    result.nativeLayer = new LeafletDeepImageLayer({
       pane: pane,
       bounds: L.latLngBounds(
         this.pointToLatLng(0, 0, 0),
         this.pointToLatLng(this.item.options.viewport.width, this.item.options.viewport.height, 0)
       ),
-      minZoom: layerSpec.minZoom,
-      maxZoom: layerSpec.maxZoom,
+      minZoom: result.minZoom,
+      maxZoom: result.maxZoom,
       cnTileSize: layerSpec.tileSize,
       cnViewportWidth: this.item.options.viewport.width,
       cnViewportHeight: this.item.options.viewport.height,
@@ -196,25 +270,9 @@ export class LeafletDeepZoomComponent implements OnInit {
       cnImageSrc: this.context.resolveUrl(layerSpec.imageSrc, this.item),
     });
 
-    return {
-      title: layerSpec.title,
-      opacity: typeof layerSpec.opacity === "number" ? layerSpec.opacity : DeepZoomLayerControlsDefaults.opacity,
-      visible: typeof layerSpec.visible === "boolean" ? layerSpec.visible : DeepZoomLayerControlsDefaults.visible,
-      previewImage: layerSpec.previewImage || DeepZoomLayerControlsDefaults.previewImage,
-      color: layerSpec.color || DeepZoomLayerControlsDefaults.color,
-      nativeLayer: nativeLayer,
-      update: function () { this.nativeLayer.setOpacity(this.opacity); }
-    };
-
+    return result;
   }
 
-  private pointToLatLng(x: number, y: number, z: number): L.LatLng {
-    return this.map.options.crs.pointToLatLng(L.point(x, y), z);
-  }
-
-  private latLngToPoint(latlng: L.LatLng, zoom: number): L.Point {
-    return this.map.options.crs.latLngToPoint(latlng, zoom);
-  }
 
   private createVectorLayer(layerSpec: DeepZoomItemVectorLayer, pane: string): LeafletLayerControls {
     let nativeLayer = L.layerGroup([], { pane: pane });
@@ -253,22 +311,20 @@ export class LeafletDeepZoomComponent implements OnInit {
       }
     }
 
-    return {
+    return this.context.assign({}, DeepZoomLayerControlsDefaults, {
+      name: layerSpec.name,
       title: layerSpec.title,
-      opacity: typeof layerSpec.opacity === "number" ? layerSpec.opacity : DeepZoomLayerControlsDefaults.opacity,
-      visible: typeof layerSpec.visible === "boolean" ? layerSpec.visible : DeepZoomLayerControlsDefaults.visible,
-      previewImage: layerSpec.previewImage || DeepZoomLayerControlsDefaults.previewImage,
-      color: layerSpec.color || DeepZoomLayerControlsDefaults.color,
+      opacity: layerSpec.opacity,
+      opacityControl: layerSpec.opacityControl,
+      visible: layerSpec.visible,
+      minZoom: layerSpec.minZoom,
+      maxZoom: layerSpec.maxZoom,
+      previewImage: layerSpec.previewImage,
+      color: layerSpec.color,
       nativeLayer: nativeLayer,
-      update: function () {
-        this.nativeLayer.eachLayer(l => {
-          l.setStyle({
-            opacity: this.opacity,
-            fillOpacity: this.opacity
-          });
-        })
-      }
-    };
+      update: function () { this.nativeLayer.getPane().style.opacity = this.opacity + ""; }
+    })
+
 
   }
 

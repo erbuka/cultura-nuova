@@ -13,29 +13,21 @@ import { Item } from 'src/app/types/item';
 export class MainComponent implements OnInit {
 
   item: Item = null;
-  config: Config;
 
-  constructor(private context: ContextService, private route: ActivatedRoute, private router: Router, private location: Location) { }
+  constructor(public context: ContextService, private route: ActivatedRoute, private router: Router, private location: Location) { }
 
   ngOnInit(): void {
 
-    this.context.getConfig().subscribe(cfg => {
+    this.route.url.subscribe(v => {
 
-      this.config = cfg;
+      if (v.length === 0) {
+        this.context.getItem(this.context.config.entry).subscribe(item => this.item = item);
+      } else {
+        let url = this.context.joinUrl(...v.map(x => x.path));
+        this.context.getItem(url).subscribe(item => this.item = item);
+      }
 
-      this.route.url.subscribe(v => {
-
-        if (v.length === 0) {
-          this.context.getItem(this.config.entry).subscribe(item => this.item = item);
-        } else {
-          let url = this.context.joinUrl(...v.map(x => x.path));
-          this.context.getItem(url).subscribe(item => this.item = item);
-        }
-      });
-
-    })
-
-
+    });
 
   }
 
@@ -50,4 +42,5 @@ export class MainComponent implements OnInit {
   goUp(): void {
     this.router.navigateByUrl(this.context.resolveUrl("..", this.item));
   }
+
 }

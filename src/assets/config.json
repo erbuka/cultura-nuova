@@ -1,5 +1,18 @@
 {
-    "name" : "Test App",
-    "backgroundImage" : "assets/bg.png",
-    "entry" : "assets/main"
+    "name": "Test App",
+    "backgroundImage": "assets/bg.png",
+    "entry": "assets/main",
+    "internationalization": {
+        "defaultLocale": "it",
+        "locales": [
+            {
+                "id": "it",
+                "description": "Italiano"
+            },
+            {
+                "id": "en",
+                "description": "English"
+            }
+        ]
+    }
 }

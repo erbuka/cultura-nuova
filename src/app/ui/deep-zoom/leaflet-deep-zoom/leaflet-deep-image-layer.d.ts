@@ -10,6 +10,6 @@ export type LeafletDeepImageLayerOptions = L.GridLayerOptions | {
     cnImageSrc: string,
 }
 
-declare class LeafletDeepImageLayer extends L.GridLayer {
+export declare class LeafletDeepImageLayer extends L.GridLayer {
     constructor(options: LeafletDeepImageLayerOptions);
 }

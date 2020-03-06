@@ -12,18 +12,13 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
 
     options.tileSize = L.point(options.cnTileSize * scaleX, options.cnTileSize * scaleY);
 
-    console.log(options.tileSize);
-
     L.GridLayer.prototype.initialize.call(this, options);
-
 
     this.zoomLevelCount = options.maxZoom - options.minZoom + 1;
 
     this.zoomLevels = {};
 
     this.imagesCache = {};
-
-    window["images"] = this.imagesCache;
 
     let w = options.cnWidth, h = options.cnHeight;
 
@@ -54,6 +49,8 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
     let tileSize = this.getTileSize();
 
     let tile = L.DomUtil.create("div", "leaflet-tile");
+
+
     let canvas = L.DomUtil.create("canvas");
     let ctx = canvas.getContext("2d");
 
@@ -64,17 +61,14 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
     tile.appendChild(canvas);
 
     let draw = (img) => {
-      
+
       let sx = coords.x === 0 ? 0 : overlap;
       let sy = coords.y === 0 ? 0 : overlap;
       let sw = coords.x === level.tilesX - 1 ? img.width - sx : img.width - sx - overlap;
       let sh = coords.y === level.tilesY - 1 ? img.height - sy : img.height - sy - overlap;
 
       ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw / this.options.cnTileSize * canvas.width, sh / this.options.cnTileSize * canvas.height);
-      
-      ctx.fillStyle = "#000";
-      ctx.font = "12px Arial";
-      ctx.fillText(`(${coords.x}, ${coords.y}, ${coords.z})`, 0, 20);
+     
     }
 
     let cachedImage = this.imagesCache[key];
@@ -89,6 +83,10 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
         draw(img);
         this.imagesCache[key] = img;
         done(null, tile);
+      });
+      img.addEventListener("error", () => {
+        tile.innerHTML = `Failed to load ${img.src}`;
+        done(null, tile)
       });
       img.src = Location.joinWithSlash(this.options.cnImageSrc, `${this.zoomLevelCount - 1 + (z - this.options.maxZoom)}/${coords.x}_${coords.y}.jpg`);
 

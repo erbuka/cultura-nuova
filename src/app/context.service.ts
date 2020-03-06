@@ -1,7 +1,7 @@
 import { Injectable, TemplateRef, EventEmitter, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { Location } from '@angular/common';
 
 import * as ajv from "ajv";
@@ -9,9 +9,18 @@ import { Item } from './types/item';
 
 const ITEM_SCHEMA = require('./types/schema.json');
 
+interface ConfigLocale {
+  id: string;
+  description: string;
+}
+
 export interface Config {
   backgroundImage: string;
   entry: string;
+  internationalization?: {
+    defaultLocale: string,
+    locales: ConfigLocale[]
+  }
 }
 
 
@@ -24,18 +33,74 @@ export type Error = {
 })
 export class ContextService {
 
+  _currentLocale: ConfigLocale;
+
+  config: Config = null;
+
   templates: Map<string, TemplateRef<any>> = new Map();
 
   onError: EventEmitter<Error> = new EventEmitter();
 
   private jsonValidator: ajv.Ajv = null;
+  private initializeSubject: BehaviorSubject<boolean>;
 
   constructor(private httpClient: HttpClient) {
     this.jsonValidator = new ajv({ allErrors: true });
   }
 
-  getConfig(): Observable<Config> {
-    return this.httpClient.get<any>("assets/config.json");
+  getLocales(): ConfigLocale[] {
+    if (!this.config.internationalization)
+      return [];
+
+    return this.config.internationalization.locales;
+  }
+
+  setCurrentLocale(localeId: string) {
+
+    this._currentLocale = null;
+
+    if (!this.config.internationalization)
+      throw new Error("No locale have been configured");
+
+    let loc = this.config.internationalization.locales.find(loc => loc.id === localeId);
+
+    if (!loc)
+      throw new Error(`Locale not found: ${localeId}`);
+
+    sessionStorage.setItem("cn-locale-id", loc.id);
+
+    this._currentLocale = loc;
+
+  }
+
+  getCurrentLocale(): ConfigLocale {
+    return this._currentLocale;
+  }
+
+
+  initialize(): BehaviorSubject<boolean> {
+    if (!this.initializeSubject) {
+      this.initializeSubject = new BehaviorSubject(false);
+      this.httpClient.get<Config>("assets/config.json").subscribe({
+        next: v => {
+          this.config = v;
+
+          if (this.config.internationalization) {
+
+            try {
+              this.setCurrentLocale(sessionStorage.getItem("cn-locale-id"));
+            }
+            catch (e) {
+              this.setCurrentLocale(this.config.internationalization.defaultLocale);
+            }
+
+          }
+
+          this.initializeSubject.next(true);
+        }
+      })
+    }
+    return this.initializeSubject;
   }
 
   getItem(url: string, handleError: boolean = true): Observable<Item> {
@@ -117,5 +182,14 @@ export class ContextService {
     console.error(err);
     this.onError.emit(err);
   }
+
+  assign<T, X, Y>(t: T, x: X, y: Y): T & X & Y;
+  assign(t: any, ...sources: any): any {
+    return Object.assign(t, ...sources.map(x =>
+      Object.entries(x)
+        .filter(([key, val]) => val !== undefined)
+        .reduce((obj, [key, val]) => { obj[key] = val; return obj; }, {})
+    ))
+  };
 
 }

@@ -1,63 +1,77 @@
-<div class="h-100 cn-relative">
+<div class="h-100 cn-relative" style="user-select: none;">
+    <!-- Map container-->
     <div class="cn-deep-zoom-container h-100" style="z-index: 0; background-color: transparent;" #mapContainer>
     </div>
 
-    <div class="cn-dz-layer-controls bg-background rounded mat-elevation-z4">
-        <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
-            <div class="cn-dz-layer-preview cn-bg-cover" [style.background-color]="l.color" [appBgImage]="l.previewImage | cnUrl : item"></div>
-            <div class="mx-2">{{ l.title }}</div>
-            <mat-slider class="ml-auto mr-2" min="0" step="0.01" max="1" [disabled]="!l.visible"
-                (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
-            </mat-slider>
-            <button mat-icon-button (click)="l.visible=!l.visible; updateLayers()">
-                <mat-icon *ngIf="l.visible">visibility</mat-icon>
-                <mat-icon *ngIf="!l.visible" style="opacity: 0.25;">visibility_off</mat-icon>
-            </button>
+    <!-- Controls -->
+    <div style="z-index: 2;">
+        <div class="cn-dz-layer-controls bg-background rounded mat-elevation-z4">
+            <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
+                <div class="cn-dz-layer-preview cn-bg-cover" [style.background-color]="l.color"
+                    [appBgImage]="l.previewImage | cnUrl : item"></div>
+                <div class="mx-2">{{ l.title }}</div>
+                <div class="ml-auto"></div>
+                <mat-slider *ngIf="l.opacityControl" class="mr-2" min="0" step="0.01" max="1" [disabled]="!l.visible"
+                    (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
+                </mat-slider>
+                <button mat-icon-button (click)="toggleLayerVisibility(l)">
+                    <mat-icon *ngIf="l.visible">visibility</mat-icon>
+                    <mat-icon *ngIf="!l.visible" style="opacity: 0.25;">visibility_off</mat-icon>
+                </button>
+            </div>
         </div>
-    </div>
 
-    <div class="cn-dz-minimap rounded bg-background p-1 mat-elevation-z4">
-        <div class="cn-dz-minimap-image" [style.padding-bottom]="1.0 / viewportAspectRatio * 100 + '%'"
-            [appBgImage]="item.options.minimapImage | cnUrl : item">
-            <div class="cn-dz-minimap-track" [ngStyle]="minimapTrackStyle"></div>
+        <div class="cn-dz-minimap rounded bg-background p-1 mat-elevation-z4">
+            <div class="cn-dz-minimap-image" [style.padding-bottom]="1.0 / viewportAspectRatio * 100 + '%'"
+                [appBgImage]="item.options.minimapImage | cnUrl : item">
+                <div class="cn-dz-minimap-track" [ngStyle]="minimapTrackStyle"></div>
+            </div>
         </div>
-    </div>
 
-    <div class="cn-dz-tools mat-elevation-z4 bg-background rounded">
 
-        <mat-menu #unitsMenu>
-            <button mat-menu-item>
-                <span>Pixels</span>
-            </button>
-            <button mat-menu-item>
-                <span>Inches</span>
-            </button>
-            <button mat-menu-item>
-                <span>Meters</span>
-            </button>
-        </mat-menu>
+        <div class="cn-dz-tools mat-elevation-z4 bg-background rounded">
 
-        <div class="d-flex p-2 align-items-center">
-            <button mat-icon-button (click)="tool='pan'" [class.cn-opacity-25]="tool !== 'pan'">
-                <mat-icon>pan_tool</mat-icon>
-            </button>
-            <button mat-icon-button (click)="tool='measure'" [class.cn-opacity-25]="tool !== 'measure'">
-                <mat-icon>square_foot</mat-icon>
-            </button>
-            <button mat-button [matMenuTriggerFor]="unitsMenu">
-                Pixels
-            </button>
-            <div class="border-left"></div>
-            <button mat-icon-button (click)="map.zoomIn()">
-                <mat-icon>zoom_in</mat-icon>
-            </button>
-            <button mat-icon-button (click)="map.zoomOut()">
-                <mat-icon>zoom_out</mat-icon>
-            </button>
-            <button mat-icon-button (click)="resetCamera()">
-                <mat-icon>zoom_out_map</mat-icon>
-            </button>
+            <mat-menu #unitsMenu>
+                <button mat-menu-item (click)="measureUnit='pixels'">
+                    <span>Pixels</span>
+                </button>
+                <button mat-menu-item (click)="measureUnit='inches'">
+                    <span>Inches</span>
+                </button>
+                <button mat-menu-item (click)="measureUnit='centimeters'">
+                    <span>Centimeters</span>
+                </button>
+            </mat-menu>
+
+            <div class="d-flex p-2 align-items-center">
+                <button mat-icon-button (click)="tool='pan'" [class.cn-opacity-25]="tool !== 'pan'">
+                    <mat-icon>pan_tool</mat-icon>
+                </button>
+                <button mat-icon-button (click)="tool='measure'" [class.cn-opacity-25]="tool !== 'measure'">
+                    <mat-icon>square_foot</mat-icon>
+                </button>
+                <button mat-button [matMenuTriggerFor]="unitsMenu">
+                    <span *ngIf="measureUnit==='pixels'">Pixels</span>
+                    <span *ngIf="measureUnit==='inches'">Inches</span>
+                    <span *ngIf="measureUnit==='centimeters'">Centimeters</span>
+                </button>
+                <div class="border-left"></div>
+                <button mat-icon-button (click)="map.zoomIn()">
+                    <mat-icon>zoom_in</mat-icon>
+                </button>
+                <button mat-icon-button (click)="map.zoomOut()">
+                    <mat-icon>zoom_out</mat-icon>
+                </button>
+                <span style="width: 3rem">
+                    {{formattedZoom}}
+                </span>
+                <button mat-icon-button (click)="resetCamera()">
+                    <mat-icon>zoom_out_map</mat-icon>
+                </button>
+            </div>
         </div>
+
+
     </div>
 
 </div>
