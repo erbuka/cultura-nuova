@@ -47,6 +47,8 @@ const vectorSub = function (a: IVector, b: IVector) {
     }
 }
 
+
+
 class Cache<K extends (string | number), T extends (any & Partial<Disposable>)> implements Disposable {
 
 
@@ -133,6 +135,42 @@ class EventHandlers implements Disposable {
     }
 
 }
+
+class ImageLoader implements Disposable {
+    private _worker: Worker;
+    private _handlers: EventHandlers;
+    private _images: { [url: string]: HTMLImageElement };
+
+    constructor() {
+        this._worker = new Worker("scripts/image-loader.worker.js");
+        this._handlers = new EventHandlers();
+        this._images = {};
+        this._handlers.register(this._worker, "message", (evt: MessageEvent) => {
+
+            let image = this._images[evt.data.originalUrl];
+            let url = evt.data.blobUrl;
+
+            image.addEventListener("load", () => {
+               URL.revokeObjectURL(url);
+            })
+
+            image.src = url;
+
+        });
+    }
+
+    load(url: string): HTMLImageElement {
+        let image = this._images[url] = new Image();
+        this._worker.postMessage(url);
+        return image;
+    }
+
+    dispose(): void {
+        this._handlers.dispose();
+    }
+}
+
+const imageLoader = new ImageLoader();
 
 class Projection {
     private _scale: IVector;
@@ -452,7 +490,7 @@ export class DeepImageLayer extends Layer {
 
             dz.projection.transform(ctx);
 
-            let z0 = Math.ceil(dz.zoom);
+            let z0 = Math.floor(dz.zoom);
 
 
             for (let i = this.options.minZoom; i <= z0; i++)
@@ -505,12 +543,12 @@ export class DeepImageLayer extends Layer {
 
                 let img: HTMLImageElement = this._imageCache.get(hash);
                 if (!img) {
-                    img = new Image();
-                    img.src = tileUrl;
+                    img = imageLoader.load(tileUrl);
                     this._imageCache.put(hash, img);
+                    //loadBlob(tileUrl).then((url) => img.src = url);
                 }
 
-                if (!img.complete)
+                if (!(img && img.src && img.complete))
                     continue;
 
                 let tw: number = worldTileWidth;
