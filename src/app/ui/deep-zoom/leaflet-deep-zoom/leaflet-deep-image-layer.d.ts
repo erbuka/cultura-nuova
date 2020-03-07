@@ -8,6 +8,7 @@ export type LeafletDeepImageLayerOptions = L.GridLayerOptions | {
     cnHeight: number,
     cnTileOverlap: number,
     cnImageSrc: string,
+    cnImageFormat: string
 }
 
 export declare class LeafletDeepImageLayer extends L.GridLayer {

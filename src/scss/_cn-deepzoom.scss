@@ -1,5 +1,6 @@
 .cn-deep-zoom-container {
   @extend .cn-relative;
+  user-select: none;
 }
 
 

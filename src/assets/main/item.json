@@ -21,6 +21,11 @@
             "image": "./volta.png"
         },
         {
+            "href": "./planisfero",
+            "title": "Planisfero",
+            "image": "./planisfero/post.jpg"
+        },
+        {
             "href": "./intervento",
             "title": "Intervento",
             "image": "./intervento.png"

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, OnDestroy, OnChanges, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { DeepZoomItem, DeepZoomItemDeepImageLayer } from 'src/app/types/deep-zoom-item';
 import { DeepZoomLayerControls, DeepZoomLayerControlsDefaults } from '../deep-zoom';
 import { ContextService } from 'src/app/context.service';
@@ -23,10 +23,12 @@ export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
   deepZoom: cdz.DeepZoom = null;
   layerControls: CanvasLayerControls[] = null;
 
-  constructor(private context: ContextService) { }
+  constructor(private context: ContextService, private cdRef:ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    this.deepZoom = new cdz.DeepZoom(this.mapContainer.nativeElement);
+    this.deepZoom = new cdz.DeepZoom(this.mapContainer.nativeElement, {
+      debugMode: false
+    });
     this.createLayers();
     this.updateLayers();
   }
@@ -43,8 +45,22 @@ export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.layerControls.forEach(l => this.deepZoom.addLayer(l.nativeLayer));
+    this.layerControls.reverse().forEach(l => this.deepZoom.addLayer(l.nativeLayer));
 
+
+  }
+
+  toggleLayerVisibility(l: CanvasLayerControls): void {
+    let visible = !l.visible;
+
+    if (visible && this.item.layerGroups) {
+      this.item.layerGroups.filter(g => g.exclusive && g.layers.includes(l.name)).forEach(g => {
+        this.layerControls.filter(l2 => g.layers.includes(l2.name)).forEach(l2 => l2.visible = false);
+      })
+    }
+
+    l.visible = visible;
+    this.updateLayers();
   }
 
   updateLayers(): void {
@@ -84,7 +100,7 @@ export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
       minZoom: layerSpec.minZoom,
       maxZoom: layerSpec.maxZoom,
       getTileURL: (zoom, x, y) => {
-        return this.context.joinUrl(baseUrl, `${zoomLevelsCount - 1 + (zoom - layerSpec.maxZoom)}/${x}_${y}.jpg`);
+        return this.context.joinUrl(baseUrl, `${zoomLevelsCount - 1 + (zoom - layerSpec.maxZoom)}/${x}_${y}.${layerSpec.imageFormat}`);
       }
     });
 

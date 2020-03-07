@@ -88,7 +88,7 @@ export const LeafletDeepImageLayer = L.GridLayer.extend({
         tile.innerHTML = `Failed to load ${img.src}`;
         done(null, tile)
       });
-      img.src = Location.joinWithSlash(this.options.cnImageSrc, `${this.zoomLevelCount - 1 + (z - this.options.maxZoom)}/${coords.x}_${coords.y}.jpg`);
+      img.src = Location.joinWithSlash(this.options.cnImageSrc, `${this.zoomLevelCount - 1 + (z - this.options.maxZoom)}/${coords.x}_${coords.y}.${this.options.cnImageFormat}`);
 
     }
 

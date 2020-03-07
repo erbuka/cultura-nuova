@@ -40,7 +40,7 @@ export interface DeepZoomItemLayer {
 
 export interface DeepZoomItemDeepImageLayer extends DeepZoomItemLayer {
     type: "deep-image";
-
+    imageFormat: "jpg" | "jpeg" | "png";
     imageSrc: string;
     width: number;
     height: number;
@@ -64,7 +64,7 @@ export interface DeepZoomItem extends ItemBase {
         minimapImage: string
     },
     layers: (DeepZoomItemDeepImageLayer | DeepZoomItemVectorLayer)[],
-    layerGroups: {
+    layerGroups?: {
         name: string;
         exclusive: boolean;
         title?: string;

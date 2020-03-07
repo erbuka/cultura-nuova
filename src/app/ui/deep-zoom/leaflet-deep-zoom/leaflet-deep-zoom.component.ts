@@ -12,11 +12,6 @@ const MEASURE_LAYER_PANE = "dz-measure-pane";
 
 
 interface LeafletLayerControls extends DeepZoomLayerControls {
-  name: string;
-  title: string;
-  opacity: number;
-  visible: boolean;
-  previewImage: string;
   nativeLayer: L.Layer;
   update(): void;
 }
@@ -86,7 +81,7 @@ export class LeafletDeepZoomComponent implements OnInit {
   toggleLayerVisibility(l: LeafletLayerControls): void {
     let visible = !l.visible;
 
-    if (visible) {
+    if (visible && this.item.layerGroups) {
       this.item.layerGroups.filter(g => g.exclusive && g.layers.includes(l.name)).forEach(g => {
         this.layerControls.filter(l2 => g.layers.includes(l2.name)).forEach(l2 => l2.visible = false);
       })
@@ -159,6 +154,7 @@ export class LeafletDeepZoomComponent implements OnInit {
       zoomControl: false,
       zoomAnimation: true,
       zoomSnap: 0,
+      zoomDelta: 0.1
     });
 
     // Setup map listeners 
@@ -268,6 +264,7 @@ export class LeafletDeepZoomComponent implements OnInit {
       cnHeight: layerSpec.height,
       cnTileOverlap: layerSpec.tileOverlap,
       cnImageSrc: this.context.resolveUrl(layerSpec.imageSrc, this.item),
+      cnImageFormat: layerSpec.imageFormat
     });
 
     return result;

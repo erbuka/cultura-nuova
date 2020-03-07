@@ -6,6 +6,7 @@ export type DeepZoomTools = "pan" | "measure";
 export type DeepZoomMeasureUnit = "pixels" | MeasurableUnit;
 
 export interface DeepZoomLayerControls {
+    name:string;
     title: string;
     opacity: number;
     opacityControl: boolean;
@@ -17,6 +18,7 @@ export interface DeepZoomLayerControls {
 }
 
 export const DeepZoomLayerControlsDefaults: DeepZoomLayerControls = {
+    name:"",
     title: "",
     opacity: 1,
     opacityControl: true,

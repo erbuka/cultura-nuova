@@ -9,7 +9,7 @@
             <mat-slider class="ml-auto mr-2" min="0" step="0.01" max="1" [disabled]="!l.visible"
                 (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
             </mat-slider>
-            <button mat-icon-button (click)="l.visible=!l.visible; updateLayers()">
+            <button mat-icon-button (click)="toggleLayerVisibility(l)">
                 <mat-icon *ngIf="l.visible">visibility</mat-icon>
                 <mat-icon *ngIf="!l.visible" style="opacity: 0.25;">visibility_off</mat-icon>
             </button>

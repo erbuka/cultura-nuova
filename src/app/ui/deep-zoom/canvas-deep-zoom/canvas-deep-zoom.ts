@@ -1,38 +1,10 @@
 
-const moveTowards = function (n: number, target: number, maxDelta: number) {
+const moveTowards = function (n: number, target: number, maxDelta: number): number {
     return Math.abs(target - n) <= maxDelta ? target : n + Math.sign(target - n) * maxDelta;
 }
 
-function imgLoad(url) {
-    'use strict';
-    // Create new promise with the Promise() constructor;
-    // This has as its argument a function with two parameters, resolve and reject
-    return new Promise(function (resolve, reject) {
-        // Standard XHR to load an image
-        var request = new XMLHttpRequest();
-        request.open('GET', url);
-        request.responseType = 'blob';
-        
-        // When the request loads, check whether it was successful
-        request.onload = function () {
-            if (request.status === 200) {
-                // If successful, resolve the promise by passing back the request response
-                resolve(request.response);
-            } else {
-                // If it fails, reject the promise with a error message
-                reject(new Error('Image didn\'t load successfully; error code:' + request.statusText));
-            }
-        };
-      
-        request.onerror = function () {
-            // Also deal with the case when the entire request fails to begin with
-            // This is probably a network error, so reject the promise with an appropriate message
-            reject(new Error('There was a network error.'));
-        };
-      
-        // Send the request
-        request.send();
-    });
+const clamp = function (val: number, a: number, b: number): number {
+    return Math.min(Math.max(val, a), b);
 }
 
 interface Disposable {
@@ -67,7 +39,6 @@ const vectorAdd = function (a: IVector, b: IVector) {
         y: a.y + b.y
     }
 }
-
 
 const vectorSub = function (a: IVector, b: IVector) {
     return {
@@ -180,6 +151,16 @@ class Projection {
     }
 
     update() {
+
+        let ox = this.left - Math.floor(this.left);
+        let oy = this.top - Math.floor(this.top);
+
+        this.left -= ox;
+        this.right -= ox;
+        this.top -= oy;
+        this.bottom -= oy;
+
+
         this._scale = {
             x: (this.right - this.left) / this.viewWidth,
             y: (this.bottom - this.top) / this.viewHeight
@@ -208,6 +189,10 @@ class Projection {
     }
 }
 
+export interface DeepZoomOptions {
+    debugMode: boolean;
+}
+
 export class DeepZoom implements Disposable {
 
     private _width: number;
@@ -230,7 +215,13 @@ export class DeepZoom implements Disposable {
         leftButtonDown: false
     }
 
-    constructor(public container: HTMLElement) {
+    options: DeepZoomOptions;
+
+    constructor(public container: HTMLElement, options: Partial<DeepZoomOptions>) {
+        this.options = Object.assign({
+            debugMode: false
+        }, options);
+
         this.start();
     }
 
@@ -441,7 +432,17 @@ export class DeepImageLayer extends Layer {
 
         let ctx = this._container.getContext("2d");
 
-        this._container.style.opacity = this.options.opacity + "";
+        let opacity: number = 0;
+        if (dz.zoom >= this.options.minZoom && dz.zoom <= this.options.maxZoom) {
+            opacity = this.options.opacity;
+        } else {
+            if (dz.zoom > this.options.maxZoom) {
+                opacity = clamp((1 - (dz.zoom - this.options.maxZoom)) * 2, 0, 1) * this.options.opacity;
+            }
+        }
+
+
+        this._container.style.opacity = opacity + "";
         this._container.style.display = this.options.visible ? "block" : "none";
 
         ctx.save();
@@ -451,23 +452,22 @@ export class DeepImageLayer extends Layer {
 
             dz.projection.transform(ctx);
 
-            let z = dz.zoom + this.options.maxZoom;
-            let z0 = Math.ceil(z);
-            let z1 = z0 - 1;
-            let zDelta = z - z1;
+            let z0 = Math.ceil(dz.zoom);
 
-            this.renderLevel(dz, z0, ctx, 1);
-            this.renderLevel(dz, z1, ctx, 1 - zDelta);
+
+            for (let i = this.options.minZoom; i <= z0; i++)
+                this.renderLevel(dz, i, ctx);
+
+            //this.renderLevel(dz, z0, ctx);
+
 
         }
         ctx.restore();
     }
 
-    private renderLevel(dz: DeepZoom, zoom: number, ctx: CanvasRenderingContext2D, opacity: number = 1) {
-        if (zoom - 2 * this.options.maxZoom > 0)
+    private renderLevel(dz: DeepZoom, zoom: number, ctx: CanvasRenderingContext2D) {
+        if (zoom - this.options.maxZoom > 0)
             return;
-
-        ctx.globalAlpha = opacity;
 
         let zoomLevel = this._zoomLevels[zoom];
 
@@ -495,17 +495,11 @@ export class DeepImageLayer extends Layer {
                 let tileWidth = x === tx - 1 && zoomLevel.excessX > 0 ? zoomLevel.excessX : this.options.tileSize;
                 let tileHeight = y === ty - 1 && zoomLevel.excessY > 0 ? zoomLevel.excessY : this.options.tileSize;
 
-                /*
+
                 let sx = x === 0 ? 0 : overlap;
                 let sy = y === 0 ? 0 : overlap;
-                let sw = x === tx - 1 ? tileWidth - sx : tileWidth - sx - overlap;
-                let sh = y === ty - 1 ? tileHeight - sy : tileHeight - sy - overlap;
-                */
-
-                let sx = 0;
-                let sy = 0;
-                let sw = tileWidth + (x > 0 ? overlap : 0) + (x < tx - 1 ? overlap : 0);
-                let sh = tileHeight + (y > 0 ? overlap : 0) + (y < ty - 1 ? overlap : 0);
+                let sw = tileWidth;
+                let sh = tileHeight;
 
                 let tileUrl = this.options.getTileURL(zoom, x, y);
 
@@ -516,6 +510,9 @@ export class DeepImageLayer extends Layer {
                     this._imageCache.put(hash, img);
                 }
 
+                if (!img.complete)
+                    continue;
+
                 let tw: number = worldTileWidth;
                 let th: number = worldTileHeight;
 
@@ -524,7 +521,17 @@ export class DeepImageLayer extends Layer {
                     th = y === maxY && zoomLevel.viewportExcessY > 0 ? zoomLevel.viewportExcessY : worldTileHeight;
                 }
 
+                ctx.clearRect(x * worldTileWidth, y * worldTileHeight, tw, th);
                 ctx.drawImage(img, sx, sy, sw, sh, x * worldTileWidth, y * worldTileHeight, tw, th);
+
+                if (dz.options.debugMode) {
+                    let fontSize = 18 * Math.pow(2, -dz.zoom)
+                    ctx.font = `${fontSize}px Arial`;
+                    ctx.fillStyle = ctx.strokeStyle = "rgba(0,0,0,.25)";
+                    ctx.lineWidth = Math.pow(2, -dz.zoom);
+                    ctx.strokeRect(x * worldTileWidth, y * worldTileHeight, tw, th);
+                    ctx.fillText(`(${x}, ${y}, ${zoom})`, x * worldTileWidth + 2, y * worldTileHeight + fontSize);
+                }
 
             }
         }
@@ -590,7 +597,9 @@ export class DeepImageLayer extends Layer {
                     }
 
                 }
-    
+
+                console.log(this._zoomLevels);
+
 
                 resolve();
             });
