@@ -27,7 +27,7 @@ export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.deepZoom = new cdz.DeepZoom(this.mapContainer.nativeElement, {
-      debugMode: true
+      debugMode: false
     });
     this.createLayers();
     this.updateLayers();
