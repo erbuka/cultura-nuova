@@ -33,7 +33,7 @@ export class LeafletDeepZoomComponent implements OnInit {
   measureLayer: LeafletMeasureLayer = null;
   navigatorBounds: NavigatorTrackBounds = null;
   _tool: DeepZoomTools = "pan";
-  _measureUnit: DeepZoomMeasureUnit = "pixels";
+  _measureUnit: DeepZoomMeasureUnit = "centimeters";
 
   constructor(private context: ContextService, private router: Router) { }
 
