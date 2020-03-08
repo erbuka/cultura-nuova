@@ -549,12 +549,10 @@ export class DeepImageLayer extends Layer {
 
             let z0 = Math.floor(dz.zoom);
 
-
             for (let i = this.options.minZoom; i <= z0; i++)
                 this.renderLevel(dz, i, ctx);
 
             //this.renderLevel(dz, z0, ctx);
-
 
         }
         ctx.restore();
