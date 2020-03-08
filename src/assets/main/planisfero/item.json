@@ -16,6 +16,7 @@
             "name": "griglia",
             "title": "Griglia",
             "visible": true,
+            "opacityControl" : false,
             "previewImage": "./layers/griglia/8/0_0.png",
             "imageSrc": "./layers/griglia",
             "imageFormat": "png",
