@@ -3,6 +3,7 @@ import { DeepZoomItem, DeepZoomItemDeepImageLayer } from 'src/app/types/deep-zoo
 import { DeepZoomLayerControls, DeepZoomLayerControlsDefaults } from '../deep-zoom';
 import { ContextService } from 'src/app/context.service';
 import * as cdz from './canvas-deep-zoom';
+import { NavigatorTrackBounds } from '../navigator/navigator.component';
 
 
 interface CanvasLayerControls extends DeepZoomLayerControls {
@@ -12,7 +13,8 @@ interface CanvasLayerControls extends DeepZoomLayerControls {
 @Component({
   selector: 'app-canvas-deep-zoom',
   templateUrl: './canvas-deep-zoom.component.html',
-  styleUrls: ['./canvas-deep-zoom.component.scss']
+  styleUrls: ['./canvas-deep-zoom.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
 
@@ -22,15 +24,28 @@ export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
 
   deepZoom: cdz.DeepZoom = null;
   layerControls: CanvasLayerControls[] = null;
+  navigatorBounds: NavigatorTrackBounds = null;
 
-  constructor(private context: ContextService, private cdRef:ChangeDetectorRef) { }
+  constructor(private context: ContextService, private cdRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    this.deepZoom = new cdz.DeepZoom(this.mapContainer.nativeElement, {
-      debugMode: false
+    this.createDeepZoom();
+  }
+
+  private createDeepZoom() {
+    this.deepZoom = new cdz.DeepZoom(this.mapContainer.nativeElement, { debugMode: false });
+
+    this.deepZoom.events.on("zoom", () => {
+      this.updateNavigatorBounds();
     });
+
+    this.deepZoom.events.on("pan", () => {
+      this.updateNavigatorBounds();
+    });
+
     this.createLayers();
     this.updateLayers();
+    this.updateNavigatorBounds();
   }
 
 
@@ -47,7 +62,16 @@ export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
 
     this.layerControls.reverse().forEach(l => this.deepZoom.addLayer(l.nativeLayer));
 
+  }
 
+  updateNavigatorBounds(): void {
+    this.navigatorBounds = {
+      top: this.deepZoom.projection.top,
+      left: this.deepZoom.projection.left,
+      bottom: this.deepZoom.projection.bottom,
+      right: this.deepZoom.projection.right
+    }
+    this.cdRef.markForCheck();
   }
 
   toggleLayerVisibility(l: CanvasLayerControls): void {
@@ -67,10 +91,12 @@ export class CanvasDeepZoomComponent implements OnInit, OnDestroy {
     this.layerControls.forEach(c => {
       c.nativeLayer.options.visible = c.visible;
       c.nativeLayer.options.opacity = c.opacity;
-    })
+    });
+    this.cdRef.markForCheck();
   }
 
   ngOnDestroy(): void {
+    this.deepZoom.dispose();
   }
 
   createDeepImageLayer(layerSpec: DeepZoomItemDeepImageLayer): CanvasLayerControls {

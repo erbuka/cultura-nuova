@@ -24,8 +24,8 @@
             "height": 11024,
             "tileSize": 256,
             "tileOverlap": 1,
-            "minZoom": -14,
-            "maxZoom": 0
+            "minZoom": -15,
+            "maxZoom": -1
         },
         {
             "type": "deep-image",

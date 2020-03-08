@@ -1,0 +1,8 @@
+<ng-container *ngIf="bounds">
+    <div class="cn-dz-minimap rounded bg-background p-1 mat-elevation-z4">
+        <div class="cn-dz-minimap-image" [style.padding-bottom]="100.0 / viewportAspectRatio + '%'"
+            [appBgImage]="item.options.minimapImage | cnUrl : item">
+            <div class="cn-dz-minimap-track" [ngStyle]="navigatorStyle"></div>
+        </div>
+    </div>
+</ng-container>

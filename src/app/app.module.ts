@@ -24,6 +24,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { CanvasDeepZoomComponent } from './ui/deep-zoom/canvas-deep-zoom/canvas-deep-zoom.component';
+import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { CanvasDeepZoomComponent } from './ui/deep-zoom/canvas-deep-zoom/canvas-
     SlideshowComponent,
     MainComponent,
     LeafletDeepZoomComponent,
-    CanvasDeepZoomComponent
+    CanvasDeepZoomComponent,
+    NavigatorComponent
   ],
   imports: [
     BrowserModule,

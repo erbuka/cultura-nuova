@@ -47,6 +47,10 @@ const vectorSub = function (a: IVector, b: IVector) {
     }
 }
 
+const vectorSqrLength = function (a: IVector): number {
+    return a.x * a.x + a.y * a.y;
+}
+
 
 
 class Cache<K extends (string | number), T extends (any & Partial<Disposable>)> implements Disposable {
@@ -151,7 +155,7 @@ class ImageLoader implements Disposable {
             let url = evt.data.blobUrl;
 
             image.addEventListener("load", () => {
-               URL.revokeObjectURL(url);
+                URL.revokeObjectURL(url);
             })
 
             image.src = url;
@@ -227,6 +231,47 @@ class Projection {
     }
 }
 
+
+class EventEmitter<S> implements Disposable {
+
+    private _source: S;
+    private _handlers: { event: string, handler: EventEmitter.Handler<S> }[] = [];
+
+    constructor(source: S) {
+        this._source = source;
+    }
+
+    on(event: string, handler: EventEmitter.Handler<S>) {
+        this._handlers.push({
+            event: event,
+            handler: handler
+        });
+    }
+
+    off(event: string, handler: EventEmitter.Handler<S>) {
+        let idx = this._handlers.findIndex(h => h.event === event && h.handler === handler);
+        if (idx >= 0)
+            this._handlers.splice(idx, 1);
+    }
+
+    fire(event: string) {
+        this._handlers.filter(h => h.event === event).forEach(h => h.handler(this._source));
+    }
+
+    clear(): void {
+        this._handlers = [];
+    }
+
+    dispose(): void {
+        this.clear();
+    }
+
+}
+
+namespace EventEmitter {
+    export type Handler<T> = (source: T) => void;
+}
+
 export interface DeepZoomOptions {
     debugMode: boolean;
 }
@@ -255,7 +300,10 @@ export class DeepZoom implements Disposable {
 
     options: DeepZoomOptions;
 
+    events: EventEmitter<DeepZoom> = null;
+
     constructor(public container: HTMLElement, options: Partial<DeepZoomOptions>) {
+        this.events = new EventEmitter(this);
         this.options = Object.assign({
             debugMode: false
         }, options);
@@ -287,6 +335,7 @@ export class DeepZoom implements Disposable {
 
     dispose(): void {
         this._handlers.dispose();
+        this.events.dispose();
         this._layers.forEach(l => this.removeLayer(l));
         this._disposed = true;
     }
@@ -327,6 +376,10 @@ export class DeepZoom implements Disposable {
                 );
 
                 this._lookAt = vectorSub(this._lookAt, delta);
+
+                if (vectorSqrLength(delta) > 0) {
+                    this.events.fire("pan");
+                }
 
             }
             this._mouse.x = evt.offsetX;
@@ -373,7 +426,11 @@ export class DeepZoom implements Disposable {
     }
 
     private updateZoom(dt: number) {
+        let fireEvent = this._zoom != this._desiredZoom;
         this._zoom = moveTowards(this._zoom, this._desiredZoom, 2 * dt);
+        if (fireEvent) {
+            this.events.fire("zoom");
+        }
     }
 
     private updateProjection() {

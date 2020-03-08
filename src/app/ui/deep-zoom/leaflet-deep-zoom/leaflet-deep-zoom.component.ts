@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, OnChanges } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, OnChanges, ChangeDetectionStrategy } from '@angular/core';
 import { ContextService } from 'src/app/context.service';
 import * as L from 'leaflet';
 import { DeepZoomItem, DeepZoomItemDeepImageLayer, DeepZoomItemVectorLayer } from 'src/app/types/deep-zoom-item';
@@ -6,6 +6,7 @@ import { DeepZoomLayerControls, DeepZoomTools, DeepZoomMeasureUnit, DeepZoomLaye
 import { Router } from '@angular/router';
 import { LeafletDeepImageLayer } from './leaflet-deep-image-layer';
 import { LeafletMeasureLayer } from './leaflet-measure-layer';
+import { NavigatorTrackBounds } from '../navigator/navigator.component';
 
 
 const MEASURE_LAYER_PANE = "dz-measure-pane";
@@ -29,12 +30,13 @@ export class LeafletDeepZoomComponent implements OnInit {
 
   map: L.Map = null;
   layerControls: LeafletLayerControls[] = null;
-  minimapTrackStyle: object = {};
   measureLayer: LeafletMeasureLayer = null;
+  navigatorBounds: NavigatorTrackBounds = null;
   _tool: DeepZoomTools = "pan";
   _measureUnit: DeepZoomMeasureUnit = "pixels";
 
   constructor(private context: ContextService, private router: Router) { }
+
 
   get viewportAspectRatio(): number {
     return this.item.options.viewport.width / this.item.options.viewport.height;
@@ -78,6 +80,18 @@ export class LeafletDeepZoomComponent implements OnInit {
     this.createMap();
   }
 
+  updateNavigatorBounds():void { 
+    let bounds = this.map.getBounds();
+    let worldBounds = L.bounds(this.latLngToPoint(bounds.getNorthEast(), 0), this.latLngToPoint(bounds.getSouthWest(), 0));
+
+    this.navigatorBounds =  {
+      left: worldBounds.min.x,
+      top: worldBounds.min.y,
+      right: worldBounds.max.x,
+      bottom: worldBounds.max.y,
+    };
+  }
+
   toggleLayerVisibility(l: LeafletLayerControls): void {
     let visible = !l.visible;
 
@@ -93,7 +107,6 @@ export class LeafletDeepZoomComponent implements OnInit {
 
 
   updateLayers(): void {
-    //this.layerControls.forEach(l => l.nativeLayer.getPane().style.display = l.visible ? "block" : "none");
     let zoom = this.map.getZoom();
     this.layerControls.forEach(l => {
 
@@ -116,32 +129,6 @@ export class LeafletDeepZoomComponent implements OnInit {
     this.map.setView(this.pointToLatLng(viewport.width / 2, viewport.height / 2, 0), this.map.getMinZoom());
   }
 
-  updateMinimapTrackStyle() {
-    let bounds = this.map.getBounds();
-    let a = L.bounds(this.latLngToPoint(bounds.getNorthEast(), 0), this.latLngToPoint(bounds.getSouthWest(), 0));
-    let b = L.bounds([0, 0], [this.item.options.viewport.width, this.item.options.viewport.height]);
-
-    let minX = Math.max(a.min.x, b.min.x);
-    let maxX = Math.min(a.max.x, b.max.x);
-    let minY = Math.max(a.min.y, b.min.y);
-    let maxY = Math.min(a.max.y, b.max.y);
-
-    if (maxX > minX && maxY > minY) { // Intersezione non nulla
-      let left = minX / b.max.x * 100 + "%"
-      let top = minY / b.max.y * 100 + "%"
-      let width = (maxX - minX) / b.max.x * 100 + "%";
-      let height = (maxY - minY) / b.max.y * 100 + "%";
-
-      this.minimapTrackStyle = {
-        left: left,
-        top: top,
-        width: width,
-        height: height
-      }
-
-    }
-
-  }
 
   private createMap(): void {
 
@@ -158,9 +145,12 @@ export class LeafletDeepZoomComponent implements OnInit {
     });
 
     // Setup map listeners 
-    this.map.on("move", () => this.updateMinimapTrackStyle());
+    this.map.on("move", () => {
+      this.updateNavigatorBounds();
+    });
+
     this.map.on("zoom", () => {
-      this.updateMinimapTrackStyle();
+      this.updateNavigatorBounds();
       this.updateLayers();
     });
 
