@@ -73,6 +73,7 @@
             "visible": true,
             "previewImage": "./layer1/8/0_0.jpg",
             "imageSrc": "./layer1",
+            "imageFormat" :"jpg",
             "width": 4256,
             "height": 6396,
             "tileSize": 256,
@@ -89,12 +90,13 @@
             "visible": false,
             "previewImage": "./layer0/8/0_0.jpg",
             "imageSrc": "./layer0",
+            "imageFormat" :"jpg",
             "width": 4256,
             "height": 2832,
             "tileSize": 256,
             "tileOverlap": 1,
-            "minZoom": -13,
-            "maxZoom": 0
+            "minZoom": -14,
+            "maxZoom": -1
         },
         {
             "type": "deep-image",
@@ -105,12 +107,13 @@
             "visible": false,
             "previewImage": "./layer1/8/0_0.jpg",
             "imageSrc": "./layer1",
+            "imageFormat" :"jpg",
             "width": 4256,
             "height": 6396,
             "tileSize": 256,
             "tileOverlap": 1,
-            "minZoom": -13,
-            "maxZoom": 0
+            "minZoom": -15,
+            "maxZoom": -2
         }
     ],
     "layerGroups": [

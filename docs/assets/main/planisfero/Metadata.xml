@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<Metadata version="1">
+  <AspectRatio>1,36066763425254</AspectRatio>
+  <Image>
+    <FileName>C:\Cappella Pazzi\Pazzi_planisfero+griglia\Pazzi_ante_post+griglia\source images\mosaico planisfero-ante_new.jpg</FileName>
+    <x>0</x>
+    <y>0</y>
+    <Width>1</Width>
+    <Height>1</Height>
+    <ZOrder>1</ZOrder>
+    <Tag />
+  </Image>
+  <Image>
+    <FileName>C:\Cappella Pazzi\Pazzi_planisfero+griglia\Pazzi_ante_post+griglia\source images\mosaico planisfero_post_new.jpg</FileName>
+    <x>0</x>
+    <y>0</y>
+    <Width>1</Width>
+    <Height>1</Height>
+    <ZOrder>2</ZOrder>
+    <Tag />
+  </Image>
+  <Image>
+    <FileName>C:\Cappella Pazzi\Pazzi_planisfero+griglia\Pazzi_ante_post+griglia\source images\griglia_completa.png</FileName>
+    <x>0</x>
+    <y>0</y>
+    <Width>1</Width>
+    <Height>1</Height>
+    <ZOrder>3</ZOrder>
+    <Tag />
+  </Image>
+</Metadata>
