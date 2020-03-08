@@ -48,6 +48,7 @@ import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component
     AppRoutingModule,
     BrowserAnimationsModule,
     FormsModule,
+    HammerModule,
 
     MatButtonModule,
     MatIconModule,
@@ -56,7 +57,6 @@ import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component
     MatSelectModule,
     MatMenuModule,
 
-    HammerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

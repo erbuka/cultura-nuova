@@ -1,11 +1,16 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { DeepZoomItem } from 'src/app/types/deep-zoom-item';
 
 export type NavigatorTrackBounds = {
-  top: number;
-  left: number;
-  bottom: number;
-  right: number;
+  top: number,
+  left: number,
+  bottom: number,
+  right: number,
+}
+
+export type NavigatorPanEvent = {
+  x: number,
+  y: number
 }
 
 @Component({
@@ -15,6 +20,11 @@ export type NavigatorTrackBounds = {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavigatorComponent implements OnInit {
+
+
+  @ViewChild("minimap", { read: ElementRef }) minimap: ElementRef;
+
+  @Output() navigatorPan: EventEmitter<NavigatorPanEvent> = new EventEmitter();
 
   @Input() item: DeepZoomItem;
   @Input() bounds: NavigatorTrackBounds = {
@@ -40,6 +50,20 @@ export class NavigatorComponent implements OnInit {
       top: `${this.bounds.top / viewport.height * 100}%`,
       height: `${(this.bounds.bottom - this.bounds.top) / viewport.height * 100}%`
     }
+  }
+
+  onPan(evt: Event & { center: { x: number, y: number } }): void {
+    let bounds = this.minimap.nativeElement.getBoundingClientRect();
+    let viewport = this.item.options.viewport;
+
+    let posX = (evt.center.x - bounds.x) / bounds.width * viewport.width;
+    let posY = (evt.center.y - bounds.y) / bounds.height * viewport.height;
+
+    this.navigatorPan.emit({
+      x: Math.round(posX),
+      y: Math.round(posY)
+    });
+
   }
 
 }

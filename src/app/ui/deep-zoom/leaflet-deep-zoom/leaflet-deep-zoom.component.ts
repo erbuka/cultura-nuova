@@ -6,7 +6,7 @@ import { DeepZoomLayerControls, DeepZoomTools, DeepZoomMeasureUnit, DeepZoomLaye
 import { Router } from '@angular/router';
 import { LeafletDeepImageLayer } from './leaflet-deep-image-layer';
 import { LeafletMeasureLayer } from './leaflet-measure-layer';
-import { NavigatorTrackBounds } from '../navigator/navigator.component';
+import { NavigatorTrackBounds, NavigatorPanEvent } from '../navigator/navigator.component';
 
 
 const MEASURE_LAYER_PANE = "dz-measure-pane";
@@ -80,11 +80,11 @@ export class LeafletDeepZoomComponent implements OnInit {
     this.createMap();
   }
 
-  updateNavigatorBounds():void { 
+  updateNavigatorBounds(): void {
     let bounds = this.map.getBounds();
     let worldBounds = L.bounds(this.latLngToPoint(bounds.getNorthEast(), 0), this.latLngToPoint(bounds.getSouthWest(), 0));
 
-    this.navigatorBounds =  {
+    this.navigatorBounds = {
       left: worldBounds.min.x,
       top: worldBounds.min.y,
       right: worldBounds.max.x,
@@ -129,6 +129,10 @@ export class LeafletDeepZoomComponent implements OnInit {
     this.map.setView(this.pointToLatLng(viewport.width / 2, viewport.height / 2, 0), this.map.getMinZoom());
   }
 
+
+  onNavigatorPan(evt: NavigatorPanEvent): void {
+    this.map.panTo(this.pointToLatLng(evt.x, evt.y, 0), { animate: false });
+  }
 
   private createMap(): void {
 
@@ -278,7 +282,7 @@ export class LeafletDeepZoomComponent implements OnInit {
       if (shape) {
 
         if (s.title) {
-          shape.bindTooltip(s.title);
+          shape.bindTooltip(s.title, { pane: pane });
         }
 
         if (s.href) {

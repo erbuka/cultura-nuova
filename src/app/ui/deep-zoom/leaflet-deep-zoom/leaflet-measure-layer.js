@@ -16,13 +16,18 @@ export const LeafletMeasureLayer = L.Layer.extend({
 
     },
     onAdd(map) {
+        this._measureLine = L.polyline([], {
+            pane: this.options.pane,
+            color: "#fff",
+            weight: 3,
+            dashArray: "10 10",
+        });
         this._measurePopup = L.popup({
             pane: this.options.pane,
             closeButton: false,
             //autoPan: false
         }, this).setLatLng([0, 0]);
 
-        this._measureLine = L.polyline([], { pane: this.options.pane });
         this._measuring = false;
 
         let mapEvents = this._mapEvents = {

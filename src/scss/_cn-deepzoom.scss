@@ -36,7 +36,7 @@
 
     .cn-dz-minimap-track {
       position: absolute;
-      border: 1px solid theme-color("accent");
+      border: 2px solid theme-color("accent");
       background-color: transparentize($color: theme-color("accent"), $amount: 0.9);
     }
   }

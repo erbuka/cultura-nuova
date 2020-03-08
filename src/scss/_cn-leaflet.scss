@@ -1,0 +1,34 @@
+// Override global font
+.leaflet-container {
+  font: inherit !important;
+}
+
+.leaflet-map-pane svg {
+  z-index: unset;
+}
+.leaflet-map-pane canvas {
+  z-index: unset;
+}
+
+// Popups
+.leaflet-popup-content-wrapper {
+  @extend .rounded;
+}
+.leaflet-popup-content {
+  @extend .m-0;
+  @extend .p-2;
+}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  color: mat-color($cn-mat-accent, default-contrast);
+  @extend .bg-accent;
+  @extend .mat-elevation-z1;
+}
+
+// Tooltip
+
+.leaflet-tooltip {
+  color: mat-color($cn-mat-accent, default-contrast);
+  @extend .bg-accent;
+  @extend .mat-elevation-z1;
+}

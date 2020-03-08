@@ -26,7 +26,7 @@ export const DeepZoomLayerControlsDefaults: DeepZoomLayerControls = {
     minZoom: -18,
     maxZoom: 0,
     previewImage: "",
-    color: "#ffffff"
+    color: "#999999"
 }
 
 const INCHES_CONVERSION_TABLE: { [unit in MeasurableUnit]: number } = {
