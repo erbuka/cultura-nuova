@@ -4,8 +4,8 @@
 /assets
 
 # compiled output
-/dev
-/dist
+/build-dev
+/build-prod
 /tmp
 /out-tsc
 # Only exists if Bazel was run
