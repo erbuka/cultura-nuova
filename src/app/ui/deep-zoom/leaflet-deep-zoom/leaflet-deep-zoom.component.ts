@@ -25,7 +25,6 @@ interface LeafletLayerControls extends DeepZoomLayerControls {
 export class LeafletDeepZoomComponent implements OnInit {
 
   @ViewChild("mapContainer", { static: true }) mapContainer: ElementRef;
-
   @Input() item: DeepZoomItem = null;
 
   map: L.Map = null;

@@ -1,6 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+# assets
+/assets
+
 # compiled output
+/dev
 /dist
 /tmp
 /out-tsc

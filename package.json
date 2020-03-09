@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng build --watch --base-href=/ --output-path dev",
+    "start:dev-server" : "node ./scripts/dev-server.js",
     "build": "ng build --prod --base-href=/dist/",
     "build:ghpages": "ng build --prod --output-path docs --base-href /cultura-nuova/",
     "build:type-schema": "node ./scripts/build-type-schemas.js",
@@ -43,6 +44,8 @@
     "@types/node": "^12.12.29",
     "ajv": "^6.12.0",
     "codelyzer": "^5.1.2",
+    "concurrently": "^5.1.0",
+    "express": "^4.17.1",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.1.0",
