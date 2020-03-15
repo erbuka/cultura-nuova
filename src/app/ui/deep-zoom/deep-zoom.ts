@@ -1,3 +1,4 @@
+import { LocalizedText } from 'src/app/types/item';
 
 type MeasurableUnit = "inches" | "centimeters";
 
@@ -7,7 +8,7 @@ export type DeepZoomMeasureUnit = "pixels" | MeasurableUnit;
 
 export interface DeepZoomLayerControls {
     name:string;
-    title: string;
+    title: LocalizedText;
     opacity: number;
     opacityControl: boolean;
     visible: boolean;

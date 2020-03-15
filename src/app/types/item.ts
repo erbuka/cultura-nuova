@@ -8,4 +8,6 @@ export interface ItemBase {
   url?: string;
 }
 
+export type LocalizedText = string | { [locale: string]: string }
+
 export type Item = PageItem | DeepZoomItem | BlockListItem | SlideshowItem;

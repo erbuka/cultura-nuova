@@ -4,17 +4,29 @@
             <div>
                 <h3>Basilica di Santa Croce - Cappella Maggiore, Firenze</h3>
             </div>
-            <div class="ml-auto">
-                <button mat-icon-button (click)="goBack()">
-                    <mat-icon>chevron_left</mat-icon>
+            <div class="ml-auto"></div>
+            <div *ngIf="locales">
+
+                <mat-menu #localeMenu>
+                    <button mat-menu-item *ngFor="let l of locales" (click)="context.setCurrentLocale(l.id, true)">
+                        {{l.description}}
+                    </button>
+                </mat-menu>
+
+                <button mat-button [matMenuTriggerFor]="localeMenu">
+                    {{ context.getCurrentLocale().description }}
                 </button>
-                <button mat-icon-button (click)="goUp()">
-                    <mat-icon>arrow_upward</mat-icon>
-                </button>
-                <button mat-icon-button (click)="goHome()">
-                    <mat-icon>home</mat-icon>
-                </button>
+
             </div>
+            <button mat-icon-button (click)="goBack()">
+                <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button mat-icon-button (click)="goUp()">
+                <mat-icon>arrow_upward</mat-icon>
+            </button>
+            <button mat-icon-button (click)="goHome()">
+                <mat-icon>home</mat-icon>
+            </button>
         </div>
         <div class="cn-app-content">
             <app-item [item]="item"></app-item>

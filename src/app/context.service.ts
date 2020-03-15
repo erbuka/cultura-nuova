@@ -5,11 +5,11 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { Location } from '@angular/common';
 
 import * as ajv from "ajv";
-import { Item } from './types/item';
+import { Item, LocalizedText } from './types/item';
 
 const ITEM_SCHEMA = require('./types/schema.json');
 
-interface ConfigLocale {
+export interface ConfigLocale {
   id: string;
   description: string;
 }
@@ -48,6 +48,18 @@ export class ContextService {
     this.jsonValidator = new ajv({ allErrors: true });
   }
 
+  translate(text: LocalizedText) {
+    let locale = this.getCurrentLocale();
+    if (typeof text === "object" && locale) {
+      let translation = text[locale.id];
+      return translation ? translation : `Translation not found for locale "${locale.id}"`;
+    } else if (typeof text === "string") {
+      return text;
+    } else {
+      return `Invalid text type: ${typeof text}`;
+    }
+  }
+
   getLocales(): ConfigLocale[] {
     if (!this.config.internationalization)
       return [];
@@ -55,7 +67,7 @@ export class ContextService {
     return this.config.internationalization.locales;
   }
 
-  setCurrentLocale(localeId: string) {
+  setCurrentLocale(localeId: string, reload: boolean = false) {
 
     this._currentLocale = null;
 
@@ -70,6 +82,9 @@ export class ContextService {
     sessionStorage.setItem("cn-locale-id", loc.id);
 
     this._currentLocale = loc;
+
+    if (reload)
+      location.reload();
 
   }
 

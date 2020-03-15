@@ -25,6 +25,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { CanvasDeepZoomComponent } from './ui/deep-zoom/canvas-deep-zoom/canvas-deep-zoom.component';
 import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component';
+import { LocalizedTextPipe } from './localized-text.pipe';
 
 @NgModule({
   declarations: [
@@ -40,7 +41,8 @@ import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component
     MainComponent,
     LeafletDeepZoomComponent,
     CanvasDeepZoomComponent,
-    NavigatorComponent
+    NavigatorComponent,
+    LocalizedTextPipe
   ],
   imports: [
     BrowserModule,

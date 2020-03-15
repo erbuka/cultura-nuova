@@ -1,8 +1,7 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { ContextService } from 'src/app/context.service';
-import { Config } from 'protractor';
+import { Component, OnInit } from '@angular/core';
+import { ContextService, ConfigLocale } from 'src/app/context.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Location, APP_BASE_HREF } from '@angular/common';
+import { Location } from '@angular/common';
 import { Item } from 'src/app/types/item';
 
 @Component({
@@ -12,11 +11,14 @@ import { Item } from 'src/app/types/item';
 })
 export class MainComponent implements OnInit {
 
+  locales: ConfigLocale[] = null;
   item: Item = null;
 
   constructor(public context: ContextService, private route: ActivatedRoute, private router: Router, private location: Location) { }
 
   ngOnInit(): void {
+
+    this.locales = this.context.getLocales();
 
     this.route.url.subscribe(v => {
 

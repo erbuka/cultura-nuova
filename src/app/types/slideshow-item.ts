@@ -1,4 +1,4 @@
-import { ItemBase } from './item';
+import { ItemBase, LocalizedText } from './item';
 
 export interface SlideshowItem extends ItemBase {
   type: "slideshow",
@@ -11,7 +11,7 @@ export interface SlideshowItem extends ItemBase {
     group: string,
     previewImage: string,
     image?:string,
-    title?: string,
+    title?: LocalizedText,
     href?: string
   }[]
 }

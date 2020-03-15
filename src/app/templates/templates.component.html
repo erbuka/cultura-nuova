@@ -145,15 +145,13 @@
                 <div class="mat-elevation-z4 h-100 bg-background">
                     <img class="d-block w-100" [src]="data.image | cnUrl : item">
                     <div class="p-4">
-                        <h3 *ngIf="data.title_it">{{ data.title_it }}</h3>
-                        <h3 *ngIf="data.title_en" style="font-style: italic;">{{ data.title_en }}</h3>
+                        <h3>{{ data.title | cnLocalizedText }}</h3>
 
-                        <p *ngIf="data.type_it">{{ data.type_it }}</p>
-                        <p *ngIf="data.type_en" style="font-style: italic;">{{ data.type_en }}</p>
+                        <p>{{ data.type | cnLocalizedText }}</p>
 
-                        <p *ngIf="data.size">{{ data.size }}</p>
+                        <p>{{ data.size }}</p>
 
-                        <p *ngIf="data.location">{{ data.location }}</p>
+                        <p>{{ data.location }}</p>
                         <p>
                             <a [routerLink]="'..' | cnUrl : item : true">Back</a>
                         </p>
@@ -162,8 +160,7 @@
             </div>
             <div class="col-lg-8 p-2">
                 <div class="mat-elevation-z4 h-100 p-4 bg-background">
-                    <p *ngIf="data.text_it" [innerHtml]="data.text_it"></p>
-                    <p *ngIf="data.text_en" style="font-style: italic;" [innerHtml]="data.text_en"></p>
+                    <p [innerHtml]="data.text | cnLocalizedText"></p>
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@
             <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
                 <div class="cn-dz-layer-preview cn-bg-cover" [style.background-color]="l.color"
                     [appBgImage]="l.previewImage | cnUrl : item"></div>
-                <div class="mx-2">{{ l.title }}</div>
+                <div class="mx-2">{{ l.title | cnLocalizedText }}</div>
                 <div class="ml-auto"></div>
                 <mat-slider *ngIf="l.opacityControl" class="mr-2" min="0" step="0.01" max="1" [disabled]="!l.visible"
                     (ngModelChange)="l.opacity=$event; updateLayers()" [ngModel]="l.opacity">
@@ -22,14 +22,6 @@
         </div>
 
         <app-navigator [item]="item" [bounds]="navigatorBounds" (navigatorPan)="onNavigatorPan($event)"></app-navigator>
-        <!--
-        <div class="cn-dz-minimap rounded bg-background p-1 mat-elevation-z4">
-            <div class="cn-dz-minimap-image" [style.padding-bottom]="1.0 / viewportAspectRatio * 100 + '%'"
-                [appBgImage]="item.options.minimapImage | cnUrl : item">
-                <div class="cn-dz-minimap-track" [ngStyle]="minimapTrackStyle"></div>
-            </div>
-        </div>
--->
 
         <div class="cn-dz-tools mat-elevation-z4 bg-background rounded">
 

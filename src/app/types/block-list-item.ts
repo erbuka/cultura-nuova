@@ -1,4 +1,4 @@
-import { ItemBase } from './item';
+import { ItemBase, LocalizedText } from './item';
 
 export interface BlockListItem extends ItemBase {
     type: "block-list";
@@ -6,5 +6,5 @@ export interface BlockListItem extends ItemBase {
         itemWidth: string,
         itemAspectRatio: number
     },
-    links: { href: string, title: string, image: string }[]
+    links: { href: string, title: LocalizedText, image: string }[]
 }

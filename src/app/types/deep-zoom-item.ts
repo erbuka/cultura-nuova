@@ -1,9 +1,9 @@
-import { ItemBase } from './item';
+import { ItemBase, LocalizedText } from './item';
 
 
 export interface DeepZoomItemShape {
     type: string;
-    title?: string;
+    title?: LocalizedText;
     href?: string;
     drawAttributes: {
         stroke: boolean;
@@ -30,7 +30,7 @@ export interface DeepZoomItemLayer {
     name: string;
     minZoom?: number;
     maxZoom?: number;
-    title?: string;
+    title?: LocalizedText;
     opacity?: number;
     opacityControl?: boolean;
     visible?: boolean;
@@ -67,7 +67,7 @@ export interface DeepZoomItem extends ItemBase {
     layerGroups?: {
         name: string;
         exclusive: boolean;
-        title?: string;
+        title?: LocalizedText;
         layers: string[]
     }[]
 }
