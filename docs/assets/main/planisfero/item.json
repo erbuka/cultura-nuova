@@ -14,7 +14,10 @@
         {
             "type": "deep-image",
             "name": "griglia",
-            "title": "Griglia",
+            "title": {
+                "it" : "Griglia",
+                "en" : "Grid"
+            },
             "visible": true,
             "opacityControl" : false,
             "previewImage": "./layers/griglia/8/0_0.png",
@@ -30,7 +33,10 @@
         {
             "type": "deep-image",
             "name": "ante",
-            "title": "Ante",
+            "title": {
+                "it" : "Ante",
+                "en" : "Before"
+            },
             "visible": false,
             "previewImage": "./layers/ante/8/0_0.png",
             "imageSrc": "./layers/ante",
@@ -45,7 +51,10 @@
         {
             "type": "deep-image",
             "name": "post",
-            "title": "Post",
+            "title": {
+                "it" : "Post",
+                "en" : "After"
+            },
             "visible": true,
             "previewImage": "./layers/post/8/0_0.png",
             "imageSrc": "./layers/post",

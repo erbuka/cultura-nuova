@@ -7,12 +7,18 @@
     "links": [
         {
             "href": "./modello-3d",
-            "title": "Modello 3D",
+            "title": {
+                "it": "Modello 3D",
+                "en": "3D Model"
+            },
             "image": "./modello3d.png"
         },
         {
             "href": "./sviluppo",
-            "title": "Sviluppo",
+            "title": {
+                "it": "Sviluppo",
+                "en": "Development"
+            },
             "image": "./sviluppo.png"
         },
         {
@@ -22,7 +28,10 @@
         },
         {
             "href": "./planisfero",
-            "title": "Planisfero",
+            "title": {
+                "it" : "Planisfero",
+                "en" : "Worldmap"
+            },
             "image": "./planisfero/post.jpg"
         },
         {
