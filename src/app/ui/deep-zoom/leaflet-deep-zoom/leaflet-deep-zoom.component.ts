@@ -31,6 +31,7 @@ export class LeafletDeepZoomComponent implements OnInit {
   layerControls: LeafletLayerControls[] = null;
   measureLayer: LeafletMeasureLayer = null;
   navigatorBounds: NavigatorTrackBounds = null;
+  hideLayers: boolean = false;
   _tool: DeepZoomTools = "pan";
   _measureUnit: DeepZoomMeasureUnit = "centimeters";
 
@@ -137,6 +138,7 @@ export class LeafletDeepZoomComponent implements OnInit {
 
 
     this.map = L.map(this.mapContainer.nativeElement, {
+      attributionControl: false,
       center: [0, 0],
       zoom: 0,
       crs: L.CRS.Simple,

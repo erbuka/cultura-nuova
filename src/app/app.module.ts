@@ -17,15 +17,17 @@ import { SlideshowComponent } from './ui/slideshow/slideshow.component';
 import { MainComponent } from './ui/main/main.component';
 import { LeafletDeepZoomComponent } from './ui/deep-zoom/leaflet-deep-zoom/leaflet-deep-zoom.component';
 
+import { CanvasDeepZoomComponent } from './ui/deep-zoom/canvas-deep-zoom/canvas-deep-zoom.component';
+import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component';
+import { LocalizedTextPipe } from './localized-text.pipe';
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
-import { CanvasDeepZoomComponent } from './ui/deep-zoom/canvas-deep-zoom/canvas-deep-zoom.component';
-import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component';
-import { LocalizedTextPipe } from './localized-text.pipe';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 @NgModule({
   declarations: [
@@ -58,6 +60,7 @@ import { LocalizedTextPipe } from './localized-text.pipe';
     MatSliderModule,
     MatSelectModule,
     MatMenuModule,
+    MatSidenavModule,
 
   ],
   providers: [],

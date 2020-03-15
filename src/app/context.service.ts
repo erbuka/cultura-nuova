@@ -9,8 +9,11 @@ import { Item, LocalizedText } from './types/item';
 
 const ITEM_SCHEMA = require('./types/schema.json');
 
+const SS_LOCALE_ID_KEY = "cn-locale-id";
+
 export interface ConfigLocale {
   id: string;
+  flagIcon?: string;
   description: string;
 }
 
@@ -79,7 +82,7 @@ export class ContextService {
     if (!loc)
       throw new Error(`Locale not found: ${localeId}`);
 
-    sessionStorage.setItem("cn-locale-id", loc.id);
+    sessionStorage.setItem(SS_LOCALE_ID_KEY, loc.id);
 
     this._currentLocale = loc;
 
@@ -103,7 +106,7 @@ export class ContextService {
           if (this.config.internationalization) {
 
             try {
-              this.setCurrentLocale(sessionStorage.getItem("cn-locale-id"));
+              this.setCurrentLocale(sessionStorage.getItem(SS_LOCALE_ID_KEY));
             }
             catch (e) {
               this.setCurrentLocale(this.config.internationalization.defaultLocale);

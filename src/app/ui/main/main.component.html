@@ -7,25 +7,30 @@
         <div *ngIf="locales">
 
             <mat-menu #localeMenu>
-                <button mat-menu-item *ngFor="let l of locales" (click)="context.setCurrentLocale(l.id, true)">
+                <button mat-menu-item class="text-right" *ngFor="let l of locales" (click)="context.setCurrentLocale(l.id, true)">
                     {{l.description}}
+                    <img *ngIf="l.flagIcon" [src]="l.flagIcon" class="ml-1" style="vertical-align:middle; height: 24px;"> 
                 </button>
             </mat-menu>
 
-            <button mat-button [matMenuTriggerFor]="localeMenu">
-                {{ context.getCurrentLocale().description }}
-            </button>
-
+            <div class="text-right mb-1">
+                <button mat-button [matMenuTriggerFor]="localeMenu">
+                    <span>{{ context.getCurrentLocale().description }}</span>
+                    <img *ngIf="context.getCurrentLocale().flagIcon" class="ml-1" [src]="context.getCurrentLocale().flagIcon" style="height: 24px;"> 
+                </button>
+            </div>
+            <div>
+                <button class="mx-1" mat-mini-fab color="primary" (click)="goBack()">
+                    <mat-icon>chevron_left</mat-icon>
+                </button>
+                <button class="mx-1" mat-mini-fab color="primary" (click)="goUp()">
+                    <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button class="mx-1" mat-mini-fab color="primary" (click)="goHome()">
+                    <mat-icon>home</mat-icon>
+                </button>
+            </div>
         </div>
-        <button mat-icon-button (click)="goBack()">
-            <mat-icon>chevron_left</mat-icon>
-        </button>
-        <button mat-icon-button (click)="goUp()">
-            <mat-icon>arrow_upward</mat-icon>
-        </button>
-        <button mat-icon-button (click)="goHome()">
-            <mat-icon>home</mat-icon>
-        </button>
     </div>
     <div class="cn-app-content" [appBgImage]="context.config.backgroundImage">
         <app-item [item]="item"></app-item>

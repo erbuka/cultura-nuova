@@ -9,6 +9,7 @@ body {
   height: 100%;
 }
 body {
+  font-size: 14px;
   margin: 0;
   font-family: $cn-font-family;
   @extend .bg-background;
@@ -19,7 +20,7 @@ body {
   animation-duration: 0.5s;
 }
 
-$cn-header-height: 4rem;
+$cn-header-height: 8rem;
 
 .cn-bg-contain {
   background-repeat: no-repeat;
@@ -61,7 +62,7 @@ $cn-header-height: 4rem;
 }
 
 .cn-app-header {
-  @extend .p-4;
+  @extend .p-2;
   @extend .mat-elevation-z4;
 
   background-color: transparentize(theme-color("background"), 0.5);

@@ -1,13 +1,29 @@
+$cn-dz-tools-height: 4rem;
+
 .cn-deep-zoom-container {
   @extend .cn-relative;
   user-select: none;
 }
 
+.cn-dz-show-layers {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+
 .cn-dz-layer-controls {
   @extend .cn-absolute;
+  @extend .bg-background;
+  @extend .rounded;
+  @extend .mat-elevation-z4;
   overflow: hidden;
   top: 16px;
   left: 16px;
+  transition: left 0.2s;
+
+  &.cn-hidden {
+    left: -100%;
+  }
 
   .cn-dz-layer {
     &:not(:last-child) {
@@ -46,6 +62,7 @@
   @extend .w-100;
   bottom: 0;
   left: 0;
-  background: transparentize(theme-color("foreground"), 0.5);
-  color: theme-color("background");
+  height: $cn-dz-tools-height;
+  background: rgba(0,0,0,.5);
+  color: white;
 }

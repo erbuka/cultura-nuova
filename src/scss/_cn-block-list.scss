@@ -6,6 +6,7 @@
       .cn-block-list-label {
         @extend .p-4;
         background-color: transparentize(theme-color("background"), 0.5);
+        font-weight: bold;
       }
   
       .cn-block-list-hover {
