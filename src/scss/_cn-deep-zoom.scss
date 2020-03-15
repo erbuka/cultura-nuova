@@ -3,7 +3,6 @@
   user-select: none;
 }
 
-
 .cn-dz-layer-controls {
   @extend .cn-absolute;
   overflow: hidden;
@@ -36,15 +35,17 @@
 
     .cn-dz-minimap-track {
       position: absolute;
-      border: 2px solid theme-color("accent");
-      background-color: transparentize($color: theme-color("accent"), $amount: 0.9);
+      border: 2px solid theme-color("primary");
+      background-color: transparentize($color: theme-color("primary"), $amount: 0.9);
     }
   }
 }
 
 .cn-dz-tools {
   @extend .cn-absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  @extend .w-100;
+  bottom: 0;
+  left: 0;
+  background: transparentize(theme-color("foreground"), 0.5);
+  color: theme-color("background");
 }

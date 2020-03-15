@@ -56,27 +56,28 @@ $cn-header-height: 4rem;
 
 @for $i from 0 through 20 {
   .cn-opacity-#{$i*5} {
-    opacity: #{$i * 5/100.0};
+    opacity: #{$i * 5/100};
   }
 }
 
-.cn-app-container {
+.cn-app-header {
+  @extend .p-4;
+  @extend .mat-elevation-z4;
+
+  background-color: transparentize(theme-color("background"), 0.5);
+  
+  position: fixed;
+  width: 100%;
+  height: $cn-header-height;
+  z-index: 1;
+}
+
+.cn-app-content {
+  @extend .cn-bg-cover;
   position: relative;
-  height: 100%;
-  overflow: auto;
-
-  .cn-app-header {
-    @extend .p-4;
-    height: $cn-header-height;
-  }
-
-  .cn-app-content {
-    @extend .p-4;
-    position: relative;
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: calc(100vh - #{$cn-header-height});
-  }
+  overflow-x: hidden;
+  padding-top: $cn-header-height;
+  height: 100vh;
 }
 
 .cn-slideshow-carousel {
@@ -111,19 +112,3 @@ $cn-header-height: 4rem;
   }
 }
 
-.cn-block-list {
-  .cn-block-list-item {
-    position: relative;
-
-    .cn-block-list-hover {
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    &:hover {
-      .cn-block-list-hover {
-        opacity: 1;
-      }
-    }
-  }
-}

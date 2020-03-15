@@ -1,0 +1,22 @@
+
+.cn-block-list {
+    .cn-block-list-item {
+      position: relative;
+
+      .cn-block-list-label {
+        @extend .p-4;
+        background-color: transparentize(theme-color("background"), 0.5);
+      }
+  
+      .cn-block-list-hover {
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+  
+      &:hover {
+        .cn-block-list-hover {
+          opacity: 1;
+        }
+      }
+    }
+  }

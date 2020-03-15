@@ -1,5 +1,5 @@
 <ng-container *ngIf="item">
-    <ng-container *ngIf="currentSlideIndex === null">
+    <div class="p-4" *ngIf="currentSlideIndex === null">
         <div *ngFor="let grp of item.groups">
             <h3>{{ grp }}</h3>
             <div class="d-flex flex-wrap mx-n1 cn-block-list">
@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-    </ng-container>
+    </div>
 
     <ng-container *ngIf="currentSlideIndex !== null">
 
@@ -37,21 +37,21 @@
                     </div>
                 </div>
 
-                <div class="cn-absolute" style="right: -1rem; top:-1rem;z-index: 1;">
-                    <button mat-mini-fab (click)="clearSlide()" class="cn-absolute">
+                <div class="cn-absolute" style="right: 0.5rem; top: 0.5rem;z-index: 1;">
+                    <button mat-mini-fab color="primary" (click)="clearSlide()" class="cn-absolute">
                         <mat-icon>close</mat-icon>
                     </button>
                 </div>
 
-                <div class="cn-absolute" style="left: -1rem; top:50%; transform: translateY(-50%); z-index: 1;">
-                    <button mat-mini-fab (click)="previousSlide()" class="cn-absolute">
+                <div class="cn-absolute" style="left: 0.5rem; top:50%; transform: translateY(-50%); z-index: 1;">
+                    <button mat-mini-fab color="primary" (click)="previousSlide()" class="cn-absolute">
                         <mat-icon>chevron_left</mat-icon>
                     </button>
                 </div>
 
 
-                <div class="cn-absolute" style="right: -1rem; top:50%; transform: translateY(-50%);">
-                    <button mat-mini-fab (click)="nextSlide()" class="cn-absolute">
+                <div class="cn-absolute" style="right: 0.5rem; top:50%; transform: translateY(-50%);">
+                    <button mat-mini-fab color="primary" (click)="nextSlide()" class="cn-absolute">
                         <mat-icon>chevron_right</mat-icon>
                     </button>
                 </div>

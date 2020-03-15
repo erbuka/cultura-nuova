@@ -20,15 +20,15 @@
 }
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  color: mat-color($cn-mat-accent, default-contrast);
-  @extend .bg-accent;
+  color: mat-color($cn-mat-primary, default-contrast);
+  @extend .bg-primary;
   @extend .mat-elevation-z1;
 }
 
 // Tooltip
 
 .leaflet-tooltip {
-  color: mat-color($cn-mat-accent, default-contrast);
-  @extend .bg-accent;
+  color: mat-color($cn-mat-primary, default-contrast);
+  @extend .bg-primary;
   @extend .mat-elevation-z1;
 }

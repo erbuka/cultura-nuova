@@ -3,6 +3,9 @@ $cn-font-family: "Roboto", "Helvetica", sans-serif;
 @import "~animate.css/animate.css";
 @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 
+@import "scss/cn-custom-palette";
+
+
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @import '~@angular/material/theming';
@@ -66,6 +69,7 @@ $theme-colors: (
 
 @import "scss/cn-common";
 @import "scss/cn-scrollbars";
-@import "scss/cn-deepzoom";
+@import "scss/cn-deep-zoom";
+@import "scss/cn-block-list";
 @import "scss/cn-leaflet";
 

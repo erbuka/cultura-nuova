@@ -1,35 +1,33 @@
 <ng-container *ngIf="item">
-    <div class="cn-app-container cn-bg-fixed" [appBgImage]="context.config.backgroundImage">
-        <div class="cn-app-header d-flex align-items-center mat-elevation-z4 bg-background">
-            <div>
-                <h3>Basilica di Santa Croce - Cappella Maggiore, Firenze</h3>
-            </div>
-            <div class="ml-auto"></div>
-            <div *ngIf="locales">
+    <div class="cn-app-header d-flex align-items-center">
+        <div>
+            <h3>Basilica di Santa Croce - Cappella Maggiore, Firenze</h3>
+        </div>
+        <div class="ml-auto"></div>
+        <div *ngIf="locales">
 
-                <mat-menu #localeMenu>
-                    <button mat-menu-item *ngFor="let l of locales" (click)="context.setCurrentLocale(l.id, true)">
-                        {{l.description}}
-                    </button>
-                </mat-menu>
-
-                <button mat-button [matMenuTriggerFor]="localeMenu">
-                    {{ context.getCurrentLocale().description }}
+            <mat-menu #localeMenu>
+                <button mat-menu-item *ngFor="let l of locales" (click)="context.setCurrentLocale(l.id, true)">
+                    {{l.description}}
                 </button>
+            </mat-menu>
 
-            </div>
-            <button mat-icon-button (click)="goBack()">
-                <mat-icon>chevron_left</mat-icon>
+            <button mat-button [matMenuTriggerFor]="localeMenu">
+                {{ context.getCurrentLocale().description }}
             </button>
-            <button mat-icon-button (click)="goUp()">
-                <mat-icon>arrow_upward</mat-icon>
-            </button>
-            <button mat-icon-button (click)="goHome()">
-                <mat-icon>home</mat-icon>
-            </button>
+
         </div>
-        <div class="cn-app-content">
-            <app-item [item]="item"></app-item>
-        </div>
+        <button mat-icon-button (click)="goBack()">
+            <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-icon-button (click)="goUp()">
+            <mat-icon>arrow_upward</mat-icon>
+        </button>
+        <button mat-icon-button (click)="goHome()">
+            <mat-icon>home</mat-icon>
+        </button>
+    </div>
+    <div class="cn-app-content" [appBgImage]="context.config.backgroundImage">
+        <app-item [item]="item"></app-item>
     </div>
 </ng-container>
