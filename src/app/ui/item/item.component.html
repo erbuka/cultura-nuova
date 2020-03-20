@@ -3,7 +3,5 @@
     <app-page *ngIf="item.type === 'page'" [item]="item"></app-page>
     <app-slideshow *ngIf="item.type === 'slideshow'" [item]="item"></app-slideshow>
     <app-leaflet-deep-zoom *ngIf="item.type === 'deep-zoom'" [item]="item"></app-leaflet-deep-zoom>
-<!--
-    <app-canvas-deep-zoom *ngIf="item.type === 'deep-zoom'" [item]="item"></app-canvas-deep-zoom>
-    -->
+    <app-three-viewer *ngIf="item.type === '3d'" [item]="item"></app-three-viewer>
 </ng-container>

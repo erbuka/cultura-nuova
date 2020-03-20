@@ -28,6 +28,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { ThreeViewerComponent } from './ui/three-viewer/three-viewer.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { MatSidenavModule } from '@angular/material/sidenav';
     LeafletDeepZoomComponent,
     CanvasDeepZoomComponent,
     NavigatorComponent,
-    LocalizedTextPipe
+    LocalizedTextPipe,
+    ThreeViewerComponent
   ],
   imports: [
     BrowserModule,

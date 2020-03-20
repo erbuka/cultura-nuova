@@ -7,10 +7,12 @@
         "locales": [
             {
                 "id": "it",
+                "flagIcon": "https://www.countryflags.io/it/flat/64.png",
                 "description": "Italiano"
             },
             {
                 "id": "en",
+                "flagIcon": "https://www.countryflags.io/us/flat/64.png",
                 "description": "English"
             }
         ]

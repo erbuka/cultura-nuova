@@ -6,7 +6,7 @@
 
 html,
 body {
-  height: 100%;
+  //height: 100%;
 }
 body {
   font-size: 14px;
@@ -67,7 +67,7 @@ $cn-header-height: 8rem;
 
   background-color: transparentize(theme-color("background"), 0.5);
   
-  position: fixed;
+  position: relative;
   width: 100%;
   height: $cn-header-height;
   z-index: 1;
@@ -77,8 +77,9 @@ $cn-header-height: 8rem;
   @extend .cn-bg-cover;
   position: relative;
   overflow-x: hidden;
-  padding-top: $cn-header-height;
-  height: 100vh;
+  overflow-y: auto;
+  //margin-top: $cn-header-height;
+  height: calc(100vh - #{$cn-header-height});
 }
 
 .cn-slideshow-carousel {
