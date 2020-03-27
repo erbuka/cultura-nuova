@@ -12,6 +12,7 @@ import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { LocalizedText } from 'src/app/types/item';
 import { HttpClient } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 const loadPlyMesh: (url: string) => Promise<BufferGeometry> = (url) => {
@@ -102,21 +103,37 @@ class TypedGroup<T extends ThreeViewerObject3D> extends Group {
 
 class ThreeViewerComponentModel extends Group implements Serializable<ThreeViewerItemModel> {
 
-  isModel:boolean = true;
+  isModel: boolean = true;
 
   title: LocalizedText = "";
   description: LocalizedText = "";
 
-  _opacity: number = 1;
+  private _opacity: number = 1;
+  private _currentMaterialIndex: number = null;
 
-  _materials: {
-    title: string;
-    description: string;
+  private _materials: {
+    title: LocalizedText;
+    description: LocalizedText;
+    meshMaterials: MeshStandardMaterial[]
   }[] = [];
+
+
+  set currentMaterial(index: number) {
+    let mat = this._materials[index];
+
+    if (mat) {
+      this._currentMaterialIndex = index;
+      this.meshes.forEach((mesh, index) => mesh.material = mat.meshMaterials[index]);
+    }
+
+  }
+
 
   set opacity(value: number) {
     this._opacity = value;
-    this.meshes.forEach(mesh => (mesh.material as MeshStandardMaterial).opacity = value);
+    this._materials
+      .reduce((prev, curr) => [...prev, ...curr.meshMaterials], <MeshStandardMaterial[]>[])
+      .forEach(mat => mat.opacity = value);
   }
 
   get opacity(): number {
@@ -131,10 +148,54 @@ class ThreeViewerComponentModel extends Group implements Serializable<ThreeViewe
     super();
   }
 
+
+
+  addMaterial(title: LocalizedText, description: LocalizedText, meshMaterials: MeshStandardMaterial[]): void {
+
+    if (this.meshes.length === 0) {
+      throw new Error("There are no meshes");
+    }
+
+    if (!(meshMaterials.length === this.meshes.length)) {
+      throw new Error(`Wrong number of materials. Expected: ${this.meshes.length}. Found: ${meshMaterials.length}`)
+    }
+
+    this._materials.push({
+      title: title,
+      description: description || "",
+      meshMaterials: meshMaterials
+    });
+
+    if (this._currentMaterialIndex === null)
+      this.currentMaterial = 0;
+
+  }
+
   async serialize(binFiles: BinaryFiles): Promise<ThreeViewerItemModel> {
     let pos = this.position;
     let scl = this.scale;
     let rot = this.rotation;
+
+    let meshes = await Promise.all(this.meshes.map(async mesh => {
+      let data = await exportPlyMesh(mesh);
+      let fileName = binFiles.store(data);
+      return {
+        name: mesh.name,
+        file: fileName
+      }
+    }));
+
+    let materials = this._materials.map(m => {
+      return {
+        title: m.title,
+        description: m.description,
+        meshMaterials: m.meshMaterials.map(x => {
+          return {
+            color: x.color.getHex()
+          }
+        })
+      }
+    });
 
     return {
       title: this.title,
@@ -142,14 +203,8 @@ class ThreeViewerComponentModel extends Group implements Serializable<ThreeViewe
       position: [pos.x, pos.y, pos.z],
       rotation: [rot.x, rot.y, rot.z],
       scale: [scl.x, scl.y, scl.z],
-      meshes: await Promise.all(this.meshes.map(async mesh => {
-        let data = await exportPlyMesh(mesh);
-        let fileName = binFiles.store(data);
-        return {
-          name: mesh.name,
-          file: fileName
-        }
-      }))
+      meshes: meshes,
+      materials: materials
     }
   }
 
@@ -188,6 +243,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   width: number = 0;
   height: number = 0;
 
+  allowEditorMode: boolean = false;
   editorMode: boolean = false;
 
   set selectedObject(obj: ThreeViewerObject3D) {
@@ -201,16 +257,15 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     return this._selectedObject;
   }
 
-  constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient) {
+  constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar) {
+    this.allowEditorMode = !environment.production;
     this.editorMode = !environment.production;
   }
 
   async ngOnInit() {
 
-
     this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true });
     this.containterRef.nativeElement.appendChild(this.renderer.domElement);
-
 
     this.rayscaster = new Raycaster();
 
@@ -286,11 +341,17 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       if (scl)
         model.scale.fromArray(scl);
 
-      if (modelDef.meshes) {
-        for (let meshDef of modelDef.meshes) {
-          let geometry = await loadPlyMesh(this.context.resolveUrl(meshDef.file, this.item));
-          model.add(new Mesh(geometry, new MeshStandardMaterial()));
-        }
+      for (let meshDef of modelDef.meshes) {
+        let geometry = await loadPlyMesh(this.context.resolveUrl(meshDef.file, this.item));
+        model.add(new Mesh(geometry, new MeshStandardMaterial()));
+      }
+
+      for (let materialDef of modelDef.materials) {
+        model.addMaterial(materialDef.title, materialDef.description, materialDef.meshMaterials.map(x => new MeshStandardMaterial({
+          transparent: true,
+          premultipliedAlpha: false,
+          color: x.color
+        })));
       }
 
       this.models.add(model);
@@ -312,14 +373,16 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     result.title = "Object";
 
     geometries.forEach(g => {
-      let mesh = new Mesh(g.geometry, new MeshStandardMaterial({
-        color: 0xffffff,
-        transparent: true,
-        premultipliedAlpha: false
-      }));
+      let mesh = new Mesh(g.geometry);
       mesh.name = g.name;
       result.add(mesh);
     });
+
+    result.addMaterial("Default", "", result.meshes.map(x => new MeshStandardMaterial({
+      premultipliedAlpha: false,
+      transparent: true,
+      color: 0xffffff
+    })));
 
     this.models.add(result);
 
@@ -372,6 +435,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         new Blob([data], { type: "application/octet-stream" }),
         { responseType: "text" }).toPromise()
     }
+
+    this.snackBar.open("Scene saved!");
 
   }
 

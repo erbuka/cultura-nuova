@@ -10,6 +10,9 @@
   }
 
   .cn-three-viewer-controls {
+    position: absolute;
+    top: 16px;
+    left: 16px;
   }
 
   .cn-three-viewer-editor {
@@ -19,7 +22,7 @@
     overflow: hidden;
     top: 0;
     left: 0;
-    width: 25rem;
+    width: 20rem;
     height: 100%;
     //font-size: 0.8rem;
 
@@ -76,7 +79,7 @@
     .cn-three-viewer-editor-item-list {
       @extend .border;
       cursor: pointer;
-      height: 15rem;
+      height: 10rem;
       overflow-x: hidden;
       overflow-y: auto;
 

@@ -8,10 +8,17 @@ export type ThreeViewerItemModel = {
     position?: ThreeViewerItemVector3,
     rotation?: ThreeViewerItemVector3,
     scale?: ThreeViewerItemVector3,
-    meshes?: {
+    meshes: {
         name: string,
         file: string
-    }[];
+    }[],
+    materials: {
+        title: LocalizedText,
+        description?: LocalizedText,
+        meshMaterials: {
+            color: number
+        }[]
+    }[]
 }
 
 export interface ThreeViewerItem extends ItemBase {
