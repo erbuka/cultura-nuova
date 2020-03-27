@@ -7,7 +7,8 @@ const files = [
     "./src/app/types/deep-zoom-item.ts",
     "./src/app/types/block-list-item.ts",
     "./src/app/types/page-item.ts",
-    "./src/app/types/slideshow-item.ts"
+    "./src/app/types/slideshow-item.ts",
+    "./src/app/types/three-viewer-item.ts"
 ];
 
 

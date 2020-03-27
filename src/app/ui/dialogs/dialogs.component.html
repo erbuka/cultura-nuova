@@ -1,0 +1,38 @@
+<input type="file" style="display: none;" #fileChooser>
+
+<ng-template #textEditDialogTmpl let-data>
+    <mat-slide-toggle class="mb-2" color="primary" [checked]="isMultilanguage(data.text)" (change)="multilanguageToggle(data)">Multilanguage</mat-slide-toggle>
+    <ng-container *ngIf="isMultilanguage(data.text)">
+        <ng-container *ngFor="let locale of context.getLocales()">
+            <mat-form-field class="w-100">
+                <mat-label>{{ locale.id }}</mat-label>
+                <input *ngIf="!data.multiline" matInput [(ngModel)]="data.text[locale.id]">
+                <textarea *ngIf="data.multiline" rows="5" matInput [(ngModel)]="data.text[locale.id]"></textarea>
+            </mat-form-field>
+        </ng-container>
+    </ng-container>
+    <ng-container *ngIf="!isMultilanguage(data.text)">
+        <mat-form-field class="w-100">
+            <mat-label>Text</mat-label>
+            <input *ngIf="!data.multiline" matInput [(ngModel)]="data.text">
+            <textarea *ngIf="data.multiline" rows="5" matInput [(ngModel)]="data.text"></textarea>
+        </mat-form-field>
+    </ng-container>
+    <div class="mt-2 text-right">
+        <button mat-raised-button color="primary" (click)="data.resolve(data.text); data.closeDialog()">Accept</button>
+        <button class="ml-2" mat-raised-button (click)="data.reject(); data.closeDialog()">Cancel</button>
+    </div>
+</ng-template>
+
+<ng-template #errorDialogTmpl let-data>
+    <h4 mat-dialog-title class="text-danger d-flex align-items-center">
+        <mat-icon>error_outline</mat-icon>
+        <span>Error</span>
+    </h4>
+    <mat-dialog-content class="pb-3">
+        <div [innerHtml]="data.description"></div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button [mat-dialog-close]="true">Close</button>
+    </mat-dialog-actions>
+</ng-template>

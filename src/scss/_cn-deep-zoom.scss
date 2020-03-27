@@ -17,12 +17,12 @@ $cn-dz-tools-height: 4rem;
   @extend .rounded;
   @extend .mat-elevation-z4;
   overflow: hidden;
+  left: -100%;
   top: 16px;
-  left: 16px;
   transition: left 0.2s;
 
-  &.cn-hidden {
-    left: -100%;
+  &.cn-show {
+    left: 16px;
   }
 
   .cn-dz-layer {

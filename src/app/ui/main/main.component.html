@@ -1,22 +1,26 @@
 <ng-container *ngIf="item">
     <div class="cn-app-header d-flex align-items-center">
         <div>
-            <h3>Basilica di Santa Croce - Cappella Maggiore, Firenze</h3>
+            <h1>Jackdaws love my big sphinx of quartz.</h1>
+            <h2>The quick brown fox jumps over the lazy dog.</h2>
         </div>
         <div class="ml-auto"></div>
         <div *ngIf="locales">
 
             <mat-menu #localeMenu>
-                <button mat-menu-item class="text-right" *ngFor="let l of locales" (click)="context.setCurrentLocale(l.id, true)">
+                <button mat-menu-item class="text-right" *ngFor="let l of locales"
+                    (click)="context.setCurrentLocale(l.id, true)">
                     {{l.description}}
-                    <img *ngIf="l.flagIcon" [src]="l.flagIcon" class="ml-1" style="vertical-align:middle; height: 24px;"> 
+                    <img *ngIf="l.flagIcon" [src]="l.flagIcon" class="ml-1"
+                        style="vertical-align:middle; height: 24px;">
                 </button>
             </mat-menu>
 
             <div class="text-right mb-1">
                 <button mat-button [matMenuTriggerFor]="localeMenu">
                     <span>{{ context.getCurrentLocale().description }}</span>
-                    <img *ngIf="context.getCurrentLocale().flagIcon" class="ml-1" [src]="context.getCurrentLocale().flagIcon" style="height: 24px;"> 
+                    <img *ngIf="context.getCurrentLocale().flagIcon" class="ml-1"
+                        [src]="context.getCurrentLocale().flagIcon" style="height: 24px;">
                 </button>
             </div>
             <div>

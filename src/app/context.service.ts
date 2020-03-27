@@ -11,6 +11,12 @@ const ITEM_SCHEMA = require('./types/schema.json');
 
 const SS_LOCALE_ID_KEY = "cn-locale-id";
 
+export type FileChooserConfig = {
+  accept: string,
+  type: "arraybuffer",
+}
+
+
 export interface ConfigLocale {
   id: string;
   flagIcon?: string;
@@ -27,8 +33,22 @@ export interface Config {
 }
 
 
-export type Error = {
+export type ErrorEvent = {
   description: string;
+}
+
+
+export type TextEditEvent = {
+  text: LocalizedText;
+  multiline: boolean;
+  resolve: (data: LocalizedText) => void,
+  reject: () => void
+}
+
+export type FileChooserEvent = {
+  config: FileChooserConfig,
+  resolve: (data: string | ArrayBuffer) => void,
+  reject: () => void
 }
 
 @Injectable({
@@ -42,7 +62,9 @@ export class ContextService {
 
   templates: Map<string, TemplateRef<any>> = new Map();
 
-  onError: EventEmitter<Error> = new EventEmitter();
+  onTextEdit: EventEmitter<TextEditEvent> = new EventEmitter();
+  onFileChoose: EventEmitter<FileChooserEvent> = new EventEmitter();
+  onError: EventEmitter<ErrorEvent> = new EventEmitter();
 
   private jsonValidator: ajv.Ajv = null;
   private initializeSubject: BehaviorSubject<boolean>;
@@ -189,6 +211,43 @@ export class ContextService {
     }
   }
 
+  editText(text: LocalizedText, multiline: boolean = false): Promise<LocalizedText> {
+    let textCopy = typeof text === "string" ? text : Object.assign({}, text);
+
+    return new Promise((resolve, reject) => {
+      this.onTextEdit.emit({
+        text: textCopy,
+        multiline: multiline,
+        resolve: resolve,
+        reject: reject
+      })
+    });
+
+  }
+
+  fileChooser(config?: { type?: "arraybuffer", accept?: string }): Promise<ArrayBuffer>;
+  fileChooser(config?: Partial<FileChooserConfig>): Promise<string | ArrayBuffer> {
+
+    let cfg: FileChooserConfig = {
+      type: "arraybuffer",
+      accept: ".*"
+    };
+
+
+    if (config) {
+      Object.assign(cfg, config);
+    }
+
+    return new Promise((resolve, reject) => {
+      this.onFileChoose.emit({
+        config: cfg,
+        resolve: resolve,
+        reject: reject
+      });
+    });
+
+  }
+
   joinUrl(...pieces: string[]): string {
     let result = "";
     for (let p of pieces)
@@ -196,7 +255,7 @@ export class ContextService {
     return result;
   }
 
-  raiseError(err: Error): void {
+  raiseError(err: ErrorEvent): void {
     console.error(err);
     this.onError.emit(err);
   }

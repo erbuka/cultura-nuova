@@ -3,6 +3,19 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatSelectModule } from '@angular/material/select';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,19 +29,16 @@ import { ItemComponent } from './ui/item/item.component';
 import { SlideshowComponent } from './ui/slideshow/slideshow.component';
 import { MainComponent } from './ui/main/main.component';
 import { LeafletDeepZoomComponent } from './ui/deep-zoom/leaflet-deep-zoom/leaflet-deep-zoom.component';
-
+import { ThreeViewerComponent } from './ui/three-viewer/three-viewer.component';
 import { CanvasDeepZoomComponent } from './ui/deep-zoom/canvas-deep-zoom/canvas-deep-zoom.component';
 import { NavigatorComponent } from './ui/deep-zoom/navigator/navigator.component';
 import { LocalizedTextPipe } from './localized-text.pipe';
+import { VectorInputComponent } from './ui/three-viewer/vector-input/vector-input.component';
+import { DialogsComponent } from './ui/dialogs/dialogs.component';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { EditableLocalizedTextComponent } from './ui/editable-localized-text/editable-localized-text.component';
 
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatSelectModule } from '@angular/material/select';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { ThreeViewerComponent } from './ui/three-viewer/three-viewer.component';
+
 
 @NgModule({
   declarations: [
@@ -46,7 +56,10 @@ import { ThreeViewerComponent } from './ui/three-viewer/three-viewer.component';
     CanvasDeepZoomComponent,
     NavigatorComponent,
     LocalizedTextPipe,
-    ThreeViewerComponent
+    ThreeViewerComponent,
+    VectorInputComponent,
+    DialogsComponent,
+    EditableLocalizedTextComponent
   ],
   imports: [
     BrowserModule,
@@ -55,6 +68,7 @@ import { ThreeViewerComponent } from './ui/three-viewer/three-viewer.component';
     BrowserAnimationsModule,
     FormsModule,
     HammerModule,
+    DragDropModule,
 
     MatButtonModule,
     MatIconModule,
@@ -62,10 +76,15 @@ import { ThreeViewerComponent } from './ui/three-viewer/three-viewer.component';
     MatSliderModule,
     MatSelectModule,
     MatMenuModule,
-    MatSidenavModule,
-
+    MatToolbarModule,
+    MatDividerModule,
+    MatSlideToggleModule,
+    MatInputModule,
+    MatCheckboxModule,
   ],
-  providers: [],
+  providers: [
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "outline", floatLabel: "always" }}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

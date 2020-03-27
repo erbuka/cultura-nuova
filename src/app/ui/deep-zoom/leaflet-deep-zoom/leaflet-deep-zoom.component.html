@@ -6,21 +6,21 @@
 
     <!-- Controls -->
     <div style="z-index: 2;">
-        <div class="cn-dz-show-layers" (click)="hideLayers=false">
+        <div class="cn-dz-show-layers" (click)="showLayers=true">
             <button mat-mini-fab color="primary">
                 <mat-icon>layers</mat-icon>
             </button>
         </div>
 
-        <div class="cn-dz-layer-controls" [class.cn-hidden]="hideLayers">
-            <div class="d-flex align-items-center py-2 border-bottom">
-                <strong class="ml-2">Layers</strong>
-                <div class="ml-auto">
-                </div>
-                <button mat-icon-button (click)="hideLayers=true">
+        <div class="cn-dz-layer-controls" [class.cn-show]="showLayers">
+
+            <mat-toolbar color="primary">
+                <span>Layers</span>
+                <button class="ml-auto" mat-icon-button (click)="showLayers=false">
                     <mat-icon>close</mat-icon>
                 </button>
-            </div>
+            </mat-toolbar>
+
             <div *ngFor="let l of layerControls" class="d-flex align-items-center cn-dz-layer w-100">
                 <div class="cn-dz-layer-preview cn-bg-cover" [style.background-color]="l.color"
                     [appBgImage]="l.previewImage | cnUrl : item"></div>

@@ -9,9 +9,8 @@ body {
   //height: 100%;
 }
 body {
-  font-size: 14px;
   margin: 0;
-  font-family: $cn-font-family;
+  @extend .mat-typography;
   @extend .bg-background;
   @extend .text-foreground;
 }
@@ -113,4 +112,3 @@ $cn-header-height: 8rem;
     @extend .text-foreground;
   }
 }
-

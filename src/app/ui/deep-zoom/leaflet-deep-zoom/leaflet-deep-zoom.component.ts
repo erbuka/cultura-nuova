@@ -31,7 +31,7 @@ export class LeafletDeepZoomComponent implements OnInit {
   layerControls: LeafletLayerControls[] = null;
   measureLayer: LeafletMeasureLayer = null;
   navigatorBounds: NavigatorTrackBounds = null;
-  hideLayers: boolean = false;
+  showLayers: boolean = false;
   _tool: DeepZoomTools = "pan";
   _measureUnit: DeepZoomMeasureUnit = "centimeters";
 
