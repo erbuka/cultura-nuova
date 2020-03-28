@@ -1,217 +1,18 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy } from '@angular/core';
 import { ThreeViewerItem, ThreeViewerItemModel } from 'src/app/types/three-viewer-item';
-import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, Group, BufferGeometry, MeshStandardMaterial, Float32BufferAttribute, Object3D, DirectionalLight, GridHelper, Vector3 } from 'three';
+import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, Group, MeshStandardMaterial, DirectionalLight, GridHelper, Vector3 } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService } from 'src/app/context.service';
 
-import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
-import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
 import { TouchControls } from './touch-controls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
-import { LocalizedText } from 'src/app/types/item';
 import { HttpClient } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-
-const loadPlyMesh: (url: string) => Promise<BufferGeometry> = (url) => {
-  return new Promise((resolve, reject) => {
-    let loader = new PLYLoader();
-    loader.load(url, (geom) => resolve(geom), null, (err) => reject(err));
-  });
-}
-
-const exportPlyMesh: (mesh: Mesh) => Promise<ArrayBuffer> = (mesh: Mesh) => {
-  let plyExporter = new PLYExporter();
-
-  // This is done because PLYExporter applies the world matrix
-  // to the mesh before exporing it, and we don't need that since
-  // we store position, rotation and scale in the parent group
-  let tempMesh = new Mesh(mesh.geometry);
-
-  return new Promise((resolve, reject) => {
-    plyExporter.parse(tempMesh, (result: any) => resolve(result as ArrayBuffer), { binary: true })
-  });
-};
-
-const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name: string, geometry: BufferGeometry }[]> = async (wfData) => {
-  return new Promise((resolve, reject) => {
-
-    let result: { name: string, geometry: BufferGeometry }[] = [];
-    let loader = new OBJLoader2();
-    let count = 0;
-
-    loader.setMaterialPerSmoothingGroup(false);
-
-    loader.setCallbackOnAssetAvailable((asset) => {
-
-      if (asset.type === "mesh") {
-        let geometry = new BufferGeometry();
-
-        if (asset.buffers.vertices)
-          geometry.setAttribute("position", new Float32BufferAttribute(asset.buffers.vertices, 3));
-
-        if (asset.buffers.normals)
-          geometry.setAttribute("normal", new Float32BufferAttribute(asset.buffers.normals, 3));
-
-        if (asset.buffers.uvs)
-          geometry.setAttribute("uv", new Float32BufferAttribute(asset.buffers.uvs, 2));
-
-        let name = asset.params.meshName ? asset.params.meshName : `mesh${count++}`;
-
-        result.push({ name: name, geometry: geometry });
-
-      }
-
-    });
-
-    loader.setCallbackOnError((err) => reject(err));
-
-    loader.parse(wfData);
-
-    resolve(result);
-
-  });
-}
-
-interface Serializable<T> {
-  serialize(binData: BinaryFiles): Promise<T>;
-}
-
-class BinaryFiles {
-
-  files: Map<string, ArrayBuffer> = new Map();
-
-  private nextId: number = 0;
-
-  store(data: ArrayBuffer): string {
-    let name = `./${this.nextId++}.bin`
-    this.files.set(name, data);
-    return name;
-  }
-
-}
-
-
-class TypedGroup<T extends ThreeViewerObject3D> extends Group {
-  constructor() { super(); }
-  children: T[];
-  add(...o: T[]): this { super.add(...o); return this; }
-  remove(...o: T[]): this { super.remove(...o); return this; }
-}
-
-class ThreeViewerComponentModel extends Group implements Serializable<ThreeViewerItemModel> {
-
-  isModel: boolean = true;
-
-  title: LocalizedText = "";
-  description: LocalizedText = "";
-
-  private _opacity: number = 1;
-  private _currentMaterialIndex: number = null;
-
-  private _materials: {
-    title: LocalizedText;
-    description: LocalizedText;
-    meshMaterials: MeshStandardMaterial[]
-  }[] = [];
-
-
-  set currentMaterial(index: number) {
-    let mat = this._materials[index];
-
-    if (mat) {
-      this._currentMaterialIndex = index;
-      this.meshes.forEach((mesh, index) => mesh.material = mat.meshMaterials[index]);
-    }
-
-  }
-
-
-  set opacity(value: number) {
-    this._opacity = value;
-    this._materials
-      .reduce((prev, curr) => [...prev, ...curr.meshMaterials], <MeshStandardMaterial[]>[])
-      .forEach(mat => mat.opacity = value);
-  }
-
-  get opacity(): number {
-    return this._opacity;
-  }
-
-  get meshes(): Mesh[] {
-    return <Mesh[]>this.children.filter(x => x instanceof Mesh);
-  }
-
-  constructor() {
-    super();
-  }
-
-
-
-  addMaterial(title: LocalizedText, description: LocalizedText, meshMaterials: MeshStandardMaterial[]): void {
-
-    if (this.meshes.length === 0) {
-      throw new Error("There are no meshes");
-    }
-
-    if (!(meshMaterials.length === this.meshes.length)) {
-      throw new Error(`Wrong number of materials. Expected: ${this.meshes.length}. Found: ${meshMaterials.length}`)
-    }
-
-    this._materials.push({
-      title: title,
-      description: description || "",
-      meshMaterials: meshMaterials
-    });
-
-    if (this._currentMaterialIndex === null)
-      this.currentMaterial = 0;
-
-  }
-
-  async serialize(binFiles: BinaryFiles): Promise<ThreeViewerItemModel> {
-    let pos = this.position;
-    let scl = this.scale;
-    let rot = this.rotation;
-
-    let meshes = await Promise.all(this.meshes.map(async mesh => {
-      let data = await exportPlyMesh(mesh);
-      let fileName = binFiles.store(data);
-      return {
-        name: mesh.name,
-        file: fileName
-      }
-    }));
-
-    let materials = this._materials.map(m => {
-      return {
-        title: m.title,
-        description: m.description,
-        meshMaterials: m.meshMaterials.map(x => {
-          return {
-            color: x.color.getHex()
-          }
-        })
-      }
-    });
-
-    return {
-      title: this.title,
-      description: this.description,
-      position: [pos.x, pos.y, pos.z],
-      rotation: [rot.x, rot.y, rot.z],
-      scale: [scl.x, scl.y, scl.z],
-      meshes: meshes,
-      materials: materials
-    }
-  }
-
-}
-
-
-type ThreeViewerObject3D = ThreeViewerComponentModel;
+import { BinaryFiles, ThreeViewerObject3D, TypedGroup, ThreeViewerComponentModel, loadPlyMesh, loadGeometryFromWavefront } from './three-viewer';
 
 
 
@@ -237,6 +38,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   touchControls: TouchControls = null;
   orbitControls: OrbitControls = null;
   transformControls: TransformControls = null;
+  gridHelper: GridHelper = null;
 
   rayscaster: Raycaster = null;
 
@@ -244,7 +46,21 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   height: number = 0;
 
   allowEditorMode: boolean = false;
-  editorMode: boolean = false;
+  private _editorMode: boolean = false;
+
+  set editorMode(value: boolean) {
+    this._editorMode = value;
+
+    this.touchControls.enabled = !value;
+    this.orbitControls.enabled = value;
+    this.transformControls.enabled = value;
+    this.gridHelper.visible = value;
+
+  }
+
+  get editorMode(): boolean {
+    return this._editorMode;
+  }
 
   set selectedObject(obj: ThreeViewerObject3D) {
     this._selectedObject = obj;
@@ -257,9 +73,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     return this._selectedObject;
   }
 
-  constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar) {
+  constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar, private dialog: MatDialog) {
     this.allowEditorMode = !environment.production;
-    this.editorMode = !environment.production;
   }
 
   async ngOnInit() {
@@ -273,32 +88,28 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.camera.matrixAutoUpdate = true;
 
     this.scene = new Scene();
+
+    this.gridHelper = new GridHelper(20, 20);
+
+    this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
+
+    this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
+    this.transformControls.addEventListener('dragging-changed', (evt) => this.orbitControls.enabled = !evt.value);
+
+    this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement);
+    this.touchControls.enabled = false;
+    this.touchControls.wheelZoomStep = 5;
+    this.touchControls.zoomSpeed = 500;
+
+    this.scene.add(this.transformControls);
+    this.scene.add(this.gridHelper);
     this.scene.add(this.models);
     {
       let l = new DirectionalLight();
       l.position.set(1, 2, 1);
       this.scene.add(l);
     }
-
-    if (this.editorMode) {
-      this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
-      this.orbitControls.enabled = this.editorMode;
-
-      this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
-
-      this.transformControls.addEventListener('dragging-changed', (evt) => {
-        this.orbitControls.enabled = !evt.value;
-      });
-
-      this.scene.add(this.transformControls);
-
-      this.scene.add(new GridHelper(20, 20));
-
-    } else {
-      this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement);
-      this.touchControls.wheelZoomStep = 100;
-      this.touchControls.zoomSpeed = 500;
-    }
+    this.editorMode = true;
 
     await this.loadItem();
 
@@ -343,7 +154,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
       for (let meshDef of modelDef.meshes) {
         let geometry = await loadPlyMesh(this.context.resolveUrl(meshDef.file, this.item));
-        model.add(new Mesh(geometry, new MeshStandardMaterial()));
+        let mesh = new Mesh(geometry, new MeshStandardMaterial());
+        mesh.name = meshDef.name;
+        model.add(mesh);
       }
 
       for (let materialDef of modelDef.materials) {
@@ -386,6 +199,19 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     this.models.add(result);
 
+  }
+
+  editMaterials(model: ThreeViewerComponentModel): void {
+    this.dialog.open(MaterialEditorComponent, {
+      minWidth: "1024px",
+      width: "1024px",
+      position: {
+        top: "100px"
+      },
+      data: {
+        model: model
+      }
+    })
   }
 
   render() {

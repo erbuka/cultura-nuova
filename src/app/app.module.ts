@@ -38,6 +38,7 @@ import { VectorInputComponent } from './ui/three-viewer/vector-input/vector-inpu
 import { DialogsComponent } from './ui/dialogs/dialogs.component';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { EditableLocalizedTextComponent } from './ui/editable-localized-text/editable-localized-text.component';
+import { MaterialEditorComponent } from './ui/three-viewer/material-editor/material-editor.component';
 
 
 
@@ -60,7 +61,8 @@ import { EditableLocalizedTextComponent } from './ui/editable-localized-text/edi
     ThreeViewerComponent,
     VectorInputComponent,
     DialogsComponent,
-    EditableLocalizedTextComponent
+    EditableLocalizedTextComponent,
+    MaterialEditorComponent
   ],
   imports: [
     BrowserModule,

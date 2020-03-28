@@ -1,0 +1,116 @@
+.cn-three-viewer-editor {
+  &.cn-inspector {
+    @extend .cn-absolute;
+    @extend .mat-elevation-z4;
+    @extend .bg-background;
+    @extend .rounded;
+    overflow: hidden;
+    top: 16px;
+    left: 16px;
+    width: 20rem;
+    height: calc(100% - 32px);
+    transition: left 0.2s;
+
+    &.cn-hidden {
+      left: -100%;
+    }
+
+    .cn-three-viewer-editor-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+
+  &.cn-materials {
+    @extend .d-flex;
+
+    .cn-three-viewer-mat-list {
+      width: 10rem;
+
+    }
+
+    .cn-materials-table {
+      @extend .w-100;
+
+      th, td {
+        @extend .p-2;
+        @extend .text-left;
+        @extend .border-bottom;
+      }
+
+    }
+
+  }
+
+  input,
+  .cn-input {
+    @extend .rounded;
+    @extend .p-1;
+    line-height: normal !important;
+    border: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  .cn-caption {
+    font-weight: bold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+  }
+
+  ul.cn-three-viewer-editor-nav {
+    margin: 0;
+    padding: 0;
+    li {
+      @extend .p-2;
+      display: inline-block;
+      cursor: pointer;
+
+      &:hover {
+        background-color: gray("300");
+      }
+
+      &.cn-selected {
+        @extend .border-left;
+        @extend .border-right;
+        @extend .border-top;
+      }
+    }
+  }
+
+  .cn-three-viewer-editor-properties {
+    @extend .p-2;
+    @extend .mat-elevation-z1;
+
+    .cn-caption {
+      @extend .mb-2;
+    }
+  }
+
+  .cn-three-viewer-editor-property {
+    @extend .w-100;
+    @extend .mb-1;
+    @extend .d-flex;
+    @extend .align-items-center;
+  }
+
+  .cn-three-viewer-editor-item-list {
+    @extend .mat-elevation-z1;
+    cursor: pointer;
+    height: 10rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    .cn-three-viewer-editor-item {
+      &:hover {
+        background-color: gray("300");
+      }
+
+      &.cn-selected {
+        background-color: gray("300");
+      }
+    }
+  }
+}

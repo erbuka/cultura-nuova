@@ -22,12 +22,12 @@
         <button mat-mini-fab color="primary">
             <mat-icon>layers</mat-icon>
         </button>
-        <button *ngIf="allowEditorMode" color="primary" class="ml-2" mat-mini-fab>
+        <button *ngIf="allowEditorMode" color="primary" class="ml-2" mat-mini-fab (click)="editorMode=true">
             <mat-icon>create</mat-icon>
         </button>
     </div>
 
-    <div class="cn-three-viewer-editor" *ngIf="editorMode">
+    <div class="cn-three-viewer-editor cn-inspector" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">
 
         <div class="cn-three-viewer-editor-wrapper">
 
@@ -36,7 +36,7 @@
                     <mat-icon>menu</mat-icon>
                 </button>
                 <div class="ml-auto"></div>
-                <button mat-icon-button>
+                <button mat-icon-button (click)="editorMode=false">
                     <mat-icon>close</mat-icon>
                 </button>
             </div>
@@ -55,10 +55,6 @@
                             <div class="ml-auto"></div>
                             <button mat-icon-button (click)="models.remove(m)">
                                 <mat-icon>delete</mat-icon>
-                            </button>
-                            <button mat-icon-button (click)="m.visible = !m.visible">
-                                <mat-icon *ngIf="m.visible">visibility</mat-icon>
-                                <mat-icon *ngIf="!m.visible" style="opacity: .25;">visibility_off</mat-icon>
                             </button>
                         </div>
                     </ng-container>
@@ -79,6 +75,7 @@
                                 [(data)]="selectedObject.title">
                             </app-editable-localized-text>
                         </div>
+
                         <div class="cn-three-viewer-editor-property">
                             <span>Position</span>
                             <div class="ml-auto"></div>
@@ -94,6 +91,18 @@
                             <div class="ml-auto"></div>
                             <app-vector-input [data]="selectedObject.scale"></app-vector-input>
                         </div>
+                        <div class="cn-three-viewer-editor-property">
+                            <span>Visible</span>
+                            <div class="ml-auto"></div>
+                            <mat-checkbox [checked]="selectedObject.visible"
+                                (change)="selectedObject.visible=$event.checked"></mat-checkbox>
+                        </div>
+                        <div class="cn-three-viewer-editor-property">
+                            <span>Opacity</span>
+                            <div class="ml-auto"></div>
+                            <input type="range" min="0" max="1" step="0.01" [(ngModel)]="selectedObject.opacity">
+                        </div>
+
                         <div class="cn-three-viewer-editor-property">
                             <span>Description</span>
                             <div class="ml-auto"></div>
@@ -121,6 +130,12 @@
                     <div class="cn-three-viewer-editor-properties mt-2"
                         *ngIf="selectedObject && selectedObject.isModel">
                         <div class="cn-caption">Model</div>
+
+                        <div class="cn-three-viewer-editor-property">
+                            <button class="w-100" mat-raised-button color="primary" (click)="editMaterials(selectedObject)">Edit
+                                Materials</button>
+                        </div>
+
                     </div>
                 </ng-container>
 

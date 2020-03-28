@@ -78,8 +78,18 @@ export class TouchControls {
         /**
          * @property {boolean} enabled
          */
-        this.enabled = true;
+        this._enabled = true;
+        Object.defineProperty(this, "enabled", {
+            set: function (value) {
+                if (value && !this._enabled)
+                    this.targetPosition.copy(this.camera.position);
 
+                this._enabled = value;
+            },
+            get: function () {
+                return this._enabled;
+            }
+        });
         /**
          * @property {number} rotationSpeed
          */
@@ -146,14 +156,16 @@ export class TouchControls {
 
     }
 
+
     onAnimationFrame() {
         if (this.disposed)
             return;
 
         requestAnimationFrame(this.onAnimationFrame.bind(this));
 
+        let dt = this.clock.getDelta();
+
         if (this.enabled) {
-            let dt = this.clock.getDelta();
             // Move the camera towards target location
             moveTowards(this.camera.position, this.targetPosition, this.zoomSpeed * dt);
         }

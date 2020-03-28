@@ -1,0 +1,58 @@
+<div class="cn-three-viewer-editor cn-materials">
+    <div class="cn-three-viewer-mat-list">
+
+        <button mat-raised-button color="primary" class="w-100" (click)="newMaterial()">
+            <mat-icon>add</mat-icon>
+            <span>ADD</span>
+        </button>
+
+        <div class="cn-three-viewer-editor-item-list mt-2" style="height: 20rem;">
+            <div *ngFor="let m of data.model.materials"
+                class="cn-three-viewer-editor-item d-flex align-items-center w-100 px-2"
+                [class.cn-selected]="selectedMaterial===m" (click)="selectedMaterial=m">
+                <span class="flex-grow-1">{{ m.title | cnLocalizedText }}</span>
+                <button mat-icon-button>
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="flex-grow-1 p-2" *ngIf="selectedMaterial">
+        <div class="d-flex flex-column w-100" style="height: 25rem;">
+            <div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Title</span>
+                    <app-editable-localized-text style="width: 20rem;" class="ml-auto cn-input"
+                        [(data)]="selectedMaterial.title"></app-editable-localized-text>
+                </div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Description</span>
+                    <app-editable-localized-text style="width: 20rem;" class="ml-auto cn-input"
+                        [(data)]="selectedMaterial.description"></app-editable-localized-text>
+                </div>
+            </div>
+            <div class="flex-grow-1 mat-elevation-z1" style="overflow-x: hidden; overflow-y: auto;">
+                <table class="cn-materials-table">
+                    <thead>
+                        <tr>
+                            <th class="cn-caption">Mesh</th>
+                            <th class="cn-caption">Color</th>
+                            <th class="cn-caption">Texture</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let mesh of data.model.meshes">
+                            <td>{{ mesh.name }}</td>
+                            <td>
+                                <input [ngModel]="'#' + mesh.material.color.getHexString()" (ngModelChange)="mesh.material.color.set($event)" type="color">
+                            </td>
+                            <td>Texture</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
