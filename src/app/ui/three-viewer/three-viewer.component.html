@@ -27,121 +27,137 @@
         </button>
     </div>
 
-    <div class="cn-three-viewer-editor cn-inspector" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">
+    <div class="cn-three-viewer-editor cn-inspector" *ngIf="allowEditorMode"
+        [class.cn-hidden]="!editorMode">
 
-        <div class="cn-three-viewer-editor-wrapper">
+        <div class="p-2 text-center" *ngIf="!selectedObject">
+            <em>No object selected</em>
+        </div>
 
-            <div class="p-2 bg-primary text-primary-contrast d-flex align-items-center">
-                <button mat-icon-button [matMenuTriggerFor]="mainMenu">
-                    <mat-icon>menu</mat-icon>
-                </button>
-                <div class="ml-auto"></div>
-                <button mat-icon-button (click)="editorMode=false">
-                    <mat-icon>close</mat-icon>
-                </button>
-            </div>
+        <div *ngIf="selectedObject" class="px-2">
 
-            <div class="px-2">
-                <ul class="cn-three-viewer-editor-nav mt-2">
-                    <li class="cn-selected cn-caption">Models</li>
-                    <li class="cn-caption">Lights</li>
-                </ul>
+            <div class="cn-three-viewer-editor-properties mt-2">
+                <div class="cn-caption">General</div>
 
-                <div class="cn-three-viewer-editor-item-list">
-                    <ng-container *ngFor="let m of models.children">
-                        <div class="d-flex align-items-center w-100 px-2 cn-three-viewer-editor-item"
-                            [class.cn-selected]="selectedObject === m" (click)="selectedObject = m">
-                            <span>{{ m.title | cnLocalizedText }}</span>
-                            <div class="ml-auto"></div>
-                            <button mat-icon-button (click)="models.remove(m)">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </div>
-                    </ng-container>
-                    <div class="text-center p-3" *ngIf="models.children.length === 0">
-                        <em>There are no models</em>
-                    </div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Title</span>
+                    <div class="ml-auto"></div>
+                    <app-editable-localized-text style="width: 10rem;" class="cn-input" [(data)]="selectedObject.title">
+                    </app-editable-localized-text>
                 </div>
 
-                <ng-container *ngIf="selectedObject">
+                <div class="cn-three-viewer-editor-property">
+                    <span>Description</span>
+                    <div class="ml-auto"></div>
+                    <app-editable-localized-text style="width: 10rem;" class="cn-input"
+                        [(data)]="selectedObject.description" multiline="true"></app-editable-localized-text>
+                </div>
 
-                    <div class="cn-three-viewer-editor-properties mt-2">
-                        <div class="cn-caption">Properties</div>
+            </div>
 
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Title</span>
-                            <div class="ml-auto"></div>
-                            <app-editable-localized-text style="width: 10rem;" class="cn-input"
-                                [(data)]="selectedObject.title">
-                            </app-editable-localized-text>
-                        </div>
+            <div class="cn-three-viewer-editor-properties mt-2">
+                <div class="cn-caption">Transform</div>
 
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Position</span>
-                            <div class="ml-auto"></div>
-                            <app-vector-input [data]="selectedObject.position"></app-vector-input>
-                        </div>
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Rotation</span>
-                            <div class="ml-auto"></div>
-                            <app-vector-input [data]="selectedObject.rotation"></app-vector-input>
-                        </div>
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Scale</span>
-                            <div class="ml-auto"></div>
-                            <app-vector-input [data]="selectedObject.scale"></app-vector-input>
-                        </div>
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Visible</span>
-                            <div class="ml-auto"></div>
-                            <mat-checkbox [checked]="selectedObject.visible"
-                                (change)="selectedObject.visible=$event.checked"></mat-checkbox>
-                        </div>
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Opacity</span>
-                            <div class="ml-auto"></div>
-                            <input type="range" min="0" max="1" step="0.01" [(ngModel)]="selectedObject.opacity">
-                        </div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Position</span>
+                    <div class="ml-auto"></div>
+                    <app-vector-input [data]="selectedObject.position"></app-vector-input>
+                </div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Rotation</span>
+                    <div class="ml-auto"></div>
+                    <app-vector-input [data]="selectedObject.rotation"></app-vector-input>
+                </div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Scale</span>
+                    <div class="ml-auto"></div>
+                    <app-vector-input [data]="selectedObject.scale"></app-vector-input>
+                </div>
 
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Description</span>
-                            <div class="ml-auto"></div>
-                            <app-editable-localized-text style="width: 10rem;" class="cn-input"
-                                [(data)]="selectedObject.description" multiline="true"></app-editable-localized-text>
-                        </div>
+            </div>
 
-                    </div>
+            <div class="cn-three-viewer-editor-properties mt-2">
+                <div class="cn-caption">Controls</div>
 
-                    <div class="cn-three-viewer-editor-properties mt-2">
-                        <div class="cn-caption">Controls</div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Opacity</span>
+                    <div class="ml-auto"></div>
+                    <mat-checkbox></mat-checkbox>
+                </div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Visibility</span>
+                    <div class="ml-auto"></div>
+                    <mat-checkbox></mat-checkbox>
+                </div>
+            </div>
 
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Opacity</span>
-                            <div class="ml-auto"></div>
-                            <mat-checkbox></mat-checkbox>
-                        </div>
-                        <div class="cn-three-viewer-editor-property">
-                            <span>Visibility</span>
-                            <div class="ml-auto"></div>
-                            <mat-checkbox></mat-checkbox>
-                        </div>
-                    </div>
+            <div class="cn-three-viewer-editor-properties mt-2" *ngIf="selectedObject && selectedObject.isModel">
+                <div class="cn-caption">Model</div>
 
-                    <div class="cn-three-viewer-editor-properties mt-2"
-                        *ngIf="selectedObject && selectedObject.isModel">
-                        <div class="cn-caption">Model</div>
 
-                        <div class="cn-three-viewer-editor-property">
-                            <button class="w-100" mat-raised-button color="primary" (click)="editMaterials(selectedObject)">Edit
-                                Materials</button>
-                        </div>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Visible</span>
+                    <div class="ml-auto"></div>
+                    <mat-checkbox [checked]="selectedObject.visible" (change)="selectedObject.visible=$event.checked">
+                    </mat-checkbox>
+                </div>
 
-                    </div>
-                </ng-container>
+                <div class="cn-three-viewer-editor-property">
+                    <span>Opacity</span>
+                    <div class="ml-auto"></div>
+                    <input class="cn-slider cn-slider-primary" style="width:10rem" type="range" min="0" max="1"
+                        step="0.01" [(ngModel)]="selectedObject.opacity">
+                </div>
+
+                <div class="cn-three-viewer-editor-property">
+                    <button class="w-100" mat-raised-button color="primary" (click)="editMaterials(selectedObject)">Edit
+                        Materials</button>
+                </div>
 
             </div>
 
         </div>
+    </div>
+
+    <div class="cn-three-viewer-editor cn-hierarchy" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">
+
+
+        <div class="p-2 bg-primary text-primary-contrast d-flex align-items-center">
+            <button mat-icon-button [matMenuTriggerFor]="mainMenu">
+                <mat-icon>menu</mat-icon>
+            </button>
+            <div class="ml-auto"></div>
+            <button mat-icon-button (click)="editorMode=false">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <div class="px-2">
+            <ul class="cn-three-viewer-editor-nav mt-2">
+                <li class="cn-selected cn-caption">Models</li>
+                <li class="cn-caption">Lights</li>
+            </ul>
+
+            <div class="cn-three-viewer-editor-item-list">
+                <ng-container *ngFor="let m of models.children">
+                    <div class="d-flex align-items-center w-100 px-2 cn-three-viewer-editor-item"
+                        [class.cn-selected]="selectedObject === m" (click)="selectedObject = m">
+                        <span>{{ m.title | cnLocalizedText }}</span>
+                        <div class="ml-auto"></div>
+                        <button mat-icon-button (click)="models.remove(m)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
+                </ng-container>
+                <div class="text-center p-3" *ngIf="models.children.length === 0">
+                    <em>There are no models</em>
+                </div>
+            </div>
+
+
+
+        </div>
+
 
 
     </div>

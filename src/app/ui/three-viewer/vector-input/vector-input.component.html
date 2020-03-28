@@ -1,7 +1,7 @@
 <ng-container *ngIf="data">
     <div class="d-flex">
-        <input class="ml-1" [ngModel]="data.x" (ngModelChange)="updateData({ x: $event })">
-        <input class="ml-1" [ngModel]="data.y" (ngModelChange)="updateData({ y: $event })">
-        <input class="ml-1" [ngModel]="data.z" (ngModelChange)="updateData({ z: $event })">
+        <input class="ml-1 cn-input" [ngModel]="data.x" (ngModelChange)="updateData({ x: $event })">
+        <input class="ml-1 cn-input" [ngModel]="data.y" (ngModelChange)="updateData({ y: $event })">
+        <input class="ml-1 cn-input" [ngModel]="data.z" (ngModelChange)="updateData({ z: $event })">
     </div>
 </ng-container>

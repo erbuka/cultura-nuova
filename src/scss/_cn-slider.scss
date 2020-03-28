@@ -1,0 +1,77 @@
+.cn-slider {
+  /*** Setup ***/
+
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+  }
+
+  &:focus {
+    outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+  }
+
+  /*** Style Thumb ***/
+
+  @mixin cn-slider-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: theme-color("dark");
+  }
+
+  &::-webkit-slider-thumb {
+    margin-top: -7px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+    -webkit-appearance: none;
+  }
+
+  &::-webkit-slider-thumb {
+    @include cn-slider-thumb();
+  }
+
+  &::-moz-range-thumb {
+    @include cn-slider-thumb();
+  }
+
+  @each $color, $value in $theme-colors {
+    &.cn-slider-#{$color} {
+      &::-webkit-slider-thumb {
+        background-color: $value;
+      }
+      &::-moz-range-thumb {
+        background-color: $value;
+      }
+    }
+  }
+
+  /*** Style track ***/
+  @mixin cn-slider-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  &::-webkit-slider-runnable-track {
+    @include cn-slider-track();
+  }
+
+  &:focus::-webkit-slider-runnable-track {
+    background: #367ebd;
+  }
+
+  &::-moz-range-track {
+    @include cn-slider-track();
+  }
+
+  @each $color, $value in $theme-colors {
+    &.cn-slider-#{$color} {
+      &:focus::-webkit-slider-runnable-track {
+        background: $value;
+      }
+    }
+  }
+}
