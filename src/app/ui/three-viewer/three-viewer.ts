@@ -1,16 +1,17 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
 import { ThreeViewerItemModel } from 'src/app/types/three-viewer-item';
 import { LocalizedText } from 'src/app/types/item';
+import { ErrorEvent } from 'src/app/context.service';
 
 
 
 export const loadPlyMesh: (url: string) => Promise<BufferGeometry> = (url) => {
     return new Promise((resolve, reject) => {
         let loader = new PLYLoader();
-        loader.load(url, (geom) => resolve(geom), null, (err) => reject(err));
+        loader.load(url, (geom) => resolve(geom), null, (err) => reject(<ErrorEvent>{ description: JSON.stringify(err) }));
     });
 }
 
@@ -58,7 +59,7 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
 
         });
 
-        loader.setCallbackOnError((err) => reject(err));
+        loader.setCallbackOnError((err) => reject(<ErrorEvent>{ description: JSON.stringify(err) }));
 
         loader.parse(wfData);
 
@@ -66,6 +67,14 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
 
     });
 }
+
+
+export const loadTexture: (url: string) => Promise<Texture> = (url) => {
+    return new Promise((resolve, reject) => {
+        let textureLoader = new TextureLoader();
+        textureLoader.load(url, (texture) => resolve(texture), null, (error) => reject(<ErrorEvent>{ description: error.message }));
+    });
+};
 
 export type ThreeViewerObject3D = ThreeViewerComponentModel;
 
@@ -80,8 +89,8 @@ export class BinaryFiles {
 
     private nextId: number = 0;
 
-    store(data: ArrayBuffer): string {
-        let name = `./${this.nextId++}.bin`
+    store(data: ArrayBuffer, ext: string = "bin"): string {
+        let name = `./${this.nextId++}.${ext}`
         this.files.set(name, data);
         return name;
     }
@@ -175,24 +184,32 @@ export class ThreeViewerComponentModel extends Group implements Serializable<Thr
         let scl = this.scale;
         let rot = this.rotation;
 
-        let meshes = await Promise.all(this.meshes.map(async mesh => {
+        let meshes = this.meshes.map(async mesh => {
             let data = await exportPlyMesh(mesh);
-            let fileName = binFiles.store(data);
+            let fileName = binFiles.store(data, "ply");
             return {
                 name: mesh.name,
                 file: fileName
             }
-        }));
+        });
 
-        let materials = this._materials.map(m => {
+        let materials = this._materials.map(async m => {
+
+            let meshMaterials = m.meshMaterials.map(async x => {
+                let map = x.map && x.map.image instanceof HTMLImageElement ?
+                    binFiles.store(await (await fetch(x.map.image.src)).arrayBuffer()) :
+                    undefined;
+
+                return {
+                    color: x.color.getHex(),
+                    map: map
+                }
+            });
+
             return {
                 title: m.title,
                 description: m.description,
-                meshMaterials: m.meshMaterials.map(x => {
-                    return {
-                        color: x.color.getHex()
-                    }
-                })
+                meshMaterials: await Promise.all(meshMaterials)
             }
         });
 
@@ -202,11 +219,19 @@ export class ThreeViewerComponentModel extends Group implements Serializable<Thr
             position: [pos.x, pos.y, pos.z],
             rotation: [rot.x, rot.y, rot.z],
             scale: [scl.x, scl.y, scl.z],
-            meshes: meshes,
-            materials: materials
+            meshes: await Promise.all(meshes),
+            materials: await Promise.all(materials)
         }
     }
 
+}
+
+export namespace ThreeViewerComponentModel {
+    export type Material = {
+        title: LocalizedText;
+        description: LocalizedText;
+        meshMaterials: MeshStandardMaterial[]
+    };
 }
 
 export class TypedGroup<T extends ThreeViewerObject3D> extends Group {
@@ -216,12 +241,4 @@ export class TypedGroup<T extends ThreeViewerObject3D> extends Group {
     remove(...o: T[]): this { super.remove(...o); return this; }
 }
 
-
-export namespace ThreeViewerComponentModel {
-    export type Material = {
-        title: LocalizedText;
-        description: LocalizedText;
-        meshMaterials: MeshStandardMaterial[]
-    };
-}
 

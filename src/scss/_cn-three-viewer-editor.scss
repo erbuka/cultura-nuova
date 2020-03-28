@@ -1,5 +1,4 @@
 .cn-three-viewer-editor {
-
   @mixin cn-window {
     @extend .cn-absolute;
     @extend .mat-elevation-z4;
@@ -12,7 +11,6 @@
       display: none;
     }
   }
-
 
   &.cn-hierarchy {
     @include cn-window();
@@ -34,26 +32,24 @@
     @extend .d-flex;
 
     .cn-three-viewer-mat-list {
-      width: 10rem;
-
+      width: 15rem;
     }
 
     .cn-materials-table {
       @extend .w-100;
 
-      th, td {
+      th,
+      td {
         @extend .p-2;
-        @extend .text-left;
         @extend .border-bottom;
       }
-
     }
-
   }
 
   .cn-input {
     @extend .rounded;
     @extend .p-1;
+    height: 24px;
     line-height: normal !important;
     border: 0;
     background-color: rgba(0, 0, 0, 0.1);
@@ -72,12 +68,14 @@
       @extend .p-2;
       display: inline-block;
       cursor: pointer;
+      opacity: 0.5;
 
       &:hover {
         background-color: gray("300");
       }
 
       &.cn-selected {
+        opacity: 1;
         @extend .border-left;
         @extend .border-right;
         @extend .border-top;
@@ -99,12 +97,12 @@
     @extend .mb-1;
     @extend .d-flex;
     @extend .align-items-center;
+    min-height: 24px;
   }
 
   .cn-three-viewer-editor-item-list {
     @extend .mat-elevation-z1;
     cursor: pointer;
-    height: 10rem;
     overflow-x: hidden;
     overflow-y: auto;
 

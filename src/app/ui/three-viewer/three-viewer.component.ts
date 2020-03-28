@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy } from '@angular/core';
-import { ThreeViewerItem, ThreeViewerItemModel } from 'src/app/types/three-viewer-item';
+import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, Host, ChangeDetectorRef } from '@angular/core';
+import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
 import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, Group, MeshStandardMaterial, DirectionalLight, GridHelper, Vector3 } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService } from 'src/app/context.service';
@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, TypedGroup, ThreeViewerComponentModel, loadPlyMesh, loadGeometryFromWavefront } from './three-viewer';
+import { BinaryFiles, ThreeViewerObject3D, TypedGroup, ThreeViewerComponentModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture } from './three-viewer';
 
 
 
@@ -48,6 +48,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   allowEditorMode: boolean = false;
   private _editorMode: boolean = false;
 
+  showLoading: boolean = true;
+
   set editorMode(value: boolean) {
     this._editorMode = value;
 
@@ -55,6 +57,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.orbitControls.enabled = value;
     this.transformControls.enabled = value;
     this.gridHelper.visible = value;
+    this.selectedObject = null;
 
   }
 
@@ -64,22 +67,22 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
   set selectedObject(obj: ThreeViewerObject3D) {
     this._selectedObject = obj;
-    if (obj && this.editorMode) {
-      this.transformControls.attach(obj);
-    }
+    obj ? this.transformControls.attach(obj) : this.transformControls.detach();
   }
 
   get selectedObject(): ThreeViewerObject3D {
     return this._selectedObject;
   }
 
-  constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar, private dialog: MatDialog) {
+  constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
+    private dialog: MatDialog, private cdRef: ChangeDetectorRef) {
     this.allowEditorMode = !environment.production;
   }
 
   async ngOnInit() {
 
-    this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true });
+    this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true, antialias: true });
+
     this.containterRef.nativeElement.appendChild(this.renderer.domElement);
 
     this.rayscaster = new Raycaster();
@@ -91,15 +94,20 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     this.gridHelper = new GridHelper(20, 20);
 
-    this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
 
-    this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
-    this.transformControls.addEventListener('dragging-changed', (evt) => this.orbitControls.enabled = !evt.value);
+    this.zone.runOutsideAngular(() => {
 
-    this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement);
-    this.touchControls.enabled = false;
-    this.touchControls.wheelZoomStep = 5;
-    this.touchControls.zoomSpeed = 500;
+      this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
+      this.transformControls.addEventListener('dragging-changed', (evt) => this.orbitControls.enabled = !evt.value);
+
+      this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
+
+      this.touchControls = new TouchControls(this.camera, this.containterRef.nativeElement);
+      this.touchControls.enabled = false;
+      this.touchControls.wheelZoomStep = 5;
+      this.touchControls.zoomSpeed = 500;
+
+    });
 
     this.scene.add(this.transformControls);
     this.scene.add(this.gridHelper);
@@ -109,16 +117,19 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       l.position.set(1, 2, 1);
       this.scene.add(l);
     }
-    this.editorMode = true;
 
     await this.loadItem();
+    this.showLoading = false;
 
-    this.zone.runOutsideAngular(() => {
+    this.editorMode = false;
+
+    this.zone.runOutsideAngular(async () => {
       this.resize();
       this.render();
     });
 
   }
+
 
   ngOnDestroy(): void {
     if (this.touchControls)
@@ -160,11 +171,20 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       }
 
       for (let materialDef of modelDef.materials) {
-        model.addMaterial(materialDef.title, materialDef.description, materialDef.meshMaterials.map(x => new MeshStandardMaterial({
-          transparent: true,
-          premultipliedAlpha: false,
-          color: x.color
-        })));
+
+        let materials: MeshStandardMaterial[] = [];
+
+        for (let meshMaterialDef of materialDef.meshMaterials) {
+          let mat = new MeshStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
+
+          if (meshMaterialDef.map) {
+            mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
+          }
+
+          materials.push(mat);
+        }
+
+        model.addMaterial(materialDef.title, materialDef.description, materials);
       }
 
       this.models.add(model);
@@ -177,7 +197,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
   }
 
-  async createModelFromWavefront() {
+  async loadModelFromWaveFront() {
 
     let data: ArrayBuffer = await this.context.fileChooser({ type: "arraybuffer", accept: ".obj" });
     let geometries = await loadGeometryFromWavefront(data);
@@ -199,6 +219,12 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     this.models.add(result);
 
+  }
+
+  onObjectRemoved(obj: ThreeViewerObject3D) {
+    if (obj === this.selectedObject) {
+      this.selectedObject = null;
+    }
   }
 
   editMaterials(model: ThreeViewerComponentModel): void {
@@ -276,8 +302,5 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
   }
-
-
-
 
 }

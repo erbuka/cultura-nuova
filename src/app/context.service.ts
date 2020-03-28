@@ -70,7 +70,7 @@ export class ContextService {
   private initializeSubject: BehaviorSubject<boolean>;
 
   constructor(private httpClient: HttpClient) {
-    this.jsonValidator = new ajv({ allErrors: true });
+    this.jsonValidator = new ajv();
   }
 
   translate(text: LocalizedText) {
@@ -97,7 +97,7 @@ export class ContextService {
     this._currentLocale = null;
 
     if (!this.config.internationalization)
-      throw new Error("No locale have been configured");
+      throw new Error("No locales have been configured");
 
     let loc = this.config.internationalization.locales.find(loc => loc.id === localeId);
 

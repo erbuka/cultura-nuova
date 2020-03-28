@@ -83,7 +83,6 @@ export class TouchControls {
             set: function (value) {
                 if (value && !this._enabled)
                     this.targetPosition.copy(this.camera.position);
-
                 this._enabled = value;
             },
             get: function () {

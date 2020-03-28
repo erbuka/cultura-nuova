@@ -16,7 +16,8 @@ export type ThreeViewerItemModel = {
         title: LocalizedText,
         description?: LocalizedText,
         meshMaterials: {
-            color: number
+            color: number,
+            map?: string
         }[]
     }[]
 }

@@ -35,18 +35,28 @@
                 <table class="cn-materials-table">
                     <thead>
                         <tr>
-                            <th class="cn-caption">Mesh</th>
-                            <th class="cn-caption">Color</th>
-                            <th class="cn-caption">Texture</th>
+                            <th class="cn-caption text-left">Mesh</th>
+                            <th style="width: 6rem" class="cn-caption text-left">Color</th>
+                            <th style="width: 6rem" class="cn-caption text-right">Map</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let mesh of data.model.meshes">
+                        <tr *ngFor="let mesh of data.model.meshes; index as mIdx">
                             <td>{{ mesh.name }}</td>
                             <td>
-                                <input [ngModel]="'#' + mesh.material.color.getHexString()" (ngModelChange)="mesh.material.color.set($event)" type="color">
+                                <input [ngModel]="'#' + selectedMaterial.meshMaterials[mIdx].color.getHexString()"
+                                    (ngModelChange)="selectedMaterial.meshMaterials[mIdx].color.set($event)" type="color">
                             </td>
-                            <td>Texture</td>
+                            <td class="text-right">
+                                <button mat-icon-button *ngIf="selectedMaterial.meshMaterials[mIdx].map"
+                                    (click)="selectedMaterial.meshMaterials[mIdx].map=null;selectedMaterial.meshMaterials[mIdx].needsUpdate=true">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                                <button mat-icon-button (click)="selectMap(selectedMaterial.meshMaterials[mIdx])">
+                                    <mat-icon>publish</mat-icon>
+                                </button>
+
+                            </td>
                         </tr>
                     </tbody>
                 </table>

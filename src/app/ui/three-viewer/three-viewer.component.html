@@ -1,5 +1,5 @@
 <mat-menu #addMenu>
-    <button mat-menu-item (click)="createModelFromWavefront()">Model</button>
+    <button mat-menu-item (click)="loadModelFromWaveFront()">Model</button>
     <button mat-menu-item>Light</button>
 </mat-menu>
 
@@ -16,7 +16,12 @@
 </mat-menu>
 
 <div class="cn-three-viewer">
+    
     <div class="cn-three-viewer-container" #containerRef></div>
+
+    <div class="cn-absolute p-4 bg-background mat-elevation-z4" style="right: 16px; bottom: 16px" *ngIf="showLoading">
+        <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
+    </div>
 
     <div class="cn-three-viewer-controls">
         <button mat-mini-fab color="primary">
@@ -110,6 +115,14 @@
                 </div>
 
                 <div class="cn-three-viewer-editor-property">
+                    <span>Material</span>
+                    <div class="ml-auto"></div>
+                    <select class="cn-input" style="width: 10rem;" [(ngModel)]="selectedObject.currentMaterial">
+                        <option *ngFor="let mat of selectedObject.materials; index as matIdx" [value]="matIdx" >{{ mat.title | cnLocalizedText }}</option>
+                    </select>
+                </div>
+
+                <div class="cn-three-viewer-editor-property">
                     <button class="w-100" mat-raised-button color="primary" (click)="editMaterials(selectedObject)">Edit
                         Materials</button>
                 </div>
@@ -138,13 +151,13 @@
                 <li class="cn-caption">Lights</li>
             </ul>
 
-            <div class="cn-three-viewer-editor-item-list">
+            <div class="cn-three-viewer-editor-item-list" style="height: 30rem;">
                 <ng-container *ngFor="let m of models.children">
                     <div class="d-flex align-items-center w-100 px-2 cn-three-viewer-editor-item"
                         [class.cn-selected]="selectedObject === m" (click)="selectedObject = m">
                         <span>{{ m.title | cnLocalizedText }}</span>
                         <div class="ml-auto"></div>
-                        <button mat-icon-button (click)="models.remove(m)">
+                        <button mat-icon-button (click)="models.remove(m); onObjectRemoved(m)">
                             <mat-icon>delete</mat-icon>
                         </button>
                     </div>
