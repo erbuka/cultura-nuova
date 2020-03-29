@@ -111,6 +111,9 @@ export class ThreeViewerComponentModel extends Group implements Serializable<Thr
     private _materials: ThreeViewerComponentModel.Material[] = [];
 
     set currentMaterial(index: number) {
+
+        index = parseInt(<any>index);
+
         let mat = this._materials[index];
 
         if (mat) {
@@ -219,6 +222,7 @@ export class ThreeViewerComponentModel extends Group implements Serializable<Thr
             position: [pos.x, pos.y, pos.z],
             rotation: [rot.x, rot.y, rot.z],
             scale: [scl.x, scl.y, scl.z],
+            activeMaterial: this.currentMaterial,
             meshes: await Promise.all(meshes),
             materials: await Promise.all(materials)
         }

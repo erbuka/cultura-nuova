@@ -12,6 +12,7 @@ export type ThreeViewerItemModel = {
         name: string,
         file: string
     }[],
+    activeMaterial?: number,
     materials: {
         title: LocalizedText,
         description?: LocalizedText,

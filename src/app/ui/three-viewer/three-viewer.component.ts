@@ -187,6 +187,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         model.addMaterial(materialDef.title, materialDef.description, materials);
       }
 
+      model.currentMaterial = modelDef.activeMaterial || 0;
+
       this.models.add(model);
 
     }
