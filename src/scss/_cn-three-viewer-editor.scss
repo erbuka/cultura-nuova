@@ -5,11 +5,8 @@
     @extend .bg-background;
     overflow-x: hidden;
     overflow-y: auto;
-    transition: opacity 0.2s;
+    transition: left 0.2s, right 0.2s;
 
-    &.cn-hidden {
-      display: none;
-    }
   }
 
   &.cn-hierarchy {
@@ -18,6 +15,11 @@
     left: 0;
     width: 20rem;
     height: 100%;
+    
+    &.cn-hidden {
+      left: -20rem;
+    }
+
   }
 
   &.cn-inspector {
@@ -26,6 +28,11 @@
     right: 0;
     width: 20rem;
     height: 100%;
+    
+    &.cn-hidden {
+      right: -20rem;
+    }
+
   }
 
   &.cn-materials {

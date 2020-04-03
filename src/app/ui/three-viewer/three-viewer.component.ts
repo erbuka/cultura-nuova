@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, Host, ChangeDetectorRef } from '@angular/core';
-import { ThreeViewerItem } from 'src/app/types/three-viewer-item';
-import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, Group, MeshStandardMaterial, DirectionalLight, GridHelper, Vector3 } from 'three';
+import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
+import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3 } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService } from 'src/app/context.service';
 
@@ -12,8 +12,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, TypedGroup, ThreeViewerComponentModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture } from './three-viewer';
+import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight } from './three-viewer';
 
+
+type EditorTab = "models" | "lights";
 
 
 @Component({
@@ -26,9 +28,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   @ViewChild("containerRef", { read: ElementRef, static: true }) containterRef: ElementRef;
   @Input() item: ThreeViewerItem;
 
-  models: TypedGroup<ThreeViewerComponentModel> = new TypedGroup();
-
-  _selectedObject: ThreeViewerObject3D = null;
+  activeEditorHierarchyGroup: ThreeViewerGroup<any> = null;
+  lights: ThreeViewerGroup<ThreeViewerLight> = new ThreeViewerGroup();
+  models: ThreeViewerGroup<ThreeViewerModel> = new ThreeViewerGroup();
 
   clock: Clock = new Clock(true);
   camera: PerspectiveCamera = null;
@@ -46,9 +48,26 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   height: number = 0;
 
   allowEditorMode: boolean = false;
-  private _editorMode: boolean = false;
-
   showLoading: boolean = true;
+
+  set editorActiveTab(tab: EditorTab) {
+    this._editorActiveTab = tab;
+    switch (tab) {
+      case "models":
+        this.activeEditorHierarchyGroup = this.models;
+        break;
+      case "lights":
+        this.activeEditorHierarchyGroup = this.lights;
+        break;
+      default:
+        throw new Error(`Unknwon tab: ${tab}`);
+    }
+  }
+
+  get editorActiveTab(): EditorTab {
+    return this._editorActiveTab;
+  }
+
 
   set editorMode(value: boolean) {
     this._editorMode = value;
@@ -65,18 +84,24 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     return this._editorMode;
   }
 
-  set selectedObject(obj: ThreeViewerObject3D) {
+  set selectedObject(obj: any) {
     this._selectedObject = obj;
     obj ? this.transformControls.attach(obj) : this.transformControls.detach();
   }
 
-  get selectedObject(): ThreeViewerObject3D {
+  get selectedObject(): any {
     return this._selectedObject;
   }
+
+  private _selectedObject: any = null;
+  private _editorMode: boolean = false;
+  private _editorActiveTab: EditorTab = "models";
+
 
   constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
     private dialog: MatDialog, private cdRef: ChangeDetectorRef) {
     this.allowEditorMode = !environment.production;
+    this.editorActiveTab = "models";
   }
 
   async ngOnInit() {
@@ -94,11 +119,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     this.gridHelper = new GridHelper(20, 20);
 
+    this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
+    this.transformControls.addEventListener('dragging-changed', (evt) => this.orbitControls.enabled = !evt.value);
 
     this.zone.runOutsideAngular(() => {
-
-      this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
-      this.transformControls.addEventListener('dragging-changed', (evt) => this.orbitControls.enabled = !evt.value);
 
       this.orbitControls = new OrbitControls(this.camera, this.containterRef.nativeElement);
 
@@ -112,16 +136,13 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.scene.add(this.transformControls);
     this.scene.add(this.gridHelper);
     this.scene.add(this.models);
-    {
-      let l = new DirectionalLight();
-      l.position.set(1, 2, 1);
-      this.scene.add(l);
-    }
+    this.scene.add(this.lights);
+
 
     await this.loadItem();
     this.showLoading = false;
-
     this.editorMode = false;
+
 
     this.zone.runOutsideAngular(async () => {
       this.resize();
@@ -137,6 +158,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   }
 
   async loadItem(): Promise<void> {
+
     // Setup camera
 
     this.camera.position.fromArray(this.item.camera.position);
@@ -145,55 +167,91 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     // Load models
     this.models.remove(...this.models.children);
 
-    for (let modelDef of this.item.models) {
-      let model = new ThreeViewerComponentModel();
-      let pos = modelDef.position;
-      let rot = modelDef.rotation;
-      let scl = modelDef.scale;
+    // I'm not using array functions here (map, forEach, ...) becaue
+    // this is an async function and it would make the code a bit harder
+    // to read
 
-      model.title = modelDef.title;
-      model.description = modelDef.description || "";
+    if (this.item.models) {
+      for (let modelDef of this.item.models) {
+        let model = new ThreeViewerModel();
+        let pos = modelDef.position;
+        let rot = modelDef.rotation;
+        let scl = modelDef.scale;
 
-      if (pos)
-        model.position.fromArray(pos);
+        model.title = modelDef.title;
+        model.description = modelDef.description || "";
 
-      if (rot)
-        model.rotation.fromArray(rot);
 
-      if (scl)
-        model.scale.fromArray(scl);
+        if (pos)
+          model.position.fromArray(pos);
 
-      for (let meshDef of modelDef.meshes) {
-        let geometry = await loadPlyMesh(this.context.resolveUrl(meshDef.file, this.item));
-        let mesh = new Mesh(geometry, new MeshStandardMaterial());
-        mesh.name = meshDef.name;
-        model.add(mesh);
-      }
+        if (rot)
+          model.rotation.fromArray(rot);
 
-      for (let materialDef of modelDef.materials) {
+        if (scl)
+          model.scale.fromArray(scl);
 
-        let materials: MeshStandardMaterial[] = [];
+        for (let meshDef of modelDef.meshes) {
+          let geometry = await loadPlyMesh(this.context.resolveUrl(meshDef.file, this.item));
+          let mesh = new Mesh(geometry, new MeshStandardMaterial());
 
-        for (let meshMaterialDef of materialDef.meshMaterials) {
-          let mat = new MeshStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
-
-          if (meshMaterialDef.map) {
-            mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
-          }
-
-          materials.push(mat);
+          mesh.name = meshDef.name;
+          model.add(mesh);
         }
 
-        model.addMaterial(materialDef.title, materialDef.description, materials);
+        for (let materialDef of modelDef.materials) {
+
+          let materials: MeshStandardMaterial[] = [];
+
+          for (let meshMaterialDef of materialDef.meshMaterials) {
+            let mat = new MeshStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
+
+            if (meshMaterialDef.map) {
+              mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
+            }
+
+            materials.push(mat);
+          }
+
+          model.addMaterial(materialDef.title, materialDef.description, materials);
+        }
+
+        model.currentMaterial = modelDef.activeMaterial || 0;
+
+        this.models.add(model);
+
       }
-
-      model.currentMaterial = modelDef.activeMaterial || 0;
-
-      this.models.add(model);
-
     }
 
     // Load lights
+
+    this.lights.remove(...this.lights.children);
+
+    if (this.item.lights) {
+
+      for (let lightDef of this.item.lights) {
+        let [pos, rot, scl] = [lightDef.position, lightDef.rotation, lightDef.scale];
+        let light = new ThreeViewerLight(lightDef.type);
+
+        light.title = lightDef.title;
+        light.description = lightDef.description || "";
+
+        light.color.setHex(lightDef.color);
+
+        if (pos)
+          light.position.fromArray(pos);
+
+        if (rot)
+          light.rotation.fromArray(rot);
+
+        if (scl)
+          light.scale.fromArray(scl);
+
+        this.lights.add(light);
+
+      }
+    }
+
 
     // Load other stuff
 
@@ -203,7 +261,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     let data: ArrayBuffer = await this.context.fileChooser({ type: "arraybuffer", accept: ".obj" });
     let geometries = await loadGeometryFromWavefront(data);
-    let result = new ThreeViewerComponentModel();
+    let result = new ThreeViewerModel();
 
     result.title = "Object";
 
@@ -223,13 +281,19 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
   }
 
+  addLight(type: ThreeViewerItemLightType): void {
+    let light = new ThreeViewerLight(type);
+    light.title = "Light";
+    this.lights.add(light);
+  }
+
   onObjectRemoved(obj: ThreeViewerObject3D) {
     if (obj === this.selectedObject) {
       this.selectedObject = null;
     }
   }
 
-  editMaterials(model: ThreeViewerComponentModel): void {
+  editMaterials(model: ThreeViewerModel): void {
     this.dialog.open(MaterialEditorComponent, {
       minWidth: "1024px",
       width: "1024px",
@@ -266,6 +330,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     let lookAt = new Vector3();
     let binFiles = new BinaryFiles();
 
+
+    this.showLoading = true;
+
     this.camera.getWorldDirection(lookAt);
     lookAt.add(this.camera.position);
 
@@ -276,8 +343,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         position: [this.camera.position.x, this.camera.position.y, this.camera.position.z],
         lookAt: [lookAt.x, lookAt.y, lookAt.z]
       },
-      models: await Promise.all(this.models.children.map(async model => await model.serialize(binFiles)))
-
+      models: await Promise.all(this.models.children.map(async model => await model.serialize(binFiles))),
+      lights: await Promise.all(this.lights.children.map(async light => await light.serialize(binFiles)))
     };
 
     await this.httpClient.post(this.context.resolveUrl("./item.json", this.item),
@@ -289,6 +356,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         new Blob([data], { type: "application/octet-stream" }),
         { responseType: "text" }).toPromise()
     }
+
+    this.showLoading = false;
 
     this.snackBar.open("Scene saved!");
 

@@ -46,6 +46,12 @@ $cn-header-height: 8rem;
   position: relative;
 }
 
+.cn-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .cn-overlay {
   @extend .cn-absolute;
   width: 100%;

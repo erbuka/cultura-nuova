@@ -1,11 +1,11 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { ThreeViewerComponentModel, loadTexture } from '../three-viewer';
+import { ThreeViewerModel, loadTexture } from '../three-viewer';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MeshStandardMaterial, Texture } from 'three';
+import { MeshStandardMaterial } from 'three';
 import { ContextService } from 'src/app/context.service';
 
 export type MaterialEditorData = {
-  model: ThreeViewerComponentModel
+  model: ThreeViewerModel
 }
 
 @Component({
@@ -15,7 +15,7 @@ export type MaterialEditorData = {
 })
 export class MaterialEditorComponent implements OnInit {
 
-  selectedMaterial: ThreeViewerComponentModel.Material = null;
+  selectedMaterial: ThreeViewerModel.Material = null;
 
   constructor(public dialogRef: MatDialogRef<MaterialEditorComponent>, private context: ContextService, @Inject(MAT_DIALOG_DATA) public data: MaterialEditorData) { }
 

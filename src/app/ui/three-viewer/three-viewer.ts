@@ -1,12 +1,12 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, Light, DirectionalLight, AmbientLight, Object3D, Vector3, Color } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
-import { ThreeViewerItemModel } from 'src/app/types/three-viewer-item';
+import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
 import { LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
 
-
+// Utility functions
 
 export const loadPlyMesh: (url: string) => Promise<BufferGeometry> = (url) => {
     return new Promise((resolve, reject) => {
@@ -35,6 +35,7 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
         let loader = new OBJLoader2();
         let count = 0;
 
+        loader.setUseOAsMesh(true);
         loader.setMaterialPerSmoothingGroup(false);
 
         loader.setCallbackOnAssetAvailable((asset) => {
@@ -68,7 +69,6 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
     });
 }
 
-
 export const loadTexture: (url: string) => Promise<Texture> = (url) => {
     return new Promise((resolve, reject) => {
         let textureLoader = new TextureLoader();
@@ -76,8 +76,7 @@ export const loadTexture: (url: string) => Promise<Texture> = (url) => {
     });
 };
 
-export type ThreeViewerObject3D = ThreeViewerComponentModel;
-
+// Serialization
 
 interface Serializable<T> {
     serialize(binData: BinaryFiles): Promise<T>;
@@ -97,10 +96,68 @@ export class BinaryFiles {
 
 }
 
+/**
+ * Light
+ */
+export class ThreeViewerLight extends Group implements Serializable<ThreeViewerItemLight> {
 
-export class ThreeViewerComponentModel extends Group implements Serializable<ThreeViewerItemModel> {
+    isThreeViewerLight: boolean = true;
 
-    isModel: boolean = true;
+    title: LocalizedText = "";
+    description: LocalizedText = "";
+
+    lightType: ThreeViewerItemLightType;
+
+    private light: DirectionalLight | AmbientLight;
+
+    constructor(lightType: ThreeViewerItemLightType) {
+        super();
+        this.lightType = lightType;
+        this.initialize();
+    }
+
+    get color(): Color {
+        return this.light.color;
+    }
+
+    private initialize(): void {
+        switch (this.lightType) {
+            case "ambient":
+                this.light = new AmbientLight();
+                break;
+            case "directional":
+                this.light = new DirectionalLight();
+                break;
+            default:
+                throw new Error(`Unknown light type: ${this.lightType}`);
+        }
+        this.add(this.light);
+    }
+
+    async serialize(binData: BinaryFiles): Promise<ThreeViewerItemLight> {
+        let pos = this.position;
+        let rot = this.rotation;
+        let scl = this.scale;
+        return {
+            title: this.title,
+            description: this.description,
+            position: [pos.x, pos.y, pos.z],
+            rotation: [rot.x, rot.y, rot.z],
+            scale: [scl.x, scl.y, scl.z],
+            type: this.lightType,
+            color: this.color.getHex()
+        }
+    }
+
+}
+
+
+/**
+ * Model
+ */
+export class ThreeViewerModel extends Group implements Serializable<ThreeViewerItemModel> {
+
+    isThreeViewerModel: boolean = true;
 
     title: LocalizedText = "";
     description: LocalizedText = "";
@@ -108,7 +165,7 @@ export class ThreeViewerComponentModel extends Group implements Serializable<Thr
     private _opacity: number = 1;
     private _currentMaterialIndex: number = null;
 
-    private _materials: ThreeViewerComponentModel.Material[] = [];
+    private _materials: ThreeViewerModel.Material[] = [];
 
     set currentMaterial(index: number) {
 
@@ -142,7 +199,7 @@ export class ThreeViewerComponentModel extends Group implements Serializable<Thr
         return <Mesh[]>this.children.filter(x => x instanceof Mesh);
     }
 
-    get materials(): ThreeViewerComponentModel.Material[] {
+    get materials(): ThreeViewerModel.Material[] {
         return this._materials.map(x => x);
     }
 
@@ -230,7 +287,7 @@ export class ThreeViewerComponentModel extends Group implements Serializable<Thr
 
 }
 
-export namespace ThreeViewerComponentModel {
+export namespace ThreeViewerModel {
     export type Material = {
         title: LocalizedText;
         description: LocalizedText;
@@ -238,7 +295,13 @@ export namespace ThreeViewerComponentModel {
     };
 }
 
-export class TypedGroup<T extends ThreeViewerObject3D> extends Group {
+
+export type ThreeViewerObject3D = ThreeViewerModel | ThreeViewerLight;
+
+/**
+ * A threejs group with typed children
+ */
+export class ThreeViewerGroup<T extends ThreeViewerObject3D> extends Group {
     constructor() { super(); }
     children: T[];
     add(...o: T[]): this { super.add(...o); return this; }
