@@ -1,8 +1,8 @@
 {
     "type": "slideshow",
     "options": {
-        "itemWidth": "10rem",
-        "itemAspectRatio": 1.6
+        "itemWidth": "15rem",
+        "itemAspectRatio": 1
     },
     "groups": [
         "Giornate",

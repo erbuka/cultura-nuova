@@ -82,7 +82,7 @@ export class DialogsComponent implements OnInit {
 
       };
 
-      element.addEventListener("change", listener)
+      element.addEventListener("change", listener);
 
       element.click();
 
