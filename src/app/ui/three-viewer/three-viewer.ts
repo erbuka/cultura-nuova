@@ -36,7 +36,6 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
         let count = 0;
 
         loader.setUseOAsMesh(true);
-        loader.setMaterialPerSmoothingGroup(false);
 
         loader.setCallbackOnAssetAvailable((asset) => {
 

@@ -1,4 +1,4 @@
-<input type="file" style="display: none;" #fileChooser>
+<input type="file" style="display: none;" #fileChooser (change)="fileChooserChange($event.target.files)">
 
 <ng-template #textEditDialogTmpl let-data>
     <mat-slide-toggle class="mb-2" color="primary" [checked]="isMultilanguage(data.text)" (change)="multilanguageToggle(data)">Multilanguage</mat-slide-toggle>

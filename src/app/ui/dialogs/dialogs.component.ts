@@ -13,6 +13,9 @@ export class DialogsComponent implements OnInit {
   @ViewChild("errorDialogTmpl", { static: true }) errorDialogTmpl: TemplateRef<ErrorEvent> = null;
   @ViewChild("textEditDialogTmpl", { static: true, read: TemplateRef }) textEditDialogTmpl: TemplateRef<TextEditEvent & { closeDialog: () => void }> = null;
 
+
+  private currentFileChooserEvent: FileChooserEvent = null;
+
   constructor(public context: ContextService, private dialog: MatDialog) { }
 
   ngOnInit(): void {
@@ -41,6 +44,24 @@ export class DialogsComponent implements OnInit {
     return locales;
   }
 
+  fileChooserChange(files: File[]) {
+    const evt = this.currentFileChooserEvent;
+
+    if(files.length === 0)
+      evt.reject();
+    
+    let file = files[0];
+
+    if(evt.config.type === "arraybuffer") {
+      let reader = new FileReader();
+      reader.addEventListener("load", _ => evt.resolve(reader.result));
+      reader.readAsArrayBuffer(file);
+    } else {
+      evt.reject();
+    }
+    
+  }
+
   private initTextEditor(): void {
     this.context.onTextEdit.subscribe(evt => {
       let ref = this.dialog.open(this.textEditDialogTmpl, {
@@ -52,41 +73,15 @@ export class DialogsComponent implements OnInit {
   }
 
   private initFileChooser(): void {
+    let element = this.fileChooser.nativeElement as HTMLInputElement;
+    
     this.context.onFileChoose.subscribe((e: FileChooserEvent) => {
-      let element = this.fileChooser.nativeElement as HTMLInputElement;
+      this.currentFileChooserEvent = e;
       element.accept = e.config.accept;
-
-      let listener = () => {
-
-        let files = element.files;
-
-        if (files.length > 0) {
-
-          let file = files[0];
-
-          let reader = new FileReader();
-
-          if (e.config.type === "arraybuffer") {
-            reader.addEventListener("load", (evt) => e.resolve(reader.result))
-            reader.readAsArrayBuffer(file);
-          } else {
-            e.reject();
-          }
-
-        } else {
-          e.reject();
-        }
-
-        element.removeEventListener("change", listener);
-        element.value = null;
-
-      };
-
-      element.addEventListener("change", listener);
-
+      element.value = null;
       element.click();
-
     });
+   
   }
 
   private initErrorDialog(): void {

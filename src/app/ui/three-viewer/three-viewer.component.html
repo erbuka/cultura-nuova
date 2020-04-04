@@ -179,6 +179,7 @@
                             [class.cn-selected]="selectedObject === m" (click)="selectedObject = m">
                             <span>{{ m.title | cnLocalizedText }}</span>
                             <div class="ml-auto"></div>
+                            
                             <button mat-icon-button (click)="activeEditorHierarchyGroup.remove(m); onObjectRemoved(m)">
                                 <mat-icon>delete</mat-icon>
                             </button>

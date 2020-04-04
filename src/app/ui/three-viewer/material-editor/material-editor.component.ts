@@ -29,7 +29,7 @@ export class MaterialEditorComponent implements OnInit {
 
 
   async selectMap(material: MeshStandardMaterial): Promise<void> {
-    let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg" });
+    let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg,.tga" });
     let url = URL.createObjectURL(new Blob([file]));
     let texture = await loadTexture(url);
     
