@@ -43,13 +43,22 @@
     }
 
     .cn-materials-table {
+      border-collapse: collapse;
+      
       @extend .w-100;
 
       th,
       td {
         @extend .p-2;
         @extend .border-bottom;
+        white-space: nowrap;
       }
+
+      th:not(:last-child),
+      td:not(:last-child) {
+        @extend .border-right;
+      }
+
     }
   }
 

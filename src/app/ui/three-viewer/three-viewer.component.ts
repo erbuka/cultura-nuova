@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, Host, ChangeDetectorRef } from '@angular/core';
 import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
-import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3 } from 'three';
+import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService } from 'src/app/context.service';
 
@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight } from './three-viewer';
+import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures } from './three-viewer';
 
 
 type EditorTab = "models" | "lights";
@@ -108,6 +108,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true, antialias: true });
 
+    this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = PCFShadowMap;
+
     this.containterRef.nativeElement.appendChild(this.renderer.domElement);
 
     this.rayscaster = new Raycaster();
@@ -138,7 +141,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.scene.add(this.models);
     this.scene.add(this.lights);
 
-
+    await loadStaticTextures();
     await this.loadItem();
     this.showLoading = false;
     this.editorMode = false;
@@ -195,6 +198,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
           let geometry = await loadPlyMesh(this.context.resolveUrl(meshDef.file, this.item));
           let mesh = new Mesh(geometry, new MeshStandardMaterial());
 
+          mesh.castShadow = true;
+          mesh.receiveShadow = true;
+
           mesh.name = meshDef.name;
           model.add(mesh);
         }
@@ -206,9 +212,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
           for (let meshMaterialDef of materialDef.meshMaterials) {
             let mat = new MeshStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
 
-            if (meshMaterialDef.map) {
+            if (meshMaterialDef.map)
               mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
-            }
+            
+            if(meshMaterialDef.normalMap)
+              mat.normalMap = await loadTexture(this.context.resolveUrl(meshMaterialDef.normalMap, this.item));
 
             materials.push(mat);
           }
@@ -237,6 +245,14 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         light.description = lightDef.description || "";
 
         light.color.setHex(lightDef.color);
+
+        if (light.lightType === "directional") {
+          let l = light.light as any;
+
+          l.castShadow = true;
+          l.shadowCameraVisible = true;
+
+        }
 
         if (pos)
           light.position.fromArray(pos);

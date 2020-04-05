@@ -4,6 +4,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MeshStandardMaterial } from 'three';
 import { ContextService } from 'src/app/context.service';
 
+
+type TextureMap = "map" | "normalMap";
+
 export type MaterialEditorData = {
   model: ThreeViewerModel
 }
@@ -28,15 +31,22 @@ export class MaterialEditorComponent implements OnInit {
   }
 
 
-  async selectMap(material: MeshStandardMaterial): Promise<void> {
-    let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg,.tga" });
-    let url = URL.createObjectURL(new Blob([file]));
-    let texture = await loadTexture(url);
+  async texture(material: MeshStandardMaterial, texture: TextureMap): Promise<void> {
     
-    material.map = texture;
-    texture.premultiplyAlpha = false;
-    texture.needsUpdate = true;
-    material.needsUpdate = true;
+    if (material[texture]) {
+      material[texture] = null;
+      material.needsUpdate = true;
+    } else {
+
+      let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg,.tga" });
+      let url = URL.createObjectURL(new Blob([file]));
+      let tex = await loadTexture(url);
+
+      material[texture] = tex;
+      tex.premultiplyAlpha = false;
+      tex.needsUpdate = true;
+      material.needsUpdate = true;
+    }
 
   }
 

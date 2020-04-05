@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, Light, DirectionalLight, AmbientLight, Object3D, Vector3, Color } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, Camera } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -7,6 +7,14 @@ import { LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
 
 // Utility functions
+
+enum StaticTextureName {
+    LightGizmo
+}
+
+let staticTextures: { name: StaticTextureName, filename: string, texture: Texture }[] = [
+    { name: StaticTextureName.LightGizmo, filename: "core-assets/three-viewer/light-gizmo.png", texture: null }
+];
 
 export const loadPlyMesh: (url: string) => Promise<BufferGeometry> = (url) => {
     return new Promise((resolve, reject) => {
@@ -75,6 +83,17 @@ export const loadTexture: (url: string) => Promise<Texture> = (url) => {
     });
 };
 
+export const loadStaticTextures: () => Promise<void> = async () => {
+    for (let s of staticTextures) {
+        s.texture = await loadTexture(s.filename);
+    }
+}
+
+const getStaticTexture: (name: StaticTextureName) => Texture = (name) => {
+    return staticTextures.find(x => x.name === name).texture;
+}
+
+
 // Serialization
 
 interface Serializable<T> {
@@ -95,6 +114,7 @@ export class BinaryFiles {
 
 }
 
+
 /**
  * Light
  */
@@ -107,7 +127,9 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
 
     lightType: ThreeViewerItemLightType;
 
-    private light: DirectionalLight | AmbientLight;
+    light: DirectionalLight | AmbientLight;
+
+    gizmo: Sprite;
 
     constructor(lightType: ThreeViewerItemLightType) {
         super();
@@ -118,6 +140,28 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
     get color(): Color {
         return this.light.color;
     }
+
+    updateMatrixWorld(force?: boolean): void {
+        super.updateMatrixWorld(force);
+
+    }
+
+    private createGizmo() {
+
+        let gizmo = new Sprite(new SpriteMaterial({
+            map: getStaticTexture(StaticTextureName.LightGizmo),
+            color: 0xffffff,
+            depthTest: false,
+            depthWrite: false,
+            sizeAttenuation: false
+        }));
+
+        gizmo.scale.set(0.1, 0.1, 0.1);
+        gizmo.renderOrder = 1;
+
+        this.add(gizmo);
+    }
+
 
     private initialize(): void {
         switch (this.lightType) {
@@ -130,6 +174,9 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
             default:
                 throw new Error(`Unknown light type: ${this.lightType}`);
         }
+
+        this.createGizmo();
+
         this.add(this.light);
     }
 
@@ -259,9 +306,14 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
                     binFiles.store(await (await fetch(x.map.image.src)).arrayBuffer()) :
                     undefined;
 
+                let normalMap = x.normalMap && x.normalMap.image instanceof HTMLImageElement ?
+                    binFiles.store(await (await fetch(x.normalMap.image.src)).arrayBuffer()) :
+                    undefined;
+
                 return {
                     color: x.color.getHex(),
-                    map: map
+                    map: map,
+                    normalMap: normalMap
                 }
             });
 
@@ -308,3 +360,31 @@ export class ThreeViewerGroup<T extends ThreeViewerObject3D> extends Group {
 }
 
 
+
+// TEmp
+
+/*
+class A {
+    aFunc(): void { }
+}
+
+class B {
+    bFunc(): void { }
+}
+
+
+type AB = A & B;
+
+let arr = new Array<AB>();
+
+let a: AB = new A() as AB;
+let b: AB = new B() as AB;
+
+arr.push(a);
+
+a.aFunc();
+
+
+
+
+*/

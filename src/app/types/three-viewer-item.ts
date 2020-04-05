@@ -26,7 +26,8 @@ export interface ThreeViewerItemModel extends ThreeViewerItemObject {
         description?: LocalizedText,
         meshMaterials: {
             color: number,
-            map?: string
+            map?: string,
+            normalMap?: string
         }[]
     }[]
 }
