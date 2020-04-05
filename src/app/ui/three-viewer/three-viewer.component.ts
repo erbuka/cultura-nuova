@@ -78,6 +78,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.gridHelper.visible = value;
     this.selectedObject = null;
 
+    this.models.children.forEach(m => m.setEditorMode(value));
+    this.lights.children.forEach(l => l.setEditorMode(value));
+
   }
 
   get editorMode(): boolean {
@@ -109,7 +112,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.renderer = new WebGLRenderer({ premultipliedAlpha: false, alpha: true, antialias: true });
 
     this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = PCFShadowMap;
+    this.renderer.shadowMap.type = PCFShadowMap;
 
     this.containterRef.nativeElement.appendChild(this.renderer.domElement);
 
@@ -214,8 +217,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
             if (meshMaterialDef.map)
               mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
-            
-            if(meshMaterialDef.normalMap)
+
+            if (meshMaterialDef.normalMap)
               mat.normalMap = await loadTexture(this.context.resolveUrl(meshMaterialDef.normalMap, this.item));
 
             materials.push(mat);
@@ -379,15 +382,15 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
   }
 
+  private updateCamera(dt: number): void {
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
+  }
+  
   @HostListener("window:resize")
   resize() {
     this.width = this.renderer.domElement.width = this.containterRef.nativeElement.clientWidth;
     this.height = this.renderer.domElement.height = this.containterRef.nativeElement.clientHeight;
-  }
-
-  private updateCamera(dt: number): void {
-    this.camera.aspect = this.width / this.height;
-    this.camera.updateProjectionMatrix();
   }
 
 }

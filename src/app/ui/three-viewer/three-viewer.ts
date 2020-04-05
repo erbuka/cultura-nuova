@@ -114,11 +114,15 @@ export class BinaryFiles {
 
 }
 
+interface EditorMode {
+    setEditorMode(enabled: boolean);
+}
+
 
 /**
  * Light
  */
-export class ThreeViewerLight extends Group implements Serializable<ThreeViewerItemLight> {
+export class ThreeViewerLight extends Group implements Serializable<ThreeViewerItemLight>, EditorMode {
 
     isThreeViewerLight: boolean = true;
 
@@ -141,12 +145,16 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
         return this.light.color;
     }
 
+    setEditorMode(enabled: boolean) {
+        this.gizmo.visible = enabled;
+    }
+
     updateMatrixWorld(force?: boolean): void {
         super.updateMatrixWorld(force);
 
     }
 
-    private createGizmo() {
+    private createGizmo(): void {
 
         let gizmo = new Sprite(new SpriteMaterial({
             map: getStaticTexture(StaticTextureName.LightGizmo),
@@ -160,6 +168,8 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
         gizmo.renderOrder = 1;
 
         this.add(gizmo);
+
+        this.gizmo = gizmo;
     }
 
 
@@ -201,7 +211,7 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
 /**
  * Model
  */
-export class ThreeViewerModel extends Group implements Serializable<ThreeViewerItemModel> {
+export class ThreeViewerModel extends Group implements Serializable<ThreeViewerItemModel>, EditorMode {
 
     isThreeViewerModel: boolean = true;
 
@@ -253,6 +263,7 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
         super();
     }
 
+    setEditorMode(enabled: boolean) { }
 
     removeMaterial(idx: number) {
         if (this._materials.length <= 1)
@@ -347,7 +358,7 @@ export namespace ThreeViewerModel {
 }
 
 
-export type ThreeViewerObject3D = ThreeViewerModel | ThreeViewerLight;
+export type ThreeViewerObject3D = (ThreeViewerModel | ThreeViewerLight) & EditorMode;
 
 /**
  * A threejs group with typed children
@@ -358,33 +369,3 @@ export class ThreeViewerGroup<T extends ThreeViewerObject3D> extends Group {
     add(...o: T[]): this { super.add(...o); return this; }
     remove(...o: T[]): this { super.remove(...o); return this; }
 }
-
-
-
-// TEmp
-
-/*
-class A {
-    aFunc(): void { }
-}
-
-class B {
-    bFunc(): void { }
-}
-
-
-type AB = A & B;
-
-let arr = new Array<AB>();
-
-let a: AB = new A() as AB;
-let b: AB = new B() as AB;
-
-arr.push(a);
-
-a.aFunc();
-
-
-
-
-*/
