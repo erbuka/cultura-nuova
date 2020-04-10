@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, Host, ChangeDetectorRef } from '@angular/core';
 import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
-import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap } from 'three';
+import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService } from 'src/app/context.service';
 
@@ -13,7 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
 import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures } from './three-viewer';
-
+import { HammerInput } from '@angular/material/core';
 
 type EditorTab = "models" | "lights";
 
@@ -113,6 +113,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFShadowMap;
+
 
     this.containterRef.nativeElement.appendChild(this.renderer.domElement);
 
@@ -382,11 +383,47 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
   }
 
+
+  onCanvasClick(evt: PointerEvent): void {
+
+    if (this.editorMode) {
+
+      let rect = this.renderer.domElement.getBoundingClientRect();
+      let mouse = {
+        x: (evt.clientX - rect.left) / rect.width * 2.0 - 1.0,
+        y: (evt.clientY - rect.top) / rect.height * -2.0 + 1.0,
+      };
+
+      let allObjects: Object3D[] = [...this.models.children, ...this.lights.children];
+
+      this.rayscaster.setFromCamera(mouse, this.camera);
+      let intersections = this.rayscaster.intersectObjects(allObjects, true);
+
+      for (let intersection of intersections) {
+
+        if (intersection.object instanceof CameraHelper)
+          continue;
+
+        let first = intersection.object;
+
+        while (first != null && !allObjects.includes(first))
+          first = first.parent;
+
+        if (first != null) {
+          this.selectedObject = first;
+          break
+        }
+      }
+
+
+    }
+  }
+
   private updateCamera(dt: number): void {
     this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
   }
-  
+
   @HostListener("window:resize")
   resize() {
     this.width = this.renderer.domElement.width = this.containterRef.nativeElement.clientWidth;

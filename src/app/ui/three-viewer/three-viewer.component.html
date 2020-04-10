@@ -19,7 +19,7 @@
 
 <div class="cn-three-viewer">
 
-    <div class="cn-three-viewer-container" #containerRef></div>
+    <div class="cn-three-viewer-container" #containerRef (tap)="onCanvasClick($event.srcEvent)"></div>
 
     <div class="cn-three-viewer-controls">
         <button mat-mini-fab color="primary">
@@ -110,6 +110,16 @@
                     <input style="width: 10rem;" type="color" [ngModel]="'#' + selectedObject.color.getHexString()"
                         (ngModelChange)="selectedObject.color.set($event)">
                 </div>
+
+                <ng-container *ngIf="selectedObject.lightType === 'directional'">
+                    <div class="cn-three-viewer-editor-property">
+                        <span>Cast Shadow</span>
+                        <div class="ml-auto"></div>
+                        <mat-checkbox [checked]="selectedObject.light.castShadow" (change)="selectedObject.light.castShadow=$event.checked">
+                        </mat-checkbox>
+                    </div>
+                </ng-container>
+
             </div>
 
             <div class="cn-three-viewer-editor-properties mt-2"
@@ -179,7 +189,7 @@
                             [class.cn-selected]="selectedObject === m" (click)="selectedObject = m">
                             <span>{{ m.title | cnLocalizedText }}</span>
                             <div class="ml-auto"></div>
-                            
+
                             <button mat-icon-button (click)="activeEditorHierarchyGroup.remove(m); onObjectRemoved(m)">
                                 <mat-icon>delete</mat-icon>
                             </button>
@@ -199,7 +209,7 @@
 
     </div>
 
-    
+
     <div class="cn-overlay bg-background" *ngIf="showLoading">
         <div class="cn-absolute cn-center">
             <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>

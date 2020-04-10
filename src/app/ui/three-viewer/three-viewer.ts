@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, Camera } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, Camera, CameraHelper, OrthographicCamera } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -134,6 +134,7 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
     light: DirectionalLight | AmbientLight;
 
     gizmo: Sprite;
+    cameraHelper: CameraHelper;
 
     constructor(lightType: ThreeViewerItemLightType) {
         super();
@@ -146,7 +147,11 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
     }
 
     setEditorMode(enabled: boolean) {
-        this.gizmo.visible = enabled;
+        if (this.gizmo)
+            this.gizmo.visible = enabled;
+
+        if (this.cameraHelper)
+            this.cameraHelper.visible = enabled;
     }
 
     updateMatrixWorld(force?: boolean): void {
@@ -172,6 +177,11 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
         this.gizmo = gizmo;
     }
 
+    private createCameraHelper(): void {
+        let cm = new CameraHelper(this.light.shadow.camera);
+        this.add(cm);
+        this.cameraHelper = cm;
+    }
 
     private initialize(): void {
         switch (this.lightType) {
@@ -180,12 +190,13 @@ export class ThreeViewerLight extends Group implements Serializable<ThreeViewerI
                 break;
             case "directional":
                 this.light = new DirectionalLight();
+                this.createCameraHelper();
+                this.createGizmo();
                 break;
             default:
                 throw new Error(`Unknown light type: ${this.lightType}`);
         }
 
-        this.createGizmo();
 
         this.add(this.light);
     }
