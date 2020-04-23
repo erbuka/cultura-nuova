@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, Host, ChangeDetectorRef } from '@angular/core';
-import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
+import { ThreeViewerItem, ThreeViewerItemLightType, ThreeViewerItemDirectionalLight } from 'src/app/types/three-viewer-item';
 import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService } from 'src/app/context.service';
@@ -12,11 +12,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures } from './three-viewer';
-import { HammerInput } from '@angular/material/core';
+import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures, ThreeViewerPinLayer, ThreeViewerPin } from './three-viewer';
+import { PinLayerEditorComponent } from './pin-layer-editor/pin-layer-editor.component';
 
-type EditorTab = "models" | "lights";
+import { moveItemInArray } from '@angular/cdk/drag-drop'
 
+type EditorTab = "models" | "lights" | "pins";
 
 @Component({
   selector: 'app-three-viewer',
@@ -28,9 +29,15 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   @ViewChild("containerRef", { read: ElementRef, static: true }) containterRef: ElementRef;
   @Input() item: ThreeViewerItem;
 
+  cdkMoveItemInArray = moveItemInArray;
+
   activeEditorHierarchyGroup: ThreeViewerGroup<any> = null;
+
   lights: ThreeViewerGroup<ThreeViewerLight> = new ThreeViewerGroup();
   models: ThreeViewerGroup<ThreeViewerModel> = new ThreeViewerGroup();
+  pins: ThreeViewerGroup<ThreeViewerPin> = new ThreeViewerGroup();
+
+  pinLayers: ThreeViewerPinLayer[] = [];
 
   clock: Clock = new Clock(true);
   camera: PerspectiveCamera = null;
@@ -41,6 +48,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   orbitControls: OrbitControls = null;
   transformControls: TransformControls = null;
   gridHelper: GridHelper = null;
+
+  shadowMapSizes: number[] = [512, 1024, 2048, 4096, 8192];
 
   rayscaster: Raycaster = null;
 
@@ -59,8 +68,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       case "lights":
         this.activeEditorHierarchyGroup = this.lights;
         break;
+      case "pins":
+        this.activeEditorHierarchyGroup = this.pins;
+        break;
       default:
-        throw new Error(`Unknwon tab: ${tab}`);
+        throw new Error(`Unknown tab: ${tab}`);
     }
   }
 
@@ -99,7 +111,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   private _selectedObject: any = null;
   private _editorMode: boolean = false;
   private _editorActiveTab: EditorTab = "models";
-
 
   constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
     private dialog: MatDialog, private cdRef: ChangeDetectorRef) {
@@ -144,6 +155,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.scene.add(this.gridHelper);
     this.scene.add(this.models);
     this.scene.add(this.lights);
+    this.scene.add(this.pins);
 
     await loadStaticTextures();
     await this.loadItem();
@@ -231,6 +243,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         model.currentMaterial = modelDef.activeMaterial || 0;
 
         this.models.add(model);
+        this.onObjectAdded(model);
 
       }
     }
@@ -242,6 +255,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     if (this.item.lights) {
 
       for (let lightDef of this.item.lights) {
+
         let [pos, rot, scl] = [lightDef.position, lightDef.rotation, lightDef.scale];
         let light = new ThreeViewerLight(lightDef.type);
 
@@ -250,12 +264,11 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
         light.color.setHex(lightDef.color);
 
-        if (light.lightType === "directional") {
-          let l = light.light as any;
-
-          l.castShadow = true;
-          l.shadowCameraVisible = true;
-
+        if (lightDef.type === "directional") {
+          (light.light as DirectionalLight).castShadow = lightDef.castShadow;
+          light.shadowCameraSize = new Vector3().fromArray(lightDef.shadowCameraSize);
+          light.shadowMapWidth = lightDef.shadowMapWidth;
+          light.shadowMapHeight = lightDef.shadowMapHeight;
         }
 
         if (pos)
@@ -268,6 +281,51 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
           light.scale.fromArray(scl);
 
         this.lights.add(light);
+        this.onObjectAdded(light);
+
+      }
+    }
+
+    // Load pin layers
+    this.pinLayers = [];
+    this.pins.remove(...this.pins.children);
+
+    if (this.item.pinLayers) {
+      for (let pinLayerDef of this.item.pinLayers) {
+        let layer = new ThreeViewerPinLayer();
+
+        layer.title = pinLayerDef.title;
+        layer.description = pinLayerDef.description || "";
+        layer.color.setHex(pinLayerDef.color);
+        layer.geometry = await loadPlyMesh(this.context.resolveUrl(pinLayerDef.geometry, this.item));
+
+        this.pinLayers.push(layer);
+
+      }
+    }
+
+    // Load pins
+    if (this.item.pins) {
+      for (let pinDef of this.item.pins) {
+        let pin = new ThreeViewerPin(this.pinLayers);
+        let [pos, rot, scl] = [pinDef.position, pinDef.rotation, pinDef.scale];
+
+        pin.title = pinDef.title;
+        pin.description = pinDef.description || "";
+
+        if (pos)
+          pin.position.fromArray(pos);
+
+        if (rot)
+          pin.rotation.fromArray(rot);
+
+        if (scl)
+          pin.scale.fromArray(scl);
+
+        pin.layer = this.pinLayers[pinDef.layerIndex];
+
+        this.pins.add(pin);
+        this.onObjectAdded(pin);
 
       }
     }
@@ -298,20 +356,67 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     })));
 
     this.models.add(result);
+    this.onObjectAdded(result);
 
+  }
+
+
+  addPin(layer: ThreeViewerPinLayer): void {
+    let pin = new ThreeViewerPin(this.pinLayers);
+
+    pin.title = "Pin";
+
+    pin.layer = layer;
+    this.pins.add(pin);
+    this.onObjectAdded(pin);
   }
 
   addLight(type: ThreeViewerItemLightType): void {
     let light = new ThreeViewerLight(type);
     light.title = "Light";
     this.lights.add(light);
+    this.onObjectAdded(light);
+  }
+
+
+  onObjectAdded(obj: ThreeViewerObject3D) {
+    if (obj.onAdd)
+      obj.onAdd(this.scene);
   }
 
   onObjectRemoved(obj: ThreeViewerObject3D) {
+    if (obj.onRemove)
+      obj.onRemove(this.scene);
+
     if (obj === this.selectedObject) {
       this.selectedObject = null;
     }
   }
+
+  editPinLayers(): void {
+    let dialogRef = this.dialog.open(PinLayerEditorComponent, {
+      minWidth: "1024px",
+      width: "1024px",
+      position: {
+        top: "100px"
+      },
+      data: this.pinLayers
+    });
+
+    let sub = dialogRef.componentInstance.pinLayerDeleted.subscribe({
+      next: (layer: ThreeViewerPinLayer) => {
+        let toRemove = this.pins.children.filter(x => x.layer === layer);
+        this.pins.remove(...toRemove);
+        toRemove.forEach(x => this.onObjectRemoved(x));
+      }
+    });
+
+    dialogRef.afterClosed().subscribe({
+      next: () => sub.unsubscribe()
+    });
+
+  }
+
 
   editMaterials(model: ThreeViewerModel): void {
     this.dialog.open(MaterialEditorComponent, {
@@ -364,7 +469,9 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         lookAt: [lookAt.x, lookAt.y, lookAt.z]
       },
       models: await Promise.all(this.models.children.map(async model => await model.serialize(binFiles))),
-      lights: await Promise.all(this.lights.children.map(async light => await light.serialize(binFiles)))
+      lights: await Promise.all(this.lights.children.map(async light => await light.serialize(binFiles))),
+      pinLayers: await Promise.all(this.pinLayers.map(async pinLayer => await pinLayer.serialize(binFiles))),
+      pins: await Promise.all(this.pins.children.map(pin => pin.serialize(binFiles)))
     };
 
     await this.httpClient.post(this.context.resolveUrl("./item.json", this.item),
@@ -394,10 +501,15 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         y: (evt.clientY - rect.top) / rect.height * -2.0 + 1.0,
       };
 
-      let allObjects: Object3D[] = [...this.models.children, ...this.lights.children];
+      let allObjects: Object3D[] = [...this.models.children, ...this.lights.children, ...this.pins.children];
 
       this.rayscaster.setFromCamera(mouse, this.camera);
       let intersections = this.rayscaster.intersectObjects(allObjects, true);
+
+      intersections.sort((a, b) => {
+        return a.object.renderOrder == b.object.renderOrder ?
+          a.distance - b.distance : b.object.renderOrder - a.object.renderOrder
+      });
 
       for (let intersection of intersections) {
 

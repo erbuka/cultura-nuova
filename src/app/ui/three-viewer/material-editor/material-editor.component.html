@@ -6,16 +6,19 @@
             <span>ADD</span>
         </button>
 
-        <div class="cn-three-viewer-editor-item-list mt-2" style="height: 20rem;">
-            <div *ngFor="let m of data.model.materials"
-                class="cn-three-viewer-editor-item d-flex align-items-center w-100 px-2"
-                [class.cn-selected]="selectedMaterial===m" (click)="selectedMaterial=m">
-                <span class="flex-grow-1">{{ m.title | cnLocalizedText }}</span>
-                <button mat-icon-button>
-                    <mat-icon>delete</mat-icon>
-                </button>
+        <div class="cn-three-viewer-editor-item-list mt-2" style="height: 20rem;" cdkDropList
+            (cdkDropListDropped)="data.model.swapMaterials($event.previousIndex, $event.currentIndex)">
+            <div *ngFor="let m of data.model.materials; index as mIdx" cdkDrag>
+                <div class="cn-three-viewer-editor-item d-flex align-items-center w-100 px-2"
+                    [class.cn-selected]="selectedMaterial===m" (click)="selectedMaterial=m">
+                    <span class="flex-grow-1">{{ m.title | cnLocalizedText }}</span>
+                    <button mat-icon-button (click)="deleteMaterial(mIdx)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
             </div>
         </div>
+        
     </div>
     <div class="flex-grow-1 p-2" *ngIf="selectedMaterial">
         <div class="d-flex flex-column w-100" style="height: 25rem;">
@@ -28,7 +31,7 @@
                 <div class="cn-three-viewer-editor-property">
                     <span>Description</span>
                     <app-editable-localized-text style="width: 20rem;" class="ml-auto cn-input"
-                        [(data)]="selectedMaterial.description"></app-editable-localized-text>
+                        [(data)]="selectedMaterial.description" multiline="true"></app-editable-localized-text>
                 </div>
             </div>
             <div class="flex-grow-1 mat-elevation-z1" style="overflow-x: hidden; overflow-y: auto;">
@@ -56,7 +59,8 @@
                                 </button>
                             </td>
                             <td class="text-right">
-                                <button mat-icon-button (click)="texture(selectedMaterial.meshMaterials[mIdx], 'normalMap')">
+                                <button mat-icon-button
+                                    (click)="texture(selectedMaterial.meshMaterials[mIdx], 'normalMap')">
                                     <mat-icon *ngIf="selectedMaterial.meshMaterials[mIdx].normalMap">delete</mat-icon>
                                     <mat-icon *ngIf="!selectedMaterial.meshMaterials[mIdx].normalMap">publish</mat-icon>
                                 </button>

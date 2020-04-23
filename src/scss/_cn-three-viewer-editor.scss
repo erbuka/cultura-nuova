@@ -35,6 +35,15 @@
 
   }
 
+  &.cn-pin-layers {
+    @extend .d-flex;
+
+    .cn-three-viewer-pin-layer-list {
+      width: 15rem;
+    }
+
+  }
+
   &.cn-materials {
     @extend .d-flex;
 

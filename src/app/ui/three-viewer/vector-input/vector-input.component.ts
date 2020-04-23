@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { Vector3 } from 'three';
 
 @Component({
@@ -9,6 +9,7 @@ import { Vector3 } from 'three';
 export class VectorInputComponent implements OnInit {
 
   @Input() data: Vector3 = null;
+  @Output() dataChange: EventEmitter<Vector3> = new EventEmitter();
 
   constructor() { }
 
@@ -16,11 +17,10 @@ export class VectorInputComponent implements OnInit {
 
   }
 
-
   updateData(coords: { x?: string, y?: string, z?: string }): void {
-    for(let axis in coords) 
+    for (let axis in coords)
       this.data[axis] = parseFloat(coords[axis]) || 0;
-      
+    this.dataChange.emit(this.data.clone());
   }
 
 }

@@ -32,24 +32,44 @@ export interface ThreeViewerItemModel extends ThreeViewerItemObject {
     }[]
 }
 
-
 // Lights
 
 export type ThreeViewerItemLightType = "ambient" | "directional";
 
-export interface ThreeViewerItemLight extends ThreeViewerItemObject {
+export interface ThreeViewerItemLightBase extends ThreeViewerItemObject {
     type: ThreeViewerItemLightType;
-    color: number;
+    color: number
 }
 
-export interface ThreeViewerItemAmbientLight extends ThreeViewerItemLight {
+export interface ThreeViewerItemAmbientLight extends ThreeViewerItemLightBase {
     type: "ambient";
 }
 
-export interface ThreeViewerComponentDirectionalLight extends ThreeViewerItemLight {
+export interface ThreeViewerItemDirectionalLight extends ThreeViewerItemLightBase {
     type: "directional";
+    color: number;
+    castShadow: boolean;
+    shadowCameraSize: ThreeViewerItemVector3;
+    shadowMapWidth: number;
+    shadowMapHeight: number;
 }
 
+export type ThreeViewerItemLight = ThreeViewerItemAmbientLight | ThreeViewerItemDirectionalLight;
+
+
+// Pins
+
+
+export interface ThreeViewerItemPin extends ThreeViewerItemObject {
+    layerIndex: number;
+}
+
+export interface ThreeViewerItemPinLayer {
+    title: LocalizedText;
+    description: LocalizedText;
+    color: number;
+    geometry: string;
+}
 
 
 // Base Item
@@ -62,4 +82,6 @@ export interface ThreeViewerItem extends ItemBase {
     },
     models?: ThreeViewerItemModel[],
     lights?: ThreeViewerItemLight[],
+    pinLayers?: ThreeViewerItemPinLayer[],
+    pins?: ThreeViewerItemPin[]
 }

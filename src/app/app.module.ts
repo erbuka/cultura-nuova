@@ -10,7 +10,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSliderModule } from '@angular/material/slider';
-import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDividerModule } from '@angular/material/divider';
@@ -40,6 +39,7 @@ import { DialogsComponent } from './ui/dialogs/dialogs.component';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { EditableLocalizedTextComponent } from './ui/editable-localized-text/editable-localized-text.component';
 import { MaterialEditorComponent } from './ui/three-viewer/material-editor/material-editor.component';
+import { PinLayerEditorComponent } from './ui/three-viewer/pin-layer-editor/pin-layer-editor.component';
 
 
 
@@ -63,7 +63,8 @@ import { MaterialEditorComponent } from './ui/three-viewer/material-editor/mater
     VectorInputComponent,
     DialogsComponent,
     EditableLocalizedTextComponent,
-    MaterialEditorComponent
+    MaterialEditorComponent,
+    PinLayerEditorComponent
   ],
   imports: [
     BrowserModule,
@@ -78,7 +79,6 @@ import { MaterialEditorComponent } from './ui/three-viewer/material-editor/mater
     MatIconModule,
     MatDialogModule,
     MatSliderModule,
-    MatSelectModule,
     MatMenuModule,
     MatToolbarModule,
     MatDividerModule,

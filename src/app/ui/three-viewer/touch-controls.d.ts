@@ -7,6 +7,7 @@ export declare class TouchControls {
     rotationSpeed: number;
     zoomSpeed: number;
     wheelZoomStep: number;
+    keyboardMovementSpeed: number;
     constructor(camera: PerspectiveCamera, domElement: HTMLElement);
     dispose(): void;
 }

@@ -89,10 +89,11 @@ export class TouchControls {
                 return this._enabled;
             }
         });
+
         /**
          * @property {number} rotationSpeed
          */
-        this.rotationSpeed = 2;
+        this.rotationSpeed = Math.PI;
 
         /**
          * @property {number} zoomSpeed
@@ -103,6 +104,11 @@ export class TouchControls {
          * @property {number} wheelZoomStep
          */
         this.wheelZoomStep = 1;
+
+        /**
+         * @property {number} keyboardMovementSpeed
+         */
+        this.keyboardMovementSpeed = 10;
 
         /**
          * @private
@@ -122,6 +128,14 @@ export class TouchControls {
          */
         this.clock = new Clock(true);
 
+
+        /**
+         * @private
+         * @property {boolean} disposed
+         */
+        this.disposed = false;
+
+
         /**
          * @private
          * @property {EventHandlers} eventHandlers
@@ -130,9 +144,10 @@ export class TouchControls {
 
         /**
          * @private
-         * @property {boolean} disposed
+         * @property {object} keyState
          */
-        this.disposed = false;
+        this.keyState = {};
+
 
         /**
          * @private
@@ -149,6 +164,13 @@ export class TouchControls {
 
         // Setup mouse/keyboard events
         this.eventHandlers.bind("wheel", this.domElement, this.onMouseWheel.bind(this));
+        this.eventHandlers.bind("keydown", window, this.onKeyDown.bind(this));
+        this.eventHandlers.bind("keyup", window, this.onKeyUp.bind(this));
+
+
+        this.forward = new Vector3();
+        this.right = new Vector3();
+        this.up = new Vector3(0, 1, 0);
 
         // Run
         this.onAnimationFrame();
@@ -165,6 +187,24 @@ export class TouchControls {
         let dt = this.clock.getDelta();
 
         if (this.enabled) {
+
+            let fw = this.camera.getWorldDirection(this.forward);
+            let rt = this.right.copy(fw).cross(this.up)
+
+            if (this.keyState["KeyW"]) {
+                this.targetPosition.add(fw.multiplyScalar(this.keyboardMovementSpeed * dt));
+            } else if (this.keyState["KeyS"]) {
+                this.targetPosition.add(fw.multiplyScalar(this.keyboardMovementSpeed * -dt));
+            }
+
+            if(this.keyState["KeyA"]) {
+                this.targetPosition.add(rt.multiplyScalar(this.keyboardMovementSpeed * -dt));
+            } else if(this.keyState["KeyD"]) {
+                this.targetPosition.add(rt.multiplyScalar(this.keyboardMovementSpeed * dt));
+            }
+
+            
+
             // Move the camera towards target location
             moveTowards(this.camera.position, this.targetPosition, this.zoomSpeed * dt);
         }
@@ -187,6 +227,22 @@ export class TouchControls {
 
             this.targetPosition.copy(dir.multiplyScalar(delta).add(this.camera.position));
         }
+    }
+
+    /**
+     * 
+     * @param {KeyboardEvent} evt 
+     */
+    onKeyDown(evt) {
+        this.keyState[evt.code] = true;
+    }
+
+    /**
+     * 
+     * @param {KeybaordEvent} evt 
+     */
+    onKeyUp(evt) {
+        delete this.keyState[evt.code];
     }
 
     /**
