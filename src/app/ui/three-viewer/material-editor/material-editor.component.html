@@ -18,7 +18,7 @@
                 </div>
             </div>
         </div>
-        
+
     </div>
     <div class="flex-grow-1 p-2" *ngIf="selectedMaterial">
         <div class="d-flex flex-column w-100" style="height: 25rem;">
@@ -52,7 +52,11 @@
                                     (ngModelChange)="selectedMaterial.meshMaterials[mIdx].color.set($event)"
                                     type="color">
                             </td>
-                            <td class="text-right">
+                            <td class="text-right cn-relative">
+                                <div *ngIf="selectedMaterial.meshMaterials[mIdx].map" class="cn-overlay cn-bg-cover"
+                                    [style.background-image]="getPreviewImage(selectedMaterial.meshMaterials[mIdx].map.image.src)">
+                                </div>
+
                                 <button mat-icon-button (click)="texture(selectedMaterial.meshMaterials[mIdx], 'map')">
                                     <mat-icon *ngIf="selectedMaterial.meshMaterials[mIdx].map">delete</mat-icon>
                                     <mat-icon *ngIf="!selectedMaterial.meshMaterials[mIdx].map">publish</mat-icon>

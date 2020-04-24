@@ -3,6 +3,7 @@ import { ThreeViewerModel, loadTexture } from '../three-viewer';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MeshStandardMaterial } from 'three';
 import { ContextService } from 'src/app/context.service';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 
 type TextureMap = "map" | "normalMap";
@@ -20,7 +21,8 @@ export class MaterialEditorComponent implements OnInit {
 
   selectedMaterial: ThreeViewerModel.Material = null;
 
-  constructor(public dialogRef: MatDialogRef<MaterialEditorComponent>, private context: ContextService, @Inject(MAT_DIALOG_DATA) public data: MaterialEditorData) { }
+  constructor(public dialogRef: MatDialogRef<MaterialEditorComponent>, private context: ContextService, @Inject(MAT_DIALOG_DATA) public data: MaterialEditorData,
+    public sanitizer: DomSanitizer) { }
 
   ngOnInit(): void {
     this.selectedMaterial = this.data.model.materials[0];
@@ -30,10 +32,13 @@ export class MaterialEditorComponent implements OnInit {
     this.data.model.addMaterial("Default", "", this.data.model.meshes.map(x => new MeshStandardMaterial()));
   }
 
-  deleteMaterial(idx:number) {
+  deleteMaterial(idx: number) {
     this.data.model.removeMaterial(idx);
   }
 
+  getPreviewImage(url:string) : SafeStyle {
+    return this.sanitizer.bypassSecurityTrustStyle(`url('${url}')`);
+  }
 
   async texture(material: MeshStandardMaterial, texture: TextureMap): Promise<void> {
 
