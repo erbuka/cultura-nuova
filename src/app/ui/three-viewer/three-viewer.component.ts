@@ -186,7 +186,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     // Load models
     this.models.remove(...this.models.children);
 
-    // I'm not using array functions here (map, forEach, ...) becaue
+
+    // I'm not using array functions here (map, forEach, ...) because
     // this is an async function and it would make the code a bit harder
     // to read
 
@@ -229,10 +230,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
             let mat = new MeshStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
 
             if (meshMaterialDef.map)
-              mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
+              mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item), true);
 
             if (meshMaterialDef.normalMap)
-              mat.normalMap = await loadTexture(this.context.resolveUrl(meshMaterialDef.normalMap, this.item));
+              mat.normalMap = await loadTexture(this.context.resolveUrl(meshMaterialDef.normalMap, this.item), true);
 
             materials.push(mat);
           }
@@ -474,6 +475,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       pins: await Promise.all(this.pins.children.map(pin => pin.serialize(binFiles)))
     };
 
+    console.log(await this.httpClient.delete(this.context.resolveUrl("./", this.item), { responseType: "text" }).toPromise());
+
     await this.httpClient.post(this.context.resolveUrl("./item.json", this.item),
       new Blob([JSON.stringify(exportItem)], { type: "text/html" }),
       { responseType: "text" }).toPromise();
@@ -531,15 +534,27 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateCamera(dt: number): void {
-    this.camera.aspect = this.width / this.height;
-    this.camera.updateProjectionMatrix();
-  }
 
   @HostListener("window:resize")
   resize() {
     this.width = this.renderer.domElement.width = this.containterRef.nativeElement.clientWidth;
     this.height = this.renderer.domElement.height = this.containterRef.nativeElement.clientHeight;
+  }
+
+  @HostListener("keydown", ["$event"])
+  onKeyDown(evt: KeyboardEvent) {
+    if (this.editorMode) {
+      switch (evt.code) {
+        case "KeyR": this.transformControls.mode = "rotate"; break;
+        case "KeyT": this.transformControls.mode = "translate"; break;
+        case "KeyS": this.transformControls.mode = "scale"; break;
+      }
+    }
+  }
+
+  private updateCamera(dt: number): void {
+    this.camera.aspect = this.width / this.height;
+    this.camera.updateProjectionMatrix();
   }
 
 }

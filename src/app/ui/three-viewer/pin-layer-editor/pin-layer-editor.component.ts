@@ -1,7 +1,7 @@
-import { Component, OnInit, Inject, ViewChild, ElementRef, AfterViewInit, NgZone, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild, ElementRef, NgZone, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ThreeViewerPinLayer, loadGeometryFromWavefront } from '../three-viewer';
-import { WebGLRenderer, Scene, Mesh, BoxBufferGeometry, MeshBasicMaterial, PerspectiveCamera, BufferGeometry } from 'three';
+import { WebGLRenderer, Scene, Mesh, BoxBufferGeometry, PerspectiveCamera, MeshStandardMaterial, DirectionalLight } from 'three';
 import { ContextService } from 'src/app/context.service';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -34,8 +34,9 @@ export class PinLayerEditorComponent implements OnInit, OnDestroy {
   private _selectedLayer: ThreeViewerPinLayer = null;
   private renderer: WebGLRenderer = null;
   private scene: Scene = new Scene();
-  private previewMesh: Mesh;
-  private camera: PerspectiveCamera;
+  private previewMesh: Mesh = null;
+  private camera: PerspectiveCamera = null;
+  private light: DirectionalLight = null;
   private orbitControls: OrbitControls = null;
 
   constructor(private dialogRef: MatDialogRef<PinLayerEditorComponent>, private zone: NgZone, private context: ContextService,
@@ -68,9 +69,14 @@ export class PinLayerEditorComponent implements OnInit, OnDestroy {
 
     container.appendChild(canvas);
 
-    this.previewMesh = new Mesh(new BoxBufferGeometry(1, 1, 1), new MeshBasicMaterial({ color: 0xffffff }));
+    this.previewMesh = new Mesh(new BoxBufferGeometry(1, 1, 1), new MeshStandardMaterial({ color: 0xffffff }));
+
+    this.light = new DirectionalLight(0xffffff);
+
     this.scene = new Scene();
     this.scene.add(this.previewMesh);
+    this.scene.add(this.light);
+
 
     this.camera = new PerspectiveCamera(45);
     this.camera.position.set(0, 0, -3);
@@ -106,6 +112,8 @@ export class PinLayerEditorComponent implements OnInit, OnDestroy {
       return;
 
     requestAnimationFrame(this.render.bind(this));
+
+    this.light.position.copy(this.camera.position);
 
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();

@@ -1,7 +1,7 @@
 <ng-container *ngIf="item">
     <div class="p-4" *ngIf="currentSlideIndex === null">
-        <div *ngFor="let grp of item.groups">
-            <h3>{{ grp }}</h3>
+        <div *ngFor="let grp of item.groups" class="mb-3">
+            <h3 class="mb-0">{{ grp }}</h3>
             <div class="d-flex flex-wrap mx-n1 cn-block-list">
                 <div *ngFor="let slide of getSlidesForGroup(grp); index as i" class="p-1 cn-block-list-item"
                     [style.width]="item.options.itemWidth">
@@ -28,8 +28,17 @@
                     <div class="cn-relative w-100 h-100">
                         <ng-container *ngFor="let it of item.slides; index as i">
                             <div *ngIf="i === currentSlideIndex" class="cn-slideshow-slide">
+
+                                <!-- Item link-->
                                 <app-item *ngIf="it.href" [item]="slideItemsCache[i]"></app-item>
-                                <div *ngIf="!it.href" class="cn-bg-contain w-100 h-100"
+                                
+                                <!-- Video link-->
+                                <div *ngIf="it.video" class="w-100 h-100 cn-relative">
+                                    <video autoplay controls class="w-100 h-100" [src]="it.video | cnUrl : item"></video>
+                                </div>
+                                
+                                <!-- Fallback to preview image if there's nothing else -->
+                                <div *ngIf="!(it.href || it.video)" class="cn-bg-contain w-100 h-100"
                                     [appBgImage]="it.previewImage | cnUrl : item">
                                 </div>
                             </div>

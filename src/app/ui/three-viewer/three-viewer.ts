@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, Camera, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, Geometry, MeshBasicMaterial } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -77,7 +77,13 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
     });
 }
 
-export const loadTexture: (url: string) => Promise<Texture> = (url) => {
+export const loadTexture: (url: string, createLocalUrl: boolean) => Promise<Texture> = async (url, createLocalUrl) => {
+
+    if (createLocalUrl) {
+        let data = await (await fetch(url)).arrayBuffer();
+        url = URL.createObjectURL(new Blob([data]));
+    }
+
     return new Promise((resolve, reject) => {
         let textureLoader = new TextureLoader();
         textureLoader.load(url, (texture) => resolve(texture), null, (error) => reject(<ErrorEvent>{ description: error.message }));
@@ -86,7 +92,7 @@ export const loadTexture: (url: string) => Promise<Texture> = (url) => {
 
 export const loadStaticTextures: () => Promise<void> = async () => {
     for (let s of staticTextures) {
-        s.texture = await loadTexture(s.filename);
+        s.texture = await loadTexture(s.filename, false);
     }
 }
 
@@ -139,11 +145,11 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
         return this._material.color;
     }
 
-    get material(): MeshBasicMaterial {
+    get material(): MeshStandardMaterial {
         return this._material;
     }
 
-    private _material: MeshBasicMaterial = new MeshBasicMaterial({ color: 0xffffff });
+    private _material: MeshStandardMaterial = new MeshStandardMaterial({ color: 0xffffff });
 
     constructor() { }
 
@@ -169,7 +175,7 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
 
     set layer(layer: ThreeViewerPinLayer) {
         this.geometry = layer.geometry;
-        (this.material as MeshBasicMaterial).color = layer.color;
+        (this.material as MeshStandardMaterial).color = layer.color;
         this._layer = layer;
     }
 
@@ -180,7 +186,7 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
     private _layer: ThreeViewerPinLayer = null;
 
     constructor(private _layers: ThreeViewerPinLayer[]) {
-        super(new BoxBufferGeometry(1, 1, 1), new MeshBasicMaterial({ color: 0xffffff }));
+        super(new BoxBufferGeometry(1, 1, 1), new MeshStandardMaterial({ color: 0xffffff }));
     }
 
 

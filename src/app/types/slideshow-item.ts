@@ -10,8 +10,9 @@ export interface SlideshowItem extends ItemBase {
   slides: {
     group: string,
     previewImage: string,
-    image?:string,
+    image?: string,
     title?: LocalizedText,
-    href?: string
+    href?: string,
+    video?: string,
   }[]
 }

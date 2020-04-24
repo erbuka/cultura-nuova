@@ -48,7 +48,7 @@ export class MaterialEditorComponent implements OnInit {
     } else {
       let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg,.tga" });
       let url = URL.createObjectURL(new Blob([file]));
-      let tex = await loadTexture(url);
+      let tex = await loadTexture(url, false);
 
       material[texture] = tex;
       tex.premultiplyAlpha = false;

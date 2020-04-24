@@ -56,6 +56,7 @@ class EventHandlers {
     }
 }
 
+
 export class TouchControls {
 
     /**
@@ -230,7 +231,6 @@ export class TouchControls {
     }
 
     /**
-     * 
      * @param {KeyboardEvent} evt 
      */
     onKeyDown(evt) {
@@ -238,7 +238,6 @@ export class TouchControls {
     }
 
     /**
-     * 
      * @param {KeybaordEvent} evt 
      */
     onKeyUp(evt) {
@@ -276,12 +275,9 @@ export class TouchControls {
      * @returns {void}
      */
     onPinch(evt) {
-
         if (this.enabled) {
             console.log(evt);
-
         }
-
     }
 
     /**
@@ -292,8 +288,5 @@ export class TouchControls {
         this.hammer.destroy();
         this.eventHandlers.dispose();
     }
-
-
-
 
 }
