@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -140,6 +140,7 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
     title: LocalizedText = "";
     description: LocalizedText = "";
     geometry: BufferGeometry = new BoxBufferGeometry(1, 1, 1);
+    visible: boolean = true;
 
     get color(): Color {
         return this._material.color;
@@ -149,9 +150,45 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
         return this._material;
     }
 
+    get previewImage(): HTMLImageElement {
+        return this._previewImage;
+    }
+
     private _material: MeshStandardMaterial = new MeshStandardMaterial({ color: 0xffffff });
+    private _previewImage: HTMLImageElement = new Image();
 
     constructor() { }
+
+    createPreviewPicture() {
+        let renderer = new WebGLRenderer({ alpha: true, antialias: true });
+        let scene = new Scene();
+
+        let camera = new PerspectiveCamera(45, 1, 0.1, 10);
+        camera.position.set(0, 1.5, -2);
+        camera.lookAt(0, 0, 0);
+
+        let canvas = renderer.domElement;
+        canvas.width = 128;
+        canvas.height = 128;
+
+        let mesh = new Mesh(this.geometry, this._material);
+        scene.add(mesh);
+
+        let light = new DirectionalLight(0xffffff);
+        light.position.copy(camera.position);
+        scene.add(light);
+
+        renderer.setViewport(0, 0, canvas.width, canvas.height);
+        renderer.setClearColor(0, 0);
+        renderer.clear();
+        renderer.render(scene, camera);
+
+        this._previewImage.src = canvas.toDataURL();
+
+        renderer.dispose();
+
+
+    }
 
     async serialize(binData: BinaryFiles): Promise<ThreeViewerItemPinLayer> {
         return {

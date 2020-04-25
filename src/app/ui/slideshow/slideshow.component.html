@@ -34,7 +34,7 @@
                                 
                                 <!-- Video link-->
                                 <div *ngIf="it.video" class="w-100 h-100 cn-relative">
-                                    <video autoplay controls class="w-100 h-100" [src]="it.video | cnUrl : item"></video>
+                                    <video autoplay controls disablePictureInPicture controlsList="nodownload" class="w-100 h-100" [src]="it.video | cnUrl : item"></video>
                                 </div>
                                 
                                 <!-- Fallback to preview image if there's nothing else -->

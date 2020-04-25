@@ -33,12 +33,74 @@
     <div class="cn-three-viewer-container" #containerRef (tap)="onCanvasClick($event.srcEvent)"></div>
 
     <div class="cn-three-viewer-controls">
-        <button mat-mini-fab color="primary">
+        <button mat-mini-fab color="primary" (click)="showLayers=!showLayers">
             <mat-icon>layers</mat-icon>
         </button>
         <button *ngIf="allowEditorMode" color="primary" class="ml-2" mat-mini-fab (click)="editorMode=true">
             <mat-icon>create</mat-icon>
         </button>
+    </div>
+
+    <div class="cn-three-viewer-layers" [class.cn-hidden]="!showLayers">
+
+        <mat-toolbar color="primary">
+            <span>Layers</span>
+            <button class="ml-auto" mat-icon-button (click)="showLayers=false">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-toolbar>
+
+        <ng-container *ngFor="let model of this.models.children">
+            <div class="cn-three-viewer-layer d-flex align-items-center">
+                <div class="cn-three-viewer-layer-preview cn-bg-cover bg-accent">&nbsp;</div>
+                <span class="px-2">{{ model.title | cnLocalizedText }}</span>
+                <div class="ml-auto"></div>
+                <div>
+                    <mat-slider color="primary" min="0" max="1" step="0.01" [value]="model.opacity"
+                        (change)="model.opacity=$event.value"></mat-slider>
+                </div>
+                <div class="ml-2">
+                    <button mat-icon-button (click)="model.visible=!model.visible">
+                        <mat-icon *ngIf="model.visible">visibility</mat-icon>
+                        <mat-icon *ngIf="!model.visible" style="opacity: 0.25;">visibility_off</mat-icon>
+                    </button>
+                </div>
+            </div>
+
+            <ng-container *ngIf="model.materials.length > 1">
+                <div *ngFor="let material of model.materials; index as i"
+                    class="cn-three-viewer-layer align-items-center d-flex" >
+                    <div class="cn-three-viewer-layer-indent"></div>
+                    <div class="cn-three-viewer-layer-preview bg-accent"></div>
+                    <span class="px-2">{{ material.title | cnLocalizedText }}</span>
+                    <div class="ml-auto"></div>
+                    <div class="ml-2">
+                        <button mat-icon-button (click)="model.currentMaterial=i">
+                            <mat-icon *ngIf="model.currentMaterial===i">radio_button_checked</mat-icon>
+                            <mat-icon *ngIf="!(model.currentMaterial===i)">radio_button_unchecked</mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </ng-container>
+
+        </ng-container>
+
+        <ng-container *ngFor="let pinLayer of this.pinLayers">
+            <div class="cn-three-viewer-layer d-flex align-items-center">
+                <div class="cn-three-viewer-layer-preview cn-bg-cover"
+                    [style.background-image]="'url(' + pinLayer.previewImage.src  + ')'">
+                </div>
+                <span class="px-2">{{ pinLayer.title | cnLocalizedText }}</span>
+                <div class="ml-auto"></div>
+                <div class="ml-2">
+                    <button mat-icon-button (click)="pinLayer.visible=!pinLayer.visible">
+                        <mat-icon *ngIf="pinLayer.visible">visibility</mat-icon>
+                        <mat-icon *ngIf="!pinLayer.visible" style="opacity: 0.25;">visibility_off</mat-icon>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
     </div>
 
     <div class="cn-three-viewer-editor cn-inspector" *ngIf="allowEditorMode" [class.cn-hidden]="!editorMode">
@@ -237,7 +299,8 @@
                 <li class="cn-caption" (click)="editorActiveTab = 'lights'"
                     [class.cn-selected]="editorActiveTab === 'lights'">Lights</li>
                 <li class="cn-caption" (click)="editorActiveTab = 'pins'"
-                    [class.cn-selected]="editorActiveTab === 'pins'">Pins</li>
+                    [class.cn-selected]="editorActiveTab === 'pins'">
+                    Pins</li>
             </ul>
 
             <div class="cn-three-viewer-editor-item-list" style="height: 30rem;" cdkDropList

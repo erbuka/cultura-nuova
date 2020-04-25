@@ -15,5 +15,38 @@
     left: 16px;
   }
 
-}
+  .cn-three-viewer-layers {
+    @extend .rounded;
+    @extend .bg-background;
+    @extend .mat-elevation-z4;
+    overflow: hidden;
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    transition: left 0.25s;
 
+    &.cn-hidden {
+      left: -100%;
+    }
+
+    .cn-three-viewer-layer {
+      @extend .pr-2;
+      position: relative;
+      .cn-three-viewer-layer-indent {
+        width: 0.5rem;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      &:not(:last-child) {
+        @extend .border-bottom;
+      }
+      height: 2.5rem;
+
+      .cn-three-viewer-layer-preview {
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+    }
+  }
+}

@@ -58,6 +58,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
   allowEditorMode: boolean = false;
   showLoading: boolean = true;
+  showLayers: boolean = true;
 
   set editorActiveTab(tab: EditorTab) {
     this._editorActiveTab = tab;
@@ -300,6 +301,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
         layer.color.setHex(pinLayerDef.color);
         layer.geometry = await loadPlyMesh(this.context.resolveUrl(pinLayerDef.geometry, this.item));
 
+        layer.createPreviewPicture();
+
         this.pinLayers.push(layer);
 
       }
@@ -347,6 +350,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     geometries.forEach(g => {
       let mesh = new Mesh(g.geometry);
       mesh.name = g.name;
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
       result.add(mesh);
     });
 
@@ -435,6 +440,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   render() {
     requestAnimationFrame(this.render.bind(this));
 
+
+
     NgZone.assertNotInAngularZone();
 
     let dt: number = this.clock.getDelta();
@@ -444,6 +451,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.renderer.setViewport(0, 0, w, h);
 
     this.updateCamera(dt);
+
+    this.pins.children.forEach(pin => pin.visible = pin.layer.visible);
 
     renderer.setClearColor(0, 0);
     renderer.clear(true, true);
@@ -475,7 +484,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       pins: await Promise.all(this.pins.children.map(pin => pin.serialize(binFiles)))
     };
 
-    console.log(await this.httpClient.delete(this.context.resolveUrl("./", this.item), { responseType: "text" }).toPromise());
 
     await this.httpClient.post(this.context.resolveUrl("./item.json", this.item),
       new Blob([JSON.stringify(exportItem)], { type: "text/html" }),
