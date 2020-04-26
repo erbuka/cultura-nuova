@@ -2,7 +2,7 @@ import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMateri
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
-import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemAmbientLight, ThreeViewerItemLightType, ThreeViewerItemDirectionalLight, ThreeViewerItemPinLayer, ThreeViewerItemPin } from 'src/app/types/three-viewer-item';
+import { ThreeViewerItemModel, ThreeViewerItemLight, ThreeViewerItemLightType, ThreeViewerItemPinLayer, ThreeViewerItemPin } from 'src/app/types/three-viewer-item';
 import { LocalizedText } from 'src/app/types/item';
 import { ErrorEvent } from 'src/app/context.service';
 import { moveItemInArray } from '@angular/cdk/drag-drop';
@@ -17,10 +17,20 @@ let staticTextures: { name: StaticTextureName, filename: string, texture: Textur
     { name: StaticTextureName.LightGizmo, filename: "core-assets/three-viewer/light-gizmo.png", texture: null }
 ];
 
+
+let textureCache: { hash: string, texture: Promise<Texture> }[] = [];
+
+const computeHash: (data: ArrayBuffer) => Promise<string> = async (data) => {
+    return Array.prototype.map.call(
+        new Uint8Array(await crypto.subtle.digest("SHA-256", data)),
+        (x: number) => x.toString(16).padStart(2, "0")
+    ).reduce((prev, curr) => prev + curr, "");
+}
+
 export const loadPlyMesh: (url: string) => Promise<BufferGeometry> = (url) => {
     return new Promise((resolve, reject) => {
         let loader = new PLYLoader();
-        loader.load(url, (geom) => resolve(geom), null, (err) => reject(<ErrorEvent>{ description: JSON.stringify(err) }));
+        loader.load(url, (geom) => resolve(ThreeViewerResources.track(geom)), null, (err) => reject(<ErrorEvent>{ description: JSON.stringify(err) }));
     });
 }
 
@@ -33,7 +43,7 @@ export const exportPlyMesh: (meshOrGeometry: Mesh | BufferGeometry) => Promise<A
     let tempMesh = meshOrGeometry instanceof Mesh ? new Mesh(meshOrGeometry.geometry) : new Mesh(meshOrGeometry);
 
     return new Promise((resolve, reject) => {
-        plyExporter.parse(tempMesh, (result: any) => resolve(result as ArrayBuffer), { binary: true })
+        plyExporter.parse(tempMesh, (result: any) => resolve(result as ArrayBuffer), { binary: true });
     });
 };
 
@@ -62,7 +72,7 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
 
                 let name = asset.params.meshName ? asset.params.meshName : `mesh${count++}`;
 
-                result.push({ name: name, geometry: geometry });
+                result.push({ name: name, geometry: ThreeViewerResources.track(geometry) });
 
             }
 
@@ -77,6 +87,7 @@ export const loadGeometryFromWavefront: (wfData: ArrayBuffer) => Promise<{ name:
     });
 }
 
+/*
 export const loadTexture: (url: string, createLocalUrl: boolean) => Promise<Texture> = async (url, createLocalUrl) => {
 
     if (createLocalUrl) {
@@ -90,9 +101,30 @@ export const loadTexture: (url: string, createLocalUrl: boolean) => Promise<Text
     });
 };
 
+*/
+
+export const loadTexture: (url: string) => Promise<Texture> = async (url) => {
+
+    let data = await (await fetch(url)).arrayBuffer();
+    let hash = await computeHash(data);
+
+    if (textureCache[hash]) {
+        return textureCache[hash];
+    } else {
+        let p = new Promise((resolve, reject) => {
+            let textureLoader = new TextureLoader();
+            textureLoader.load(url, (texture) => resolve(ThreeViewerResources.track(texture)), null, (error) => reject(<ErrorEvent>{ description: error.message }));
+        });
+        textureCache[hash] = p;
+        return p;
+    }
+
+
+};
+
 export const loadStaticTextures: () => Promise<void> = async () => {
     for (let s of staticTextures) {
-        s.texture = await loadTexture(s.filename, false);
+        s.texture = await loadTexture(s.filename);
     }
 }
 
@@ -111,11 +143,14 @@ export class BinaryFiles {
 
     files: Map<string, ArrayBuffer> = new Map();
 
-    private nextId: number = 0;
+    async store(data: ArrayBuffer, ext: string = "bin"): Promise<string> {
 
-    store(data: ArrayBuffer, ext: string = "bin"): string {
-        let name = `./${this.nextId++}.${ext}`
-        this.files.set(name, data);
+        let name = `./${await computeHash(data)}.${ext}`;
+
+        if (!this.files.has(name)) {
+            this.files.set(name, data);
+        }
+
         return name;
     }
 
@@ -132,6 +167,39 @@ interface OnAdd {
 interface OnRemove {
     onRemove(scene: Scene): void;
 }
+
+
+export class ThreeViewerResources {
+    static _resources: (Texture | BufferGeometry)[] = [];
+
+    static track<T extends (Texture | BufferGeometry)>(res: T): T {
+        if (!this._resources.includes(res))
+            this._resources.push(res);
+        return res;
+    }
+
+    static cleanup(): void {
+        for (let res of this._resources) {
+            if (res instanceof Texture) {
+                if (res.image) {
+                    console.log("Revoke url: " + res.image.src);
+                    URL.revokeObjectURL(res.image.src);
+                }
+                res.dispose();
+            } else if (res instanceof BufferGeometry) {
+                res.dispose();
+                res.setIndex(null);
+                for (let attr in res.attributes)
+                    res.deleteAttribute(attr);
+
+            }
+        }
+
+        this._resources = [];
+
+    }
+};
+
 
 /**
  * Pin Layer
@@ -198,6 +266,7 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
             geometry: await binData.store(await exportPlyMesh(this.geometry), "ply")
         }
     }
+
 }
 
 /**
@@ -225,6 +294,7 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
     constructor(private _layers: ThreeViewerPinLayer[]) {
         super(new BoxBufferGeometry(1, 1, 1), new MeshStandardMaterial({ color: 0xffffff }));
     }
+
 
 
     setEditorMode(enabled: boolean) { }
@@ -528,7 +598,7 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
 
         let meshes = this.meshes.map(async mesh => {
             let data = await exportPlyMesh(mesh);
-            let fileName = binFiles.store(data, "ply");
+            let fileName = await binFiles.store(data, "ply");
             return {
                 name: mesh.name,
                 file: fileName
@@ -539,11 +609,11 @@ export class ThreeViewerModel extends Group implements Serializable<ThreeViewerI
 
             let meshMaterials = m.meshMaterials.map(async x => {
                 let map = x.map && x.map.image instanceof HTMLImageElement ?
-                    binFiles.store(await (await fetch(x.map.image.src)).arrayBuffer()) :
+                    await binFiles.store(await (await fetch(x.map.image.src)).arrayBuffer()) :
                     undefined;
 
                 let normalMap = x.normalMap && x.normalMap.image instanceof HTMLImageElement ?
-                    binFiles.store(await (await fetch(x.normalMap.image.src)).arrayBuffer()) :
+                    await binFiles.store(await (await fetch(x.normalMap.image.src)).arrayBuffer()) :
                     undefined;
 
                 return {

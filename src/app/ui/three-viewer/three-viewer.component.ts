@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, Host, ChangeDetectorRef } from '@angular/core';
-import { ThreeViewerItem, ThreeViewerItemLightType, ThreeViewerItemDirectionalLight } from 'src/app/types/three-viewer-item';
+import { Component, OnInit, Input, ViewChild, ElementRef, NgZone, HostListener, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { ThreeViewerItem, ThreeViewerItemLightType } from 'src/app/types/three-viewer-item';
 import { Scene, WebGLRenderer, PerspectiveCamera, Clock, Raycaster, Mesh, MeshStandardMaterial, GridHelper, Vector3, DirectionalLight, PCFShadowMap, Vector2, Object3D, CameraHelper } from 'three';
 import { environment } from 'src/environments/environment';
 import { ContextService } from 'src/app/context.service';
@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures, ThreeViewerPinLayer, ThreeViewerPin } from './three-viewer';
+import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures, ThreeViewerPinLayer, ThreeViewerPin, ThreeViewerResources } from './three-viewer';
 import { PinLayerEditorComponent } from './pin-layer-editor/pin-layer-editor.component';
 
 import { moveItemInArray } from '@angular/cdk/drag-drop'
@@ -113,6 +113,8 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   private _editorMode: boolean = false;
   private _editorActiveTab: EditorTab = "models";
 
+  private _disposed: boolean = false;
+
   constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
     private dialog: MatDialog, private cdRef: ChangeDetectorRef) {
     this.allowEditorMode = !environment.production;
@@ -173,8 +175,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
-    if (this.touchControls)
-      this.touchControls.dispose();
+    this._disposed = true;
   }
 
   async loadItem(): Promise<void> {
@@ -231,10 +232,10 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
             let mat = new MeshStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
 
             if (meshMaterialDef.map)
-              mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item), true);
+              mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
 
             if (meshMaterialDef.normalMap)
-              mat.normalMap = await loadTexture(this.context.resolveUrl(meshMaterialDef.normalMap, this.item), true);
+              mat.normalMap = await loadTexture(this.context.resolveUrl(meshMaterialDef.normalMap, this.item));
 
             materials.push(mat);
           }
@@ -437,10 +438,35 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     })
   }
 
+  dispose(): void {
+
+    if (this.touchControls)
+      this.touchControls.dispose();
+
+    if (this.transformControls)
+      this.transformControls.dispose();
+
+    ThreeViewerResources.cleanup();
+
+    this.models.remove(...this.models.children);
+    this.pins.remove(...this.pins.children);
+    this.lights.remove(...this.lights.children);
+    this.scene.remove(...this.scene.children);
+
+    this.scene.dispose();
+    this.renderer.dispose();
+
+  }
+
   render() {
+
+    if (this._disposed) {
+      this.dispose();
+      return;
+    }
+
+
     requestAnimationFrame(this.render.bind(this));
-
-
 
     NgZone.assertNotInAngularZone();
 
@@ -484,6 +510,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       pins: await Promise.all(this.pins.children.map(pin => pin.serialize(binFiles)))
     };
 
+    await this.httpClient.delete(this.context.resolveUrl("./", this.item), { responseType: "text" }).toPromise();
 
     await this.httpClient.post(this.context.resolveUrl("./item.json", this.item),
       new Blob([JSON.stringify(exportItem)], { type: "text/html" }),

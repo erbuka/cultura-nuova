@@ -2,6 +2,7 @@
   @extend .cn-relative;
   @extend .w-100;
   @extend .h-100;
+  overflow: hidden;
 
   .cn-three-viewer-container {
     @extend .cn-absolute;

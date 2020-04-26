@@ -50,7 +50,12 @@ export class PinLayerEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.scene = null;
+    this.camera = null;
+    this.previewMesh = null;
     this.renderer = null;
+    this.pinLayers = null;
+    this.orbitControls.dispose();
   }
 
   ngOnInit(): void {

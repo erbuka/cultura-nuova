@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng build --watch --base-href=/ --output-path build-dev",
+    "start": "ng build --prod --watch --base-href=/ --output-path build-dev",
     "start:dev-server": "node ./scripts/dev-server.js",
     "build": "ng build --prod --base-href=/ --output-path build-prod",
     "build:ghpages": "ng build --prod --output-path docs --base-href /cultura-nuova/ && ncp ./assets ./docs/assets",
