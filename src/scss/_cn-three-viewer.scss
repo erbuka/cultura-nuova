@@ -3,6 +3,11 @@
   @extend .w-100;
   @extend .h-100;
   overflow: hidden;
+  z-index: 0;
+
+  .cn-three-viewer-loading {
+    z-index: 1;
+  }
 
   .cn-three-viewer-container {
     @extend .cn-absolute;

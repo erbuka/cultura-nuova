@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, ViewChild, ElementRef, NgZone, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ThreeViewerPinLayer, loadGeometryFromWavefront } from '../three-viewer';
+import { ThreeViewerPinLayer, loadGeometryFromWavefront, createStandardMaterial } from '../three-viewer';
 import { WebGLRenderer, Scene, Mesh, BoxBufferGeometry, PerspectiveCamera, MeshStandardMaterial, DirectionalLight } from 'three';
 import { ContextService } from 'src/app/context.service';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -74,7 +74,7 @@ export class PinLayerEditorComponent implements OnInit, OnDestroy {
 
     container.appendChild(canvas);
 
-    this.previewMesh = new Mesh(new BoxBufferGeometry(1, 1, 1), new MeshStandardMaterial({ color: 0xffffff }));
+    this.previewMesh = new Mesh(new BoxBufferGeometry(1, 1, 1), createStandardMaterial({ color: 0xffffff }));
 
     this.light = new DirectionalLight(0xffffff);
 

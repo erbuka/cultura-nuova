@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialEditorComponent } from './material-editor/material-editor.component';
 
-import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures, ThreeViewerPinLayer, ThreeViewerPin, ThreeViewerResources } from './three-viewer';
+import { BinaryFiles, ThreeViewerObject3D, ThreeViewerGroup, ThreeViewerModel, loadPlyMesh, loadGeometryFromWavefront, loadTexture, ThreeViewerLight, loadStaticTextures, ThreeViewerPinLayer, ThreeViewerPin, ThreeViewerResources, createStandardMaterial } from './three-viewer';
 import { PinLayerEditorComponent } from './pin-layer-editor/pin-layer-editor.component';
 
 import { moveItemInArray } from '@angular/cdk/drag-drop'
@@ -113,12 +113,14 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
   private _editorMode: boolean = false;
   private _editorActiveTab: EditorTab = "models";
 
-  private _disposed: boolean = false;
+  private _disposed: boolean;
 
   constructor(private zone: NgZone, public context: ContextService, private httpClient: HttpClient, private snackBar: MatSnackBar,
     private dialog: MatDialog, private cdRef: ChangeDetectorRef) {
     this.allowEditorMode = !environment.production;
     this.editorActiveTab = "models";
+    this._disposed = false;
+    console.error("construct", this);
   }
 
   async ngOnInit() {
@@ -165,7 +167,6 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
     this.showLoading = false;
     this.editorMode = false;
 
-
     this.zone.runOutsideAngular(async () => {
       this.resize();
       this.render();
@@ -176,6 +177,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this._disposed = true;
+    console.error("dispose", this);
   }
 
   async loadItem(): Promise<void> {
@@ -215,7 +217,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
         for (let meshDef of modelDef.meshes) {
           let geometry = await loadPlyMesh(this.context.resolveUrl(meshDef.file, this.item));
-          let mesh = new Mesh(geometry, new MeshStandardMaterial());
+          let mesh = new Mesh(geometry, createStandardMaterial());
 
           mesh.castShadow = true;
           mesh.receiveShadow = true;
@@ -229,21 +231,34 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
           let materials: MeshStandardMaterial[] = [];
 
           for (let meshMaterialDef of materialDef.meshMaterials) {
-            let mat = new MeshStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
+            let mat = createStandardMaterial({ transparent: true, premultipliedAlpha: false, color: meshMaterialDef.color });
 
-            if (meshMaterialDef.map)
+            if (meshMaterialDef.map) {
               mat.map = await loadTexture(this.context.resolveUrl(meshMaterialDef.map, this.item));
+            }
 
-            if (meshMaterialDef.normalMap)
+            if (meshMaterialDef.normalMap) {
               mat.normalMap = await loadTexture(this.context.resolveUrl(meshMaterialDef.normalMap, this.item));
-
+            }
             materials.push(mat);
           }
 
           model.addMaterial(materialDef.title, materialDef.description, materials);
         }
 
+
+        // Force rendering to upload data to the GPU
+        {
+          let tempScene = new Scene();
+          tempScene.add(model);
+          for (let i = 0; i < model.materials.length; i++) {
+            model.currentMaterial = i;
+            this.renderer.render(tempScene, this.camera);
+          }
+        }
+
         model.currentMaterial = modelDef.activeMaterial || 0;
+
 
         this.models.add(model);
         this.onObjectAdded(model);
@@ -356,7 +371,7 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
       result.add(mesh);
     });
 
-    result.addMaterial("Default", "", result.meshes.map(x => new MeshStandardMaterial({
+    result.addMaterial("Default", "", result.meshes.map(x => createStandardMaterial({
       premultipliedAlpha: false,
       transparent: true,
       color: 0xffffff
@@ -455,6 +470,15 @@ export class ThreeViewerComponent implements OnInit, OnDestroy {
 
     this.scene.dispose();
     this.renderer.dispose();
+
+    this.models = null;
+    this.lights = null;
+    this.pinLayers = null;
+    this.pins = null;
+
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
 
   }
 

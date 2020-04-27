@@ -26,7 +26,7 @@
 
                 <div [@slideAnimation]="currentSlideIndex" class="cn-slideshow-slides">
                     <div class="cn-relative w-100 h-100">
-                        <ng-container *ngFor="let it of item.slides; index as i">
+                        <ng-container *ngFor="let it of item.slides; index as i; trackBy: trackByIdx">
                             <div *ngIf="i === currentSlideIndex" class="cn-slideshow-slide">
 
                                 <!-- Item link-->

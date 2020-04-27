@@ -1,4 +1,4 @@
-import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera } from 'three';
+import { BufferGeometry, Mesh, Float32BufferAttribute, Group, MeshStandardMaterial, TextureLoader, Texture, DirectionalLight, AmbientLight, Color, Sprite, SpriteMaterial, CameraHelper, OrthographicCamera, Vector3, Scene, WebGLRenderTarget, BoxBufferGeometry, WebGLRenderer, PerspectiveCamera, Material, MeshStandardMaterialParameters } from 'three';
 import { PLYLoader } from 'three/examples/jsm/loaders/PLYLoader';
 import { PLYExporter } from 'three/examples/jsm/exporters/PLYExporter';
 import { OBJLoader2 } from 'three/examples/jsm/loaders/OBJLoader2';
@@ -25,6 +25,10 @@ const computeHash: (data: ArrayBuffer) => Promise<string> = async (data) => {
         new Uint8Array(await crypto.subtle.digest("SHA-256", data)),
         (x: number) => x.toString(16).padStart(2, "0")
     ).reduce((prev, curr) => prev + curr, "");
+}
+
+export const createStandardMaterial: (params?: MeshStandardMaterialParameters) => MeshStandardMaterial = (params) => {
+    return ThreeViewerResources.track(new MeshStandardMaterial(params));
 }
 
 export const loadPlyMesh: (url: string) => Promise<BufferGeometry> = (url) => {
@@ -170,9 +174,9 @@ interface OnRemove {
 
 
 export class ThreeViewerResources {
-    static _resources: (Texture | BufferGeometry)[] = [];
+    static _resources: (Texture | BufferGeometry | MeshStandardMaterial)[] = [];
 
-    static track<T extends (Texture | BufferGeometry)>(res: T): T {
+    static track<T extends (Texture | BufferGeometry | MeshStandardMaterial)>(res: T): T {
         if (!this._resources.includes(res))
             this._resources.push(res);
         return res;
@@ -181,17 +185,16 @@ export class ThreeViewerResources {
     static cleanup(): void {
         for (let res of this._resources) {
             if (res instanceof Texture) {
-                if (res.image) {
-                    console.log("Revoke url: " + res.image.src);
-                    URL.revokeObjectURL(res.image.src);
-                }
                 res.dispose();
+            } else if (res instanceof MeshStandardMaterial) {
+                res.dispose();
+                res.map = null;
+                res.normalMap = null;
             } else if (res instanceof BufferGeometry) {
                 res.dispose();
                 res.setIndex(null);
                 for (let attr in res.attributes)
                     res.deleteAttribute(attr);
-
             }
         }
 
@@ -222,7 +225,7 @@ export class ThreeViewerPinLayer implements Serializable<ThreeViewerItemPinLayer
         return this._previewImage;
     }
 
-    private _material: MeshStandardMaterial = new MeshStandardMaterial({ color: 0xffffff });
+    private _material: MeshStandardMaterial = createStandardMaterial({ color: 0xffffff });
     private _previewImage: HTMLImageElement = new Image();
 
     constructor() { }
@@ -292,7 +295,7 @@ export class ThreeViewerPin extends Mesh implements Serializable<ThreeViewerItem
     private _layer: ThreeViewerPinLayer = null;
 
     constructor(private _layers: ThreeViewerPinLayer[]) {
-        super(new BoxBufferGeometry(1, 1, 1), new MeshStandardMaterial({ color: 0xffffff }));
+        super(new BoxBufferGeometry(1, 1, 1), createStandardMaterial({ color: 0xffffff }));
     }
 
 

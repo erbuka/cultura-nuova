@@ -109,7 +109,7 @@ export class TouchControls {
         /**
          * @property {number} keyboardMovementSpeed
          */
-        this.keyboardMovementSpeed = 10;
+        this.keyboardMovementSpeed = 35;
 
         /**
          * @private

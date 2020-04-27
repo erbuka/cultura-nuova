@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng build --prod --watch --base-href=/ --output-path build-dev",
+    "start": "ng build --watch --base-href=/ --output-path build-dev",
     "start:dev-server": "node ./scripts/dev-server.js",
     "build": "ng build --prod --base-href=/ --output-path build-prod",
     "build:ghpages": "ng build --prod --output-path docs --base-href /cultura-nuova/ && ncp ./assets ./docs/assets",
@@ -29,7 +29,7 @@
     "hammerjs": "^2.0.8",
     "leaflet": "^1.6.0",
     "rxjs": "~6.5.5",
-    "three": "^0.114.0",
+    "three": "^0.115.0",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.3"
   },
@@ -42,9 +42,8 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/leaflet": "^1.5.12",
     "@types/node": "^12.12.29",
-    "ajv": "^6.12.0",
+    "ajv": "^6.12.2",
     "codelyzer": "^5.1.2",
-    "concurrently": "^5.1.0",
     "express": "^4.17.1",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",

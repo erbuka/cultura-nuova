@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { ThreeViewerModel, loadTexture } from '../three-viewer';
+import { ThreeViewerModel, loadTexture, createStandardMaterial } from '../three-viewer';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MeshStandardMaterial } from 'three';
 import { ContextService } from 'src/app/context.service';
@@ -29,7 +29,7 @@ export class MaterialEditorComponent implements OnInit {
   }
 
   newMaterial(): void {
-    this.data.model.addMaterial("Default", "", this.data.model.meshes.map(x => new MeshStandardMaterial()));
+    this.data.model.addMaterial("Default", "", this.data.model.meshes.map(x => createStandardMaterial()));
   }
 
   deleteMaterial(idx: number) {
@@ -44,7 +44,6 @@ export class MaterialEditorComponent implements OnInit {
 
     if (material[texture]) {
       material[texture] = null;
-      material.needsUpdate = true;
     } else {
       let file = await this.context.fileChooser({ type: "arraybuffer", accept: ".png,.jpg,.jpeg,.tga" });
       let url = URL.createObjectURL(new Blob([file]));
@@ -53,7 +52,6 @@ export class MaterialEditorComponent implements OnInit {
       material[texture] = tex;
       tex.premultiplyAlpha = false;
       tex.needsUpdate = true;
-      material.needsUpdate = true;
     }
 
   }

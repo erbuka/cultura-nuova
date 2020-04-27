@@ -62,6 +62,7 @@ export class SlideshowComponent implements OnInit {
     this.slideItemsCache.fill(null, 0, this.slideItemsCache.length);
 
     this.route.queryParamMap.subscribe(paramMap => {
+
       if (paramMap.has("s")) {
 
         let slideIndex = parseInt(paramMap.get("s"));
@@ -111,5 +112,8 @@ export class SlideshowComponent implements OnInit {
     return this.item.slides.filter(s => s.group === group);
   }
 
+  trackByIdx(idx: number): number {
+    return idx;
+  }
 
 }
