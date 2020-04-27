@@ -5,6 +5,7 @@
         "itemAspectRatio": 1.6
     },
     "groups": [
+        "Videos",
         "Giornate",
         "Sinopia",
         "Spolvero",
@@ -12,6 +13,11 @@
         "Esempio altri controlli"
     ],
     "slides": [
+        {
+            "group" : "Videos",
+            "previewImage": "./videos/bugs.png",
+            "video" : "./videos/bugs.mp4"
+        },
         {
             "group": "Giornate",
             "previewImage": "./giornate/1.png"
@@ -78,6 +84,11 @@
             "group" : "Esempio altri controlli",
             "previewImage" : "assets/main/deep-zoom-0/layer0/8/0_0.jpg",
             "href" : "assets/main/deep-zoom-0"
+        },
+        {
+            "group" : "Esempio altri controlli",
+            "previewImage" : "assets/main/deep-zoom-0/layer0/8/0_0.jpg",
+            "href" : "assets/main/modello-3d"
         }
     ]
 }
